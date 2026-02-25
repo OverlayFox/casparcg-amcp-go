@@ -95,34 +95,38 @@ func (c *Client) readResponse() (*Response, error) {
 		return nil, fmt.Errorf("invalid response format")
 	}
 
-	code, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return nil, fmt.Errorf("invalid response code: %w", err)
-	}
-
 	response := &Response{
-		Code: types.ReturnCode(code),
 		Data: []string{},
 	}
+
+	// Try to parse the first part as a numeric code
+	code, err := strconv.Atoi(parts[0])
+	if err != nil {
+		response.Code = types.ReturnCode(0)
+		response.Message = firstLine
+		return response, nil
+	}
+	response.Code = types.ReturnCode(code)
 
 	if len(parts) > 1 {
 		response.Message = parts[1]
 	}
 
-	// For multiline responses (200 code)
-	if response.Code == types.SuccessWithMultilineData {
+	// almost any response code can be followed by multiline data
+	if response.Code >= 200 && response.Code < 300 {
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil {
-				return nil, fmt.Errorf("failed to read multiline response: %w", err)
-			}
-
-			line = strings.TrimSpace(line)
-			if line == "" {
 				break
 			}
 
-			response.Data = append(response.Data, line)
+			// AMCP Terminal Delimiter: A line that is JUST \r\n
+			// After TrimSpace, this becomes an empty string.
+			if line == "\r\n" || line == "\n" {
+				break
+			}
+
+			response.Data = append(response.Data, strings.TrimSpace(line))
 		}
 	}
 

@@ -1,6 +1,9 @@
 package casparcg
 
 import (
+	"encoding/xml"
+	"strings"
+
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
@@ -370,11 +373,27 @@ func (c *Client) VERSION(component *string) (*Response, error) {
 }
 
 // INFO retrieves information
-func (c *Client) INFO(component *types.InfoComponent) (*Response, error) {
+func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
 	cmd := types.QueryCommandInfo{
 		Component: component,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fullXml := strings.Join(resp.Data, "\n")
+	switch *component {
+	case types.InfoComponentConfig:
+		var config types.CasparConfig
+		err := xml.Unmarshal([]byte(fullXml), &config)
+		if err != nil {
+			return nil, nil, err
+		}
+		return resp, config, nil
+	}
+
+	return resp, fullXml, nil
 }
 
 // INFOCHANNEL gets information about a channel or layer
