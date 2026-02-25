@@ -1,17 +1,33 @@
 package types
 
+import (
+	"strconv"
+)
+
 type QueryCommandInterface interface {
+	String() string
 }
 
 // QueryCommandCINF returns information about a media file.
 type QueryCommandCINF struct {
-	filename string
+	Filename string
+}
+
+func (c QueryCommandCINF) String() string {
+	return "CINF " + quote(c.Filename)
 }
 
 // QueryCommandCLS lists media files in the media folder.
 // Use the command INFO PATHS to get the path to the media folder.
 type QueryCommandCLS struct {
-	directory *string
+	Directory *string
+}
+
+func (c QueryCommandCLS) String() string {
+	if c.Directory != nil {
+		return "CLS " + quote(*c.Directory)
+	}
+	return "CLS"
 }
 
 // QueryCommandFLS lists all fonts in the fonts folder.
@@ -19,15 +35,33 @@ type QueryCommandCLS struct {
 type QueryCommandFLS struct {
 }
 
+func (c QueryCommandFLS) String() string {
+	return "FLS"
+}
+
 // QueryCommandTLS lists template files in the templates folder.
 // Use the command INFO PATHS to get the path to the templates folder.
 type QueryCommandTLS struct {
-	directory *string
+	Directory *string
+}
+
+func (c QueryCommandTLS) String() string {
+	if c.Directory != nil {
+		return "TLS " + quote(*c.Directory)
+	}
+	return "TLS"
 }
 
 // QueryCommandVersion returns the version of specified component.
 type QueryCommandVersion struct {
-	component *string
+	Component *string
+}
+
+func (c QueryCommandVersion) String() string {
+	if c.Component != nil {
+		return "VERSION " + *c.Component
+	}
+	return "VERSION"
 }
 
 type InfoComponent string
@@ -43,22 +77,50 @@ const (
 
 // QueryCommandInfo retrieves a list of available channels
 type QueryCommandInfo struct {
-	component *InfoComponent
+	Component *InfoComponent
+}
+
+func (c QueryCommandInfo) String() string {
+	if c.Component != nil {
+		return "INFO " + string(*c.Component)
+	}
+	return "INFO"
 }
 
 // QueryCommandInfoChannel get information about a channel or a specific layer on a channel.
 // If layer is ommitted information about the whole channel is returned.
 type QueryCommandInfoChannel struct {
-	videoChannel int
-	layer        *int
+	VideoChannel int
+	Layer        *int
+}
+
+func (c QueryCommandInfoChannel) String() string {
+	cmd := "INFO " + strconv.Itoa(c.VideoChannel)
+	if c.Layer != nil {
+		cmd += "-" + strconv.Itoa(*c.Layer)
+	}
+	return cmd
 }
 
 // QueryCommandInfoTemplate gets information about the specified template.
 type QueryCommandInfoTemplate struct {
-	template string
+	Template string
+}
+
+func (c QueryCommandInfoTemplate) String() string {
+	return "INFO TEMPLATE " + quote(c.Template)
 }
 
 type QueryCommandInfoDelay struct {
-	videoChannel int
-	layer        *int
+	VideoChannel int
+	Layer        *int
+}
+
+func (c QueryCommandInfoDelay) String() string {
+	cmd := "INFO " + strconv.Itoa(c.VideoChannel)
+	if c.Layer != nil {
+		cmd += "-" + strconv.Itoa(*c.Layer)
+	}
+	cmd += " DELAY"
+	return cmd
 }
