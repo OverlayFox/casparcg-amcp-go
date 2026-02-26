@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
 // Client represents a connection to a CasparCG server
@@ -21,7 +21,7 @@ type Client struct {
 
 // Response represents a response from the CasparCG server
 type Response struct {
-	Code    types.ReturnCode
+	Code    returns.ReturnCode
 	Message string
 	Data    []string
 }
@@ -102,12 +102,11 @@ func (c *Client) readResponse() (*Response, error) {
 	// Try to parse the first part as a numeric code
 	code, err := strconv.Atoi(parts[0])
 	if err != nil {
-		response.Code = types.ReturnCode(0)
+		response.Code = returns.ReturnCode(0)
 		response.Message = firstLine
 		return response, nil
 	}
-	response.Code = types.ReturnCode(code)
-
+	response.Code = returns.ReturnCode(code)
 	if len(parts) > 1 {
 		response.Message = parts[1]
 	}

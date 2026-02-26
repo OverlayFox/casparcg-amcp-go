@@ -1,6 +1,10 @@
-package types
+package returns
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
+)
 
 type CasparConfig struct {
 	XMLName xml.Name `xml:"configuration"`
@@ -11,9 +15,9 @@ type CasparConfig struct {
 	} `xml:"channels"`
 	Controllers Controller `xml:"controllers"`
 
-	LockClearPhrase *string       `xml:"lock-clear-phrase,omitempty"`
-	AMCP            *AMCP         `xml:"amcp,omitempty"`
-	LogLevel        *AMCPLogLevel `xml:"log-level,omitempty"`
+	LockClearPhrase *string             `xml:"lock-clear-phrase,omitempty"`
+	AMCP            *AMCP               `xml:"amcp,omitempty"`
+	LogLevel        *types.AMCPLogLevel `xml:"log-level,omitempty"`
 
 	TemplateHosts *struct {
 		TemplateHost *[]TemplateHost `xml:"template-host,omitempty"`

@@ -16,18 +16,16 @@ func main() {
 	}
 	defer client.Close()
 
-	comp := types.InfoComponentConfig
-	_, data, err := client.INFO(&comp)
+	comp := types.InfoComponentSystem
+	resp, data, err := client.INFO(&comp)
 	if err != nil {
 		panic(err)
 	}
-	formatted := data.(types.CasparConfig)
-	fmt.Printf("%v", formatted)
+	fmt.Printf("%v", resp.Data)
 
-	// Pretty print as JSON
-	jsonData, err := json.MarshalIndent(formatted, "", "  ")
+	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(jsonData))
+	fmt.Printf("%s", jsonData)
 }

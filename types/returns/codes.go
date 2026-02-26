@@ -1,4 +1,4 @@
-package types
+package returns
 
 // ReturnCode is a type that represents the return code of an operation or function. It is typically used to indicate the success or failure of an operation, as well as to provide additional information about the outcome. The specific values and meanings of return codes can vary depending on the context in which they are used.
 type ReturnCode int

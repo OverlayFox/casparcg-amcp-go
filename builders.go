@@ -2,9 +2,12 @@ package casparcg
 
 import (
 	"encoding/xml"
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
 // CGBuilder provides a fluent interface for building CG (template) commands
@@ -385,15 +388,42 @@ func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
 	fullXml := strings.Join(resp.Data, "\n")
 	switch *component {
 	case types.InfoComponentConfig:
-		var config types.CasparConfig
+		var config returns.CasparConfig
 		err := xml.Unmarshal([]byte(fullXml), &config)
 		if err != nil {
 			return nil, nil, err
 		}
 		return resp, config, nil
-	}
 
-	return resp, fullXml, nil
+	case types.InfoComponentPaths:
+		var paths returns.Paths
+		err := xml.Unmarshal([]byte(fullXml), &paths)
+		if err != nil {
+			return nil, nil, err
+		}
+		return resp, paths, nil
+
+	case types.InfoComponentSystem:
+		parts := strings.Split(fullXml, " ")
+		if len(parts) != 3 {
+			return nil, nil, fmt.Errorf("unexpected format for SYSTEM info: %s", fullXml)
+		}
+
+		videoChannel, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid video channel in SYSTEM info: %s", parts[0])
+		}
+
+		systemInfo := returns.SystemInfo{
+			VideoChannel: videoChannel,
+			Mode:         returns.VideoMode(parts[1]),
+			Status:       parts[2],
+		}
+		return resp, systemInfo, nil
+
+	default:
+		return resp, fullXml, nil
+	}
 }
 
 // INFOCHANNEL gets information about a channel or layer
