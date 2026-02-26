@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
-	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 func main() {
@@ -16,8 +15,7 @@ func main() {
 	}
 	defer client.Close()
 
-	comp := types.InfoComponentSystem
-	resp, data, err := client.INFO(&comp)
+	resp, data, err := client.INFOTHREADS()
 	if err != nil {
 		panic(err)
 	}

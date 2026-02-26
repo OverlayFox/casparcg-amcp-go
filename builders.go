@@ -375,8 +375,84 @@ func (c *Client) VERSION(component *string) (*Response, error) {
 	return c.Send(cmd)
 }
 
-// INFO retrieves information
-func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
+func (c *Client) INFO() (*Response, error) {
+	resp, _, err := c.info("")
+	return resp, err
+}
+
+func (c *Client) INFOCONFIG() (*Response, returns.CasparConfig, error) {
+	resp, data, err := c.info(types.InfoComponentConfig)
+	if data != nil {
+		config, ok := data.(returns.CasparConfig)
+		if !ok {
+			return nil, returns.CasparConfig{}, fmt.Errorf("unexpected data type for config info: %T", data)
+		}
+		return resp, config, nil
+	}
+	return resp, returns.CasparConfig{}, err
+}
+
+func (c *Client) INFOPATHS() (*Response, returns.Paths, error) {
+	resp, data, err := c.info(types.InfoComponentPaths)
+	if data != nil {
+		paths, ok := data.(returns.Paths)
+		if !ok {
+			return nil, returns.Paths{}, fmt.Errorf("unexpected data type for paths info: %T", data)
+		}
+		return resp, paths, nil
+	}
+	return resp, returns.Paths{}, err
+}
+
+func (c *Client) INFOSYSTEM() (*Response, returns.SystemInfo, error) {
+	resp, data, err := c.info(types.InfoComponentSystem)
+	if data != nil {
+		systemInfo, ok := data.(returns.SystemInfo)
+		if !ok {
+			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
+		}
+		return resp, systemInfo, nil
+	}
+	return resp, returns.SystemInfo{}, err
+}
+
+func (c *Client) INFOSERVER() (*Response, returns.SystemInfo, error) {
+	resp, data, err := c.info(types.InfoComponentServer)
+	if data != nil {
+		systemInfo, ok := data.(returns.SystemInfo)
+		if !ok {
+			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
+		}
+		return resp, systemInfo, nil
+	}
+	return resp, returns.SystemInfo{}, err
+}
+
+func (c *Client) INFOQUEUES() (*Response, returns.SystemInfo, error) {
+	resp, data, err := c.info(types.InfoComponentQueues)
+	if data != nil {
+		systemInfo, ok := data.(returns.SystemInfo)
+		if !ok {
+			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
+		}
+		return resp, systemInfo, nil
+	}
+	return resp, returns.SystemInfo{}, err
+}
+
+func (c *Client) INFOTHREADS() (*Response, returns.SystemInfo, error) {
+	resp, data, err := c.info(types.InfoComponentThreads)
+	if data != nil {
+		systemInfo, ok := data.(returns.SystemInfo)
+		if !ok {
+			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
+		}
+		return resp, systemInfo, nil
+	}
+	return resp, returns.SystemInfo{}, err
+}
+
+func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 	cmd := types.QueryCommandInfo{
 		Component: component,
 	}
@@ -386,7 +462,7 @@ func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
 	}
 
 	fullXml := strings.Join(resp.Data, "\n")
-	switch *component {
+	switch component {
 	case types.InfoComponentConfig:
 		var config returns.CasparConfig
 		err := xml.Unmarshal([]byte(fullXml), &config)
@@ -403,15 +479,15 @@ func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
 		}
 		return resp, paths, nil
 
-	case types.InfoComponentSystem:
+	case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
 		parts := strings.Split(fullXml, " ")
 		if len(parts) != 3 {
-			return nil, nil, fmt.Errorf("unexpected format for SYSTEM info: %s", fullXml)
+			return nil, nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXml)
 		}
 
 		videoChannel, err := strconv.Atoi(parts[0])
 		if err != nil {
-			return nil, nil, fmt.Errorf("invalid video channel in SYSTEM info: %s", parts[0])
+			return nil, nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
 		}
 
 		systemInfo := returns.SystemInfo{

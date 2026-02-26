@@ -77,12 +77,12 @@ const (
 
 // QueryCommandInfo retrieves a list of available channels
 type QueryCommandInfo struct {
-	Component *InfoComponent
+	Component InfoComponent
 }
 
 func (c QueryCommandInfo) String() string {
-	if c.Component != nil {
-		return "INFO " + string(*c.Component)
+	if c.Component != "" {
+		return "INFO " + string(c.Component)
 	}
 	return "INFO"
 }
