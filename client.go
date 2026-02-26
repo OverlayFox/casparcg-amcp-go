@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
@@ -83,12 +84,12 @@ func (c *Client) readResponse() (*Response, error) {
 	reader := bufio.NewReader(c.conn)
 
 	// Read the first line to get the response code
-	firstLine, err := reader.ReadString('\n')
+	rawFirstLine, err := reader.ReadString('\n')
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
-	firstLine = strings.TrimSpace(firstLine)
+	firstLine := strings.TrimSpace(rawFirstLine)
 	parts := strings.SplitN(firstLine, " ", 2)
 
 	if len(parts) < 1 {
@@ -111,8 +112,12 @@ func (c *Client) readResponse() (*Response, error) {
 		response.Message = parts[1]
 	}
 
-	// almost any response code can be followed by multiline data
+	// Almost any response code can be followed by multiline data.
+	// Which is why we check for the presence of data for 10 milliseconds after receiving the first line.
+	// If no data is received, we assume there is none and return the response.
 	if response.Code >= 200 && response.Code < 300 {
+		c.conn.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
+		defer c.conn.SetReadDeadline(time.Time{})
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil {
