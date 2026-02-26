@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -15,10 +16,18 @@ func main() {
 	}
 	defer client.Close()
 
-	comp := types.InfoComponentPaths
-	resp, _, err := client.INFO(&comp)
+	comp := types.InfoComponentConfig
+	_, data, err := client.INFO(&comp)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v", resp)
+	formatted := data.(types.CasparConfig)
+	fmt.Printf("%v", formatted)
+
+	// Pretty print as JSON
+	jsonData, err := json.MarshalIndent(formatted, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonData))
 }
