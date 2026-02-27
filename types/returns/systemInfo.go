@@ -2,7 +2,7 @@ package returns
 
 import "github.com/overlayfox/casparcg-amcp-go/types"
 
-type SystemInfo struct {
+type GenericInfo struct {
 	VideoChannel int
 	VideoMode    types.VideoMode
 	Status       string

@@ -42,12 +42,12 @@ func (c QueryCommandFLS) String() string {
 // QueryCommandTLS lists template files in the templates folder.
 // Use the command INFO PATHS to get the path to the templates folder.
 type QueryCommandTLS struct {
-	Directory *string
+	Directory string
 }
 
 func (c QueryCommandTLS) String() string {
-	if c.Directory != nil {
-		return "TLS " + quote(*c.Directory)
+	if c.Directory != "" {
+		return "TLS " + quote(c.Directory)
 	}
 	return "TLS"
 }

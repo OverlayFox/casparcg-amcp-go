@@ -426,7 +426,7 @@ func (c *Client) FLS() (*Response, error) {
 }
 
 // TLS lists template files
-func (c *Client) TLS(directory *string) ([]string, *Response, error) {
+func (c *Client) TLS(directory string) ([]string, *Response, error) {
 	cmd := types.QueryCommandTLS{
 		Directory: directory,
 	}
@@ -501,52 +501,52 @@ func (c *Client) INFOPATHS() (returns.Paths, *Response, error) {
 	return returns.Paths{}, resp, err
 }
 
-func (c *Client) INFOSYSTEM() (returns.SystemInfo, *Response, error) {
+func (c *Client) INFOSYSTEM() (returns.GenericInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentSystem)
 	if data != nil {
-		systemInfo, ok := data.(returns.SystemInfo)
+		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for system info: %T", data)
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for system info: %T", data)
 		}
 		return systemInfo, resp, nil
 	}
-	return returns.SystemInfo{}, resp, err
+	return returns.GenericInfo{}, resp, err
 }
 
-func (c *Client) INFOSERVER() (returns.SystemInfo, *Response, error) {
+func (c *Client) INFOSERVER() (returns.GenericInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentServer)
 	if data != nil {
-		systemInfo, ok := data.(returns.SystemInfo)
+		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for server info: %T", data)
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for server info: %T", data)
 		}
 		return systemInfo, resp, nil
 	}
-	return returns.SystemInfo{}, resp, err
+	return returns.GenericInfo{}, resp, err
 }
 
-func (c *Client) INFOQUEUES() (returns.SystemInfo, *Response, error) {
+func (c *Client) INFOQUEUES() (returns.GenericInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentQueues)
 	if data != nil {
-		systemInfo, ok := data.(returns.SystemInfo)
+		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for queues info: %T", data)
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for queues info: %T", data)
 		}
 		return systemInfo, resp, nil
 	}
-	return returns.SystemInfo{}, resp, err
+	return returns.GenericInfo{}, resp, err
 }
 
-func (c *Client) INFOTHREADS() (returns.SystemInfo, *Response, error) {
+func (c *Client) INFOTHREADS() (returns.GenericInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentThreads)
 	if data != nil {
-		systemInfo, ok := data.(returns.SystemInfo)
+		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for threads info: %T", data)
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for threads info: %T", data)
 		}
 		return systemInfo, resp, nil
 	}
-	return returns.SystemInfo{}, resp, err
+	return returns.GenericInfo{}, resp, err
 }
 
 func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
@@ -587,7 +587,7 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 			return nil, nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
 		}
 
-		systemInfo := returns.SystemInfo{
+		systemInfo := returns.GenericInfo{
 			VideoChannel: videoChannel,
 			VideoMode:    types.VideoMode(parts[1]),
 			Status:       parts[2],
@@ -639,18 +639,67 @@ func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChan
 }
 
 // INFOTEMPLATE gets information about the specified template
-func (c *Client) INFOTEMPLATE(template string) (*Response, error) {
+func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, *Response, error) {
 	cmd := types.QueryCommandInfoTemplate{
 		Template: template,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.GenericInfo{}, nil, err
+	}
+
+	parts := strings.Split(resp.Data[0], " ")
+	if len(parts) != 3 {
+		return returns.GenericInfo{}, nil, fmt.Errorf("unexpected format for template info: %s", resp.Data[0])
+	}
+
+	videoChannel, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return returns.GenericInfo{}, nil, fmt.Errorf("invalid video channel in template info: %s", parts[0])
+	}
+
+	return returns.GenericInfo{
+		VideoChannel: videoChannel,
+		VideoMode:    types.VideoMode(parts[1]),
+		Status:       parts[2],
+	}, resp, nil
 }
 
 // INFODELAY gets delay information
-func (c *Client) INFODELAY(videoChannel int, layer *int) (*Response, error) {
+func (c *Client) INFOCHANNELDELAY(videoChannel int, layer *int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoDelay{
 		VideoChannel: videoChannel,
 		Layer:        layer,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
+}
+
+func (c *Client) INFOCHANNELLAYERDELAY(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
+	cmd := types.QueryCommandInfoDelay{
+		VideoChannel: videoChannel,
+		Layer:        &layer,
+	}
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
 }

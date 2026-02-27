@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 )
@@ -15,7 +14,7 @@ func main() {
 	}
 	defer client.Close()
 
-	data, _, err := client.INFOCHANNELLAYER(1, 10)
+	data, _, err := client.INFOTEMPLATE("COUNTDOWN")
 	if err != nil {
 		panic(err)
 	}
@@ -25,5 +24,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(string(jsonData))
+	println(string(jsonData))
 }
