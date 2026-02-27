@@ -106,7 +106,7 @@ func TestCommandSerialization(t *testing.T) {
 				PlayOnLoad: true,
 				Data:       strPtr(`{"f0":"Hello"}`),
 			},
-			expected: "CG 1-10 ADD 1 \"lower_third\" 1 \"{\"f0\":\"Hello\"}\"",
+			expected: "CG 1-10 ADD 1 \"lower_third\" 1 \"{\\\"f0\\\":\\\"Hello\\\"}\"",
 		},
 		{
 			name: "CG CLEAR",
