@@ -64,12 +64,12 @@ func main() {
 	// }
 
 	// Example 6: Get server version
-	resp, err = client.VERSION(nil)
-	if err != nil {
-		log.Printf("Failed to get version: %v", err)
-	} else {
-		fmt.Printf("VERSION response: Code=%d, Message=%s\n", resp.Code, resp.Message)
-	}
+	// resp, err = client.VERSION(nil)
+	// if err != nil {
+	// 	log.Printf("Failed to get version: %v", err)
+	// } else {
+	// 	fmt.Printf("VERSION response: Code=%d, Message=%s\n", resp.Code, resp.Message)
+	// }
 
 	// Example 7: Channel operations
 	resp, err = client.Layer(1, 10).PAUSE()

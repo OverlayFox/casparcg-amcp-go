@@ -15,7 +15,7 @@ func main() {
 	}
 	defer client.Close()
 
-	data, _, err := client.VERSIONCEF()
+	data, _, err := client.INFOCHANNEL(1)
 	if err != nil {
 		panic(err)
 	}

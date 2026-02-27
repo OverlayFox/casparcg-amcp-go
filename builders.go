@@ -477,76 +477,76 @@ func (c *Client) INFO() (*Response, error) {
 	return resp, err
 }
 
-func (c *Client) INFOCONFIG() (*Response, returns.CasparConfig, error) {
+func (c *Client) INFOCONFIG() (returns.CasparConfig, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentConfig)
 	if data != nil {
 		config, ok := data.(returns.CasparConfig)
 		if !ok {
-			return nil, returns.CasparConfig{}, fmt.Errorf("unexpected data type for config info: %T", data)
+			return returns.CasparConfig{}, nil, fmt.Errorf("unexpected data type for config info: %T", data)
 		}
-		return resp, config, nil
+		return config, resp, nil
 	}
-	return resp, returns.CasparConfig{}, err
+	return returns.CasparConfig{}, resp, err
 }
 
-func (c *Client) INFOPATHS() (*Response, returns.Paths, error) {
+func (c *Client) INFOPATHS() (returns.Paths, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentPaths)
 	if data != nil {
 		paths, ok := data.(returns.Paths)
 		if !ok {
-			return nil, returns.Paths{}, fmt.Errorf("unexpected data type for paths info: %T", data)
+			return returns.Paths{}, nil, fmt.Errorf("unexpected data type for paths info: %T", data)
 		}
-		return resp, paths, nil
+		return paths, resp, nil
 	}
-	return resp, returns.Paths{}, err
+	return returns.Paths{}, resp, err
 }
 
-func (c *Client) INFOSYSTEM() (*Response, returns.SystemInfo, error) {
+func (c *Client) INFOSYSTEM() (returns.SystemInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentSystem)
 	if data != nil {
 		systemInfo, ok := data.(returns.SystemInfo)
 		if !ok {
-			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
+			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for system info: %T", data)
 		}
-		return resp, systemInfo, nil
+		return systemInfo, resp, nil
 	}
-	return resp, returns.SystemInfo{}, err
+	return returns.SystemInfo{}, resp, err
 }
 
-func (c *Client) INFOSERVER() (*Response, returns.SystemInfo, error) {
+func (c *Client) INFOSERVER() (returns.SystemInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentServer)
 	if data != nil {
 		systemInfo, ok := data.(returns.SystemInfo)
 		if !ok {
-			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
+			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for server info: %T", data)
 		}
-		return resp, systemInfo, nil
+		return systemInfo, resp, nil
 	}
-	return resp, returns.SystemInfo{}, err
+	return returns.SystemInfo{}, resp, err
 }
 
-func (c *Client) INFOQUEUES() (*Response, returns.SystemInfo, error) {
+func (c *Client) INFOQUEUES() (returns.SystemInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentQueues)
 	if data != nil {
 		systemInfo, ok := data.(returns.SystemInfo)
 		if !ok {
-			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
+			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for queues info: %T", data)
 		}
-		return resp, systemInfo, nil
+		return systemInfo, resp, nil
 	}
-	return resp, returns.SystemInfo{}, err
+	return returns.SystemInfo{}, resp, err
 }
 
-func (c *Client) INFOTHREADS() (*Response, returns.SystemInfo, error) {
+func (c *Client) INFOTHREADS() (returns.SystemInfo, *Response, error) {
 	resp, data, err := c.info(types.InfoComponentThreads)
 	if data != nil {
 		systemInfo, ok := data.(returns.SystemInfo)
 		if !ok {
-			return nil, returns.SystemInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
+			return returns.SystemInfo{}, nil, fmt.Errorf("unexpected data type for threads info: %T", data)
 		}
-		return resp, systemInfo, nil
+		return systemInfo, resp, nil
 	}
-	return resp, returns.SystemInfo{}, err
+	return returns.SystemInfo{}, resp, err
 }
 
 func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
@@ -589,7 +589,7 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 
 		systemInfo := returns.SystemInfo{
 			VideoChannel: videoChannel,
-			Mode:         types.VideoMode(parts[1]),
+			VideoMode:    types.VideoMode(parts[1]),
 			Status:       parts[2],
 		}
 		return resp, systemInfo, nil
@@ -600,10 +600,29 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 }
 
 // INFOCHANNEL gets information about a channel or layer
-func (c *Client) INFOCHANNEL(videoChannel int, layer *int) (*Response, error) {
+func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
-		Layer:        layer,
+		Layer:        nil,
+	}
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
+}
+
+func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (*Response, error) {
+	cmd := types.QueryCommandInfoChannel{
+		VideoChannel: videoChannel,
+		Layer:        &layer,
 	}
 	return c.Send(cmd)
 }

@@ -4,6 +4,6 @@ import "github.com/overlayfox/casparcg-amcp-go/types"
 
 type SystemInfo struct {
 	VideoChannel int
-	Mode         types.VideoMode
+	VideoMode    types.VideoMode
 	Status       string
 }
