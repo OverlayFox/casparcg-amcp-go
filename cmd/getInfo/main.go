@@ -15,7 +15,7 @@ func main() {
 	}
 	defer client.Close()
 
-	data, _, err := client.CLS(nil)
+	data, _, err := client.CINF("FALLBACK")
 	if err != nil {
 		panic(err)
 	}

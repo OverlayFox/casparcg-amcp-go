@@ -6,7 +6,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
-type CLS struct {
+type CINF struct {
 	Filename     string           `xml:"filename"`
 	Type         types.MediaTypes `xml:"type"`
 	FileSize     int64            `xml:"filesize"`

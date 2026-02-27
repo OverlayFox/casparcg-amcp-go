@@ -339,16 +339,29 @@ func (c *Client) RESTART() (*Response, error) {
 
 // Query command methods
 
+var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
+
 // CINF returns information about a media file
-func (c *Client) CINF(filename string) (*Response, error) {
+func (c *Client) CINF(filename string) (returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCINF{
 		Filename: filename,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.CINF{}, nil, err
+	}
+
+	matches := reCINF.FindStringSubmatch(resp.Data[0])
+	cinf, err := matchesToCINF(matches)
+	if err != nil {
+		return returns.CINF{}, resp, err
+	}
+
+	return cinf, resp, nil
 }
 
 // CLS lists media files in the media folder
-func (c *Client) CLS(directory *string) ([]returns.CLS, *Response, error) {
+func (c *Client) CLS(directory *string) ([]returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCLS{
 		Directory: directory,
 	}
@@ -357,46 +370,52 @@ func (c *Client) CLS(directory *string) ([]returns.CLS, *Response, error) {
 		return nil, nil, err
 	}
 
-	clss := []returns.CLS{}
-	re := regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
+	cls := []returns.CINF{}
 	for _, file := range resp.Data {
-		matches := re.FindStringSubmatch(file)
-		if matches == nil || len(matches) != 7 {
-			return nil, nil, fmt.Errorf("unexpected format for CLS response: %s", file)
-		}
-
-		clsSize, err := strconv.Atoi(strings.TrimSpace(matches[3]))
+		matches := reCINF.FindStringSubmatch(file)
+		cinf, err := matchesToCINF(matches)
 		if err != nil {
-			return nil, nil, fmt.Errorf("invalid file size in CLS response: %s", matches[3])
+			return nil, nil, err
 		}
-
-		clsLastModified, err := time.Parse("20060102150405", strings.TrimSpace(matches[4]))
-		if err != nil {
-			return nil, nil, fmt.Errorf("invalid last modified date in CLS response: %s", matches[4])
-		}
-
-		clsFrameCount, err := strconv.Atoi(strings.TrimSpace(matches[5]))
-		if err != nil {
-			return nil, nil, fmt.Errorf("invalid frame count in CLS response: %s", matches[5])
-		}
-
-		clsFrameRate, err := types.StringToFrameRate(strings.TrimSpace(matches[6]))
-		if err != nil {
-			return nil, nil, fmt.Errorf("invalid frame rate in CLS response: %s", matches[6])
-		}
-
-		cls := returns.CLS{
-			Filename:     strings.TrimSpace(matches[1]),
-			Type:         types.MediaTypes(strings.TrimSpace(matches[2])),
-			FileSize:     int64(clsSize),
-			LastModified: clsLastModified,
-			FrameCount:   clsFrameCount,
-			FrameRate:    clsFrameRate,
-		}
-		clss = append(clss, cls)
+		cls = append(cls, cinf)
 	}
 
-	return clss, resp, nil
+	return cls, resp, nil
+}
+
+func matchesToCINF(matches []string) (returns.CINF, error) {
+	if matches == nil || len(matches) != 7 {
+		return returns.CINF{}, fmt.Errorf("unexpected format for CINF response: %s", matches)
+	}
+
+	cinfSize, err := strconv.Atoi(strings.TrimSpace(matches[3]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid file size in CINF response: %s", matches[3])
+	}
+
+	cinfLastModified, err := time.Parse("20060102150405", strings.TrimSpace(matches[4]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid last modified date in CINF response: %s", matches[4])
+	}
+
+	cinfFrameCount, err := strconv.Atoi(strings.TrimSpace(matches[5]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid frame count in CINF response: %s", matches[5])
+	}
+
+	cinfFrameRate, err := types.StringToFrameRate(strings.TrimSpace(matches[6]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid frame rate in CINF response: %s", matches[6])
+	}
+
+	return returns.CINF{
+		Filename:     strings.TrimSpace(matches[1]),
+		Type:         types.MediaTypes(strings.TrimSpace(matches[2])),
+		FileSize:     int64(cinfSize),
+		LastModified: cinfLastModified,
+		FrameCount:   cinfFrameCount,
+		FrameRate:    cinfFrameRate,
+	}, nil
 }
 
 // FLS lists all fonts
