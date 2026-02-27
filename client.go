@@ -116,8 +116,12 @@ func (c *Client) readResponse() (*Response, error) {
 	// Which is why we check for the presence of data for 10 milliseconds after receiving the first line.
 	// If no data is received, we assume there is none and return the response.
 	if response.Code >= 200 && response.Code < 300 {
-		c.conn.SetReadDeadline(time.Now().Add(10 * time.Millisecond))
-		defer c.conn.SetReadDeadline(time.Time{})
+		if err := c.conn.SetReadDeadline(time.Now().Add(10 * time.Millisecond)); err != nil {
+			return nil, fmt.Errorf("failed to set read deadline: %w", err)
+		}
+		defer func() {
+			_ = c.conn.SetReadDeadline(time.Time{})
+		}()
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil {

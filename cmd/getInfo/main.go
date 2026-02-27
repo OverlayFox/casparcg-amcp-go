@@ -13,7 +13,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	data, _, err := client.VERSION()
 	if err != nil {
