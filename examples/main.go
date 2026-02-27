@@ -53,15 +53,15 @@ func main() {
 	}
 
 	// Example 5: Query commands
-	resp, err = client.CLS(nil)
-	if err != nil {
-		log.Printf("Failed to list media: %v", err)
-	} else {
-		fmt.Printf("CLS response: Code=%d, Data lines=%d\n", resp.Code, len(resp.Data))
-		for _, line := range resp.Data {
-			fmt.Printf("  %s\n", line)
-		}
-	}
+	// resp, err = client.CLS(nil)
+	// if err != nil {
+	// 	log.Printf("Failed to list media: %v", err)
+	// } else {
+	// 	fmt.Printf("CLS response: Code=%d, Data lines=%d\n", resp.Code, len(resp.Data))
+	// 	for _, line := range resp.Data {
+	// 		fmt.Printf("  %s\n", line)
+	// 	}
+	// }
 
 	// Example 6: Get server version
 	resp, err = client.VERSION(nil)

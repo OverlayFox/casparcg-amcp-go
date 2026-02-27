@@ -3,8 +3,10 @@ package casparcg
 import (
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
 	"github.com/overlayfox/casparcg-amcp-go/types/returns"
@@ -346,11 +348,55 @@ func (c *Client) CINF(filename string) (*Response, error) {
 }
 
 // CLS lists media files in the media folder
-func (c *Client) CLS(directory *string) (*Response, error) {
+func (c *Client) CLS(directory *string) ([]returns.CLS, *Response, error) {
 	cmd := types.QueryCommandCLS{
 		Directory: directory,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	clss := []returns.CLS{}
+	re := regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
+	for _, file := range resp.Data {
+		matches := re.FindStringSubmatch(file)
+		if matches == nil || len(matches) != 7 {
+			return nil, nil, fmt.Errorf("unexpected format for CLS response: %s", file)
+		}
+
+		clsSize, err := strconv.Atoi(strings.TrimSpace(matches[3]))
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid file size in CLS response: %s", matches[3])
+		}
+
+		clsLastModified, err := time.Parse("20060102150405", strings.TrimSpace(matches[4]))
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid last modified date in CLS response: %s", matches[4])
+		}
+
+		clsFrameCount, err := strconv.Atoi(strings.TrimSpace(matches[5]))
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid frame count in CLS response: %s", matches[5])
+		}
+
+		clsFrameRate, err := returns.StringToFrameRate(strings.TrimSpace(matches[6]))
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid frame rate in CLS response: %s", matches[6])
+		}
+
+		cls := returns.CLS{
+			Filename:     strings.TrimSpace(matches[1]),
+			Type:         returns.CLSType(strings.TrimSpace(matches[2])),
+			FileSize:     int64(clsSize),
+			LastModified: clsLastModified,
+			FrameCount:   clsFrameCount,
+			FrameRate:    clsFrameRate,
+		}
+		clss = append(clss, cls)
+	}
+
+	return clss, resp, nil
 }
 
 // FLS lists all fonts

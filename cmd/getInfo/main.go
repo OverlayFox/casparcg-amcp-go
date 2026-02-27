@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -14,9 +15,15 @@ func main() {
 	}
 	defer client.Close()
 
-	_, data, err := client.INFOCONFIG()
+	data, _, err := client.CLS(nil)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v", data)
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(jsonData))
 }
