@@ -249,7 +249,8 @@ func (c CommandRestart) String() string {
 // Helper functions for command serialization
 
 func quote(s string) string {
-	return "\"" + s + "\""
+	escaped := strings.ReplaceAll(s, `"`, `\"`)
+	return "\"" + escaped + "\""
 }
 
 func buildParams(params map[string]string) string {
