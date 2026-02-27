@@ -97,7 +97,7 @@ func (c QueryCommandInfo) String() string {
 }
 
 // QueryCommandInfoChannel get information about a channel or a specific layer on a channel.
-// If layer is ommitted information about the whole channel is returned.
+// If layer is omitted information about the whole channel is returned.
 type QueryCommandInfoChannel struct {
 	VideoChannel int
 	Layer        *int
