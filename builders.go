@@ -419,17 +419,22 @@ func matchesToCINF(matches []string) (returns.CINF, error) {
 }
 
 // FLS lists all fonts
+// TODO: implement DTO for FLS response
 func (c *Client) FLS() (*Response, error) {
 	cmd := types.QueryCommandFLS{}
 	return c.Send(cmd)
 }
 
 // TLS lists template files
-func (c *Client) TLS(directory *string) (*Response, error) {
+func (c *Client) TLS(directory *string) ([]string, *Response, error) {
 	cmd := types.QueryCommandTLS{
 		Directory: directory,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+	return resp.Data, resp, nil
 }
 
 // VERSION returns the version of specified component
