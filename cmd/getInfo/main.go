@@ -15,7 +15,7 @@ func main() {
 	}
 	defer client.Close()
 
-	data, _, err := client.TLS(nil)
+	data, _, err := client.VERSIONCEF()
 	if err != nil {
 		panic(err)
 	}

@@ -438,11 +438,38 @@ func (c *Client) TLS(directory *string) ([]string, *Response, error) {
 }
 
 // VERSION returns the version of specified component
-func (c *Client) VERSION(component *string) (*Response, error) {
+func (c *Client) VERSION() (string, *Response, error) {
+	return c.version("")
+}
+
+func (c *Client) VERSIONSERVER() (string, *Response, error) {
+	return c.version(types.VersionInfoServer)
+}
+
+func (c *Client) VERSIONFLASH() (string, *Response, error) {
+	return c.version(types.VersionInfoFlash)
+}
+
+func (c *Client) VERSIONTEMPLATEHOST() (string, *Response, error) {
+	return c.version(types.VersionInfoTemplateHost)
+}
+
+func (c *Client) VERSIONCEF() (string, *Response, error) {
+	return c.version(types.VersionInfoCEF)
+}
+
+func (c *Client) version(component types.VersionInfo) (string, *Response, error) {
 	cmd := types.QueryCommandVersion{
 		Component: component,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	if len(resp.Data) == 0 {
+		return "", resp, nil
+	}
+	return strings.TrimSpace(resp.Data[0]), resp, nil
 }
 
 func (c *Client) INFO() (*Response, error) {

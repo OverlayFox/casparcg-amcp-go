@@ -52,14 +52,23 @@ func (c QueryCommandTLS) String() string {
 	return "TLS"
 }
 
+type VersionInfo string
+
+const (
+	VersionInfoServer       VersionInfo = "SERVER"
+	VersionInfoFlash        VersionInfo = "FLASH"
+	VersionInfoTemplateHost VersionInfo = "TEMPLATE_HOST"
+	VersionInfoCEF          VersionInfo = "CEF"
+)
+
 // QueryCommandVersion returns the version of specified component.
 type QueryCommandVersion struct {
-	Component *string
+	Component VersionInfo
 }
 
 func (c QueryCommandVersion) String() string {
-	if c.Component != nil {
-		return "VERSION " + *c.Component
+	if c.Component != "" {
+		return "VERSION " + string(c.Component)
 	}
 	return "VERSION"
 }
