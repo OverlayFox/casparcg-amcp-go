@@ -165,19 +165,8 @@ func (c CommandPrint) String() string {
 	return "PRINT " + strconv.Itoa(c.VideoChannel)
 }
 
-type AMCPLogLevel string
-
-const (
-	AMCPLogLevelTrace AMCPLogLevel = "trace"
-	AMCPLogLevelDebug AMCPLogLevel = "debug"
-	AMCPLogLevelInfo  AMCPLogLevel = "info"
-	AMCPLogLevelWarn  AMCPLogLevel = "warn"
-	AMCPLogLevelError AMCPLogLevel = "error"
-	AMCPLogLevelFatal AMCPLogLevel = "fatal"
-)
-
 type CommandLogLevel struct {
-	Level AMCPLogLevel
+	Level LogLevel
 }
 
 func (c CommandLogLevel) String() string {

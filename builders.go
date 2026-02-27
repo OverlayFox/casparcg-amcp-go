@@ -284,7 +284,7 @@ func (c *Client) PRINT(videoChannel int) (*Response, error) {
 }
 
 // LOGLEVEL sets the log level
-func (c *Client) LOGLEVEL(level types.AMCPLogLevel) (*Response, error) {
+func (c *Client) LOGLEVEL(level types.LogLevel) (*Response, error) {
 	cmd := types.CommandLogLevel{
 		Level: level,
 	}
@@ -380,14 +380,14 @@ func (c *Client) CLS(directory *string) ([]returns.CLS, *Response, error) {
 			return nil, nil, fmt.Errorf("invalid frame count in CLS response: %s", matches[5])
 		}
 
-		clsFrameRate, err := returns.StringToFrameRate(strings.TrimSpace(matches[6]))
+		clsFrameRate, err := types.StringToFrameRate(strings.TrimSpace(matches[6]))
 		if err != nil {
 			return nil, nil, fmt.Errorf("invalid frame rate in CLS response: %s", matches[6])
 		}
 
 		cls := returns.CLS{
 			Filename:     strings.TrimSpace(matches[1]),
-			Type:         returns.CLSType(strings.TrimSpace(matches[2])),
+			Type:         types.MediaTypes(strings.TrimSpace(matches[2])),
 			FileSize:     int64(clsSize),
 			LastModified: clsLastModified,
 			FrameCount:   clsFrameCount,
@@ -538,7 +538,7 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 
 		systemInfo := returns.SystemInfo{
 			VideoChannel: videoChannel,
-			Mode:         returns.VideoMode(parts[1]),
+			Mode:         types.VideoMode(parts[1]),
 			Status:       parts[2],
 		}
 		return resp, systemInfo, nil
