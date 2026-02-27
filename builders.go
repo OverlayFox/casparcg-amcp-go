@@ -2,9 +2,14 @@ package casparcg
 
 import (
 	"encoding/xml"
+	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
 // CGBuilder provides a fluent interface for building CG (template) commands
@@ -279,7 +284,7 @@ func (c *Client) PRINT(videoChannel int) (*Response, error) {
 }
 
 // LOGLEVEL sets the log level
-func (c *Client) LOGLEVEL(level types.AMCPLogLevel) (*Response, error) {
+func (c *Client) LOGLEVEL(level types.LogLevel) (*Response, error) {
 	cmd := types.CommandLogLevel{
 		Level: level,
 	}
@@ -334,46 +339,217 @@ func (c *Client) RESTART() (*Response, error) {
 
 // Query command methods
 
+var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
+
 // CINF returns information about a media file
-func (c *Client) CINF(filename string) (*Response, error) {
+func (c *Client) CINF(filename string) (returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCINF{
 		Filename: filename,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.CINF{}, nil, err
+	}
+
+	matches := reCINF.FindStringSubmatch(resp.Data[0])
+	cinf, err := matchesToCINF(matches)
+	if err != nil {
+		return returns.CINF{}, resp, err
+	}
+
+	return cinf, resp, nil
 }
 
 // CLS lists media files in the media folder
-func (c *Client) CLS(directory *string) (*Response, error) {
+func (c *Client) CLS(directory *string) ([]returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCLS{
 		Directory: directory,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cls := []returns.CINF{}
+	for _, file := range resp.Data {
+		matches := reCINF.FindStringSubmatch(file)
+		cinf, err := matchesToCINF(matches)
+		if err != nil {
+			return nil, nil, err
+		}
+		cls = append(cls, cinf)
+	}
+
+	return cls, resp, nil
+}
+
+func matchesToCINF(matches []string) (returns.CINF, error) {
+	if matches == nil || len(matches) != 7 {
+		return returns.CINF{}, fmt.Errorf("unexpected format for CINF response: %s", matches)
+	}
+
+	cinfSize, err := strconv.Atoi(strings.TrimSpace(matches[3]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid file size in CINF response: %s", matches[3])
+	}
+
+	cinfLastModified, err := time.Parse("20060102150405", strings.TrimSpace(matches[4]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid last modified date in CINF response: %s", matches[4])
+	}
+
+	cinfFrameCount, err := strconv.Atoi(strings.TrimSpace(matches[5]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid frame count in CINF response: %s", matches[5])
+	}
+
+	cinfFrameRate, err := types.StringToFrameRate(strings.TrimSpace(matches[6]))
+	if err != nil {
+		return returns.CINF{}, fmt.Errorf("invalid frame rate in CINF response: %s", matches[6])
+	}
+
+	return returns.CINF{
+		Filename:     strings.TrimSpace(matches[1]),
+		Type:         types.MediaTypes(strings.TrimSpace(matches[2])),
+		FileSize:     int64(cinfSize),
+		LastModified: cinfLastModified,
+		FrameCount:   cinfFrameCount,
+		FrameRate:    cinfFrameRate,
+	}, nil
 }
 
 // FLS lists all fonts
+// TODO: implement DTO for FLS response
 func (c *Client) FLS() (*Response, error) {
 	cmd := types.QueryCommandFLS{}
 	return c.Send(cmd)
 }
 
 // TLS lists template files
-func (c *Client) TLS(directory *string) (*Response, error) {
+func (c *Client) TLS(directory string) ([]string, *Response, error) {
 	cmd := types.QueryCommandTLS{
 		Directory: directory,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+	return resp.Data, resp, nil
 }
 
 // VERSION returns the version of specified component
-func (c *Client) VERSION(component *string) (*Response, error) {
+func (c *Client) VERSION() (string, *Response, error) {
+	return c.version("")
+}
+
+func (c *Client) VERSIONSERVER() (string, *Response, error) {
+	return c.version(types.VersionInfoServer)
+}
+
+func (c *Client) VERSIONFLASH() (string, *Response, error) {
+	return c.version(types.VersionInfoFlash)
+}
+
+func (c *Client) VERSIONTEMPLATEHOST() (string, *Response, error) {
+	return c.version(types.VersionInfoTemplateHost)
+}
+
+func (c *Client) VERSIONCEF() (string, *Response, error) {
+	return c.version(types.VersionInfoCEF)
+}
+
+func (c *Client) version(component types.VersionInfo) (string, *Response, error) {
 	cmd := types.QueryCommandVersion{
 		Component: component,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	if len(resp.Data) == 0 {
+		return "", resp, nil
+	}
+	return strings.TrimSpace(resp.Data[0]), resp, nil
 }
 
-// INFO retrieves information
-func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
+func (c *Client) INFO() (*Response, error) {
+	resp, _, err := c.info("")
+	return resp, err
+}
+
+func (c *Client) INFOCONFIG() (returns.CasparConfig, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentConfig)
+	if data != nil {
+		config, ok := data.(returns.CasparConfig)
+		if !ok {
+			return returns.CasparConfig{}, nil, fmt.Errorf("unexpected data type for config info: %T", data)
+		}
+		return config, resp, nil
+	}
+	return returns.CasparConfig{}, resp, err
+}
+
+func (c *Client) INFOPATHS() (returns.Paths, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentPaths)
+	if data != nil {
+		paths, ok := data.(returns.Paths)
+		if !ok {
+			return returns.Paths{}, nil, fmt.Errorf("unexpected data type for paths info: %T", data)
+		}
+		return paths, resp, nil
+	}
+	return returns.Paths{}, resp, err
+}
+
+func (c *Client) INFOSYSTEM() (returns.GenericInfo, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentSystem)
+	if data != nil {
+		systemInfo, ok := data.(returns.GenericInfo)
+		if !ok {
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for system info: %T", data)
+		}
+		return systemInfo, resp, nil
+	}
+	return returns.GenericInfo{}, resp, err
+}
+
+func (c *Client) INFOSERVER() (returns.GenericInfo, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentServer)
+	if data != nil {
+		systemInfo, ok := data.(returns.GenericInfo)
+		if !ok {
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for server info: %T", data)
+		}
+		return systemInfo, resp, nil
+	}
+	return returns.GenericInfo{}, resp, err
+}
+
+func (c *Client) INFOQUEUES() (returns.GenericInfo, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentQueues)
+	if data != nil {
+		systemInfo, ok := data.(returns.GenericInfo)
+		if !ok {
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for queues info: %T", data)
+		}
+		return systemInfo, resp, nil
+	}
+	return returns.GenericInfo{}, resp, err
+}
+
+func (c *Client) INFOTHREADS() (returns.GenericInfo, *Response, error) {
+	resp, data, err := c.info(types.InfoComponentThreads)
+	if data != nil {
+		systemInfo, ok := data.(returns.GenericInfo)
+		if !ok {
+			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for threads info: %T", data)
+		}
+		return systemInfo, resp, nil
+	}
+	return returns.GenericInfo{}, resp, err
+}
+
+func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 	cmd := types.QueryCommandInfo{
 		Component: component,
 	}
@@ -383,41 +559,147 @@ func (c *Client) INFO(component *types.InfoComponent) (*Response, any, error) {
 	}
 
 	fullXml := strings.Join(resp.Data, "\n")
-	switch *component {
+	switch component {
 	case types.InfoComponentConfig:
-		var config types.CasparConfig
+		var config returns.CasparConfig
 		err := xml.Unmarshal([]byte(fullXml), &config)
 		if err != nil {
 			return nil, nil, err
 		}
 		return resp, config, nil
-	}
 
-	return resp, fullXml, nil
+	case types.InfoComponentPaths:
+		var paths returns.Paths
+		err := xml.Unmarshal([]byte(fullXml), &paths)
+		if err != nil {
+			return nil, nil, err
+		}
+		return resp, paths, nil
+
+	case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
+		parts := strings.Split(fullXml, " ")
+		if len(parts) != 3 {
+			return nil, nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXml)
+		}
+
+		videoChannel, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
+		}
+
+		systemInfo := returns.GenericInfo{
+			VideoChannel: videoChannel,
+			VideoMode:    types.VideoMode(parts[1]),
+			Status:       parts[2],
+		}
+		return resp, systemInfo, nil
+
+	default:
+		return resp, fullXml, nil
+	}
 }
 
 // INFOCHANNEL gets information about a channel or layer
-func (c *Client) INFOCHANNEL(videoChannel int, layer *int) (*Response, error) {
+func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
-		Layer:        layer,
+		Layer:        nil,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
+}
+
+func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
+	cmd := types.QueryCommandInfoChannel{
+		VideoChannel: videoChannel,
+		Layer:        &layer,
+	}
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
 }
 
 // INFOTEMPLATE gets information about the specified template
-func (c *Client) INFOTEMPLATE(template string) (*Response, error) {
+func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, *Response, error) {
 	cmd := types.QueryCommandInfoTemplate{
 		Template: template,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.GenericInfo{}, nil, err
+	}
+
+	parts := strings.Split(resp.Data[0], " ")
+	if len(parts) != 3 {
+		return returns.GenericInfo{}, nil, fmt.Errorf("unexpected format for template info: %s", resp.Data[0])
+	}
+
+	videoChannel, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return returns.GenericInfo{}, nil, fmt.Errorf("invalid video channel in template info: %s", parts[0])
+	}
+
+	return returns.GenericInfo{
+		VideoChannel: videoChannel,
+		VideoMode:    types.VideoMode(parts[1]),
+		Status:       parts[2],
+	}, resp, nil
 }
 
 // INFODELAY gets delay information
-func (c *Client) INFODELAY(videoChannel int, layer *int) (*Response, error) {
+func (c *Client) INFOCHANNELDELAY(videoChannel int, layer *int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoDelay{
 		VideoChannel: videoChannel,
 		Layer:        layer,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
+}
+
+func (c *Client) INFOCHANNELLAYERDELAY(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
+	cmd := types.QueryCommandInfoDelay{
+		VideoChannel: videoChannel,
+		Layer:        &layer,
+	}
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
 }

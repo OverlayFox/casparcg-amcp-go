@@ -1,8 +1,7 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 )
@@ -15,14 +14,18 @@ func main() {
 	}
 	defer client.Close()
 
-	data, _, err := client.VERSION()
+	clip := "BACKGROUNDLOOP"
+	resp, err := client.Layer(1, 10).PLAY(&clip, nil)
 	if err != nil {
 		panic(err)
 	}
+	println("CG ADD response:", resp.Code, resp.Message)
 
-	jsonData, err := json.MarshalIndent(data, "", "  ")
+	time.Sleep(2 * time.Second)
+
+	resp, err = client.Layer(1, 10).STOP()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(jsonData))
+	println("CG STOP response:", resp.Code, resp.Message)
 }

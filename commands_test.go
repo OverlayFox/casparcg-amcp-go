@@ -121,7 +121,7 @@ func TestCommandSerialization(t *testing.T) {
 		{
 			name: "LOGLEVEL",
 			command: types.CommandLogLevel{
-				Level: types.AMCPLogLevelInfo,
+				Level: types.LogLevelInfo,
 			},
 			expected: "LOG LEVEL info",
 		},

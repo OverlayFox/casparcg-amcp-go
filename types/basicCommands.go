@@ -165,19 +165,8 @@ func (c CommandPrint) String() string {
 	return "PRINT " + strconv.Itoa(c.VideoChannel)
 }
 
-type AMCPLogLevel string
-
-const (
-	AMCPLogLevelTrace AMCPLogLevel = "trace"
-	AMCPLogLevelDebug AMCPLogLevel = "debug"
-	AMCPLogLevelInfo  AMCPLogLevel = "info"
-	AMCPLogLevelWarn  AMCPLogLevel = "warn"
-	AMCPLogLevelError AMCPLogLevel = "error"
-	AMCPLogLevelFatal AMCPLogLevel = "fatal"
-)
-
 type CommandLogLevel struct {
-	Level AMCPLogLevel
+	Level LogLevel
 }
 
 func (c CommandLogLevel) String() string {
@@ -260,7 +249,8 @@ func (c CommandRestart) String() string {
 // Helper functions for command serialization
 
 func quote(s string) string {
-	return "\"" + s + "\""
+	escaped := strings.ReplaceAll(s, `"`, `\"`)
+	return "\"" + escaped + "\""
 }
 
 func buildParams(params map[string]string) string {
