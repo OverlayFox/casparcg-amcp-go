@@ -619,12 +619,23 @@ func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, *Response, 
 	return infoChannel, resp, nil
 }
 
-func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (*Response, error) {
+func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
 		Layer:        &layer,
 	}
-	return c.Send(cmd)
+	resp, err := c.Send(cmd)
+	if err != nil {
+		return returns.InfoChannel{}, nil, err
+	}
+
+	var infoChannel returns.InfoChannel
+	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	if err != nil {
+		return returns.InfoChannel{}, resp, err
+	}
+
+	return infoChannel, resp, nil
 }
 
 // INFOTEMPLATE gets information about the specified template
