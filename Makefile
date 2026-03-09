@@ -13,6 +13,9 @@ test:
 	go test -race -v ./...
 
 lint:
-	@echo "==> Running golangci-lint..."
-	# Note: You must have golangci-lint installed locally for this to work
-	golangci-lint run
+	golangci-lint run 
+
+install-dev:
+	@echo "==> Installing development dependencies..."
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.11.2
+	golangci-lint --version

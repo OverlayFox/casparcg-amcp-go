@@ -120,6 +120,7 @@ func (c QueryCommandInfoTemplate) String() string {
 	return "INFO TEMPLATE " + quote(c.Template)
 }
 
+// QueryCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
 type QueryCommandInfoDelay struct {
 	VideoChannel int
 	Layer        *int

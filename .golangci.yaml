@@ -1,0 +1,43 @@
+version: "2"
+
+formatters:
+  enable:
+    - gofumpt # Stricter gofmt
+    - goimports # Manages imports
+  settings:
+    gofumpt:
+      extra-rules: true
+
+linters:
+  default: none
+  enable:
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dogsled
+    - dupword
+    - errcheck # Checks for unhandled errors
+    - errorlint
+    - gocritic
+    - govet # Reports suspicious constructs
+    - gosec
+    - grouper
+    - lll
+    - ineffassign # Detects dead assignments
+    - staticcheck # A massive suite of static analysis checks
+    - misspell # Finds commonly misspelled English words
+    - revive # A fast, configurable drop-in replacement for golint
+    - nestif
+    - nilnil
+
+  # Replaces the old root-level `linters-settings`
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+    errcheck:
+      check-type-assertions: true
+    grouper:
+      const-require-single-const: true
+      const-require-grouping: true
