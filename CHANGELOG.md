@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `.vscode` settings
+- `.golangci.yaml` linting and formatting
+- `.github/workflows` enforcement of updating changelog
+
+### Updated
+
+- `.github/workflows` to use new linter
+
+### Fixed
+
+- a bunch of linter and formatter issues
+
+## [0.0.1] 28-02-2026
+
+### Added
+
 - logo under `./assets/` that merges the go-gopher and casparCG logo
 - examples under `./cmd/`
 - generic types

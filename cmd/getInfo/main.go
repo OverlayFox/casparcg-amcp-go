@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	client := casparcg.NewClient("127.0.0.1", 5250)
-	err := client.Connect()
+	err := client.Connect(context.TODO()) // replace with a proper context when implementing this
 	if err != nil {
 		panic(err)
 	}

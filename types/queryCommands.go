@@ -4,10 +4,6 @@ import (
 	"strconv"
 )
 
-type QueryCommandInterface interface {
-	String() string
-}
-
 // QueryCommandCINF returns information about a media file.
 type QueryCommandCINF struct {
 	Filename string
@@ -32,8 +28,7 @@ func (c QueryCommandCLS) String() string {
 
 // QueryCommandFLS lists all fonts in the fonts folder.
 // Use the command INFO PATHS to get the path to the fonts folder.
-type QueryCommandFLS struct {
-}
+type QueryCommandFLS struct{}
 
 func (c QueryCommandFLS) String() string {
 	return "FLS"
@@ -84,7 +79,7 @@ const (
 	InfoComponentThreads InfoComponent = "THREADS"
 )
 
-// QueryCommandInfo retrieves a list of available channels
+// QueryCommandInfo retrieves a list of available channels.
 type QueryCommandInfo struct {
 	Component InfoComponent
 }
@@ -120,6 +115,7 @@ func (c QueryCommandInfoTemplate) String() string {
 	return "INFO TEMPLATE " + quote(c.Template)
 }
 
+// QueryCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
 type QueryCommandInfoDelay struct {
 	VideoChannel int
 	Layer        *int

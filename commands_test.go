@@ -1,4 +1,4 @@
-package casparcg
+package casparcg_test
 
 import (
 	"testing"

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type BasicCommandInterface interface {
+type CommandInterface interface {
 	String() string
 }
 
@@ -17,6 +17,7 @@ type BasicCommand struct {
 
 type CommandLoad struct {
 	BasicCommand
+
 	Clip string
 
 	Parameters *map[string]string
@@ -82,6 +83,7 @@ func (c CommandClear) String() string {
 
 type CommandCall struct {
 	BasicCommand
+
 	Params map[string]string
 }
 
@@ -225,22 +227,19 @@ func (c CommandPing) String() string {
 	return "PING"
 }
 
-type CommandBye struct {
-}
+type CommandBye struct{}
 
 func (c CommandBye) String() string {
 	return "BYE"
 }
 
-type CommandKill struct {
-}
+type CommandKill struct{}
 
 func (c CommandKill) String() string {
 	return "KILL"
 }
 
-type CommandRestart struct {
-}
+type CommandRestart struct{}
 
 func (c CommandRestart) String() string {
 	return "RESTART"

@@ -5,10 +5,7 @@ import (
 	"strconv"
 )
 
-type TemplateCommandInterface interface {
-	String() string
-}
-
+// TemplateCommandCG is the base struct for all CG template commands. It contains the common fields for all CG commands.
 type TemplateCommandCG struct {
 	VideoChannel int
 	Layer        int // defaults to 9999
@@ -120,7 +117,7 @@ func (c TemplateCommandCGInvoke) String() string {
 	return fmt.Sprintf("CG %d-%d INVOKE %d %s", c.VideoChannel, c.Layer, c.CgLayer, quote(c.Method))
 }
 
-// Retrieves information about the template on the specified layer.
+// TemplateCommandCGInfo retrieves information about the template on the specified layer.
 // If `cg_layer` is not given, information about the template host is given instead.
 type TemplateCommandCGInfo struct {
 	TemplateCommandCG
