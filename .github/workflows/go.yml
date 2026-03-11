@@ -10,12 +10,8 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  check-changelog:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ["1.21", "1.22", "1.23", "1.24", "1.25", "1.26"]
-
     steps:
       - uses: actions/checkout@v4
       - name: Check if CHANGELOG.md was updated
@@ -24,7 +20,15 @@ jobs:
           if ! git diff --name-only origin/main HEAD | grep -q '^CHANGELOG.md$'; then
             echo "CHANGELOG.md was not updated compared to main. Please update the changelog."
             exit 1
-          fi
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.21", "1.22", "1.23", "1.24", "1.25", "1.26"]
+
+    steps:
+      - uses: actions/checkout@v4
       - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
