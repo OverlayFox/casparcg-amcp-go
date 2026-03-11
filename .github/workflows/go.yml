@@ -18,6 +18,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Check if CHANGELOG.md was updated
+        run: |
+          if ! git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^CHANGELOG.md$'; then
+            echo "CHANGELOG.md was not updated in this commit. Please update the changelog."
+            exit 1
+          fi
       - name: Set up Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
