@@ -12,7 +12,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
-// CGBuilder provides a fluent interface for building CG (template) commands
+// CGBuilder provides a fluent interface for building CG (template) commands.
 type CGBuilder struct {
 	client       *Client
 	videoChannel int
@@ -20,7 +20,7 @@ type CGBuilder struct {
 }
 
 // CG creates a new CG command builder for the specified channel and layer
-// Example: client.CG(1, 12).STOP(2)
+// Example: client.CG(1, 12).STOP(2).
 func (c *Client) CG(videoChannel, layer int) *CGBuilder {
 	return &CGBuilder{
 		client:       c,
@@ -29,7 +29,7 @@ func (c *Client) CG(videoChannel, layer int) *CGBuilder {
 	}
 }
 
-// ADD prepares a template for displaying
+// ADD prepares a template for displaying.
 func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) (*Response, error) {
 	cmd := types.TemplateCommandCGAdd{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -44,7 +44,7 @@ func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *str
 	return b.client.Send(cmd)
 }
 
-// PLAY plays and displays the template in the specified layer
+// PLAY plays and displays the template in the specified layer.
 func (b *CGBuilder) PLAY(cgLayer int) (*Response, error) {
 	cmd := types.TemplateCommandCGPlay{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -56,7 +56,7 @@ func (b *CGBuilder) PLAY(cgLayer int) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// STOP stops the template in the specified layer
+// STOP stops the template in the specified layer.
 func (b *CGBuilder) STOP(cgLayer int) (*Response, error) {
 	cmd := types.TemplateCommandCGStop{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -68,7 +68,7 @@ func (b *CGBuilder) STOP(cgLayer int) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// NEXT triggers a "continue" in the template
+// NEXT triggers a "continue" in the template.
 func (b *CGBuilder) NEXT(cgLayer int) (*Response, error) {
 	cmd := types.TemplateCommandCGNext{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -80,7 +80,7 @@ func (b *CGBuilder) NEXT(cgLayer int) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// REMOVE removes the template from the specified layer
+// REMOVE removes the template from the specified layer.
 func (b *CGBuilder) REMOVE(cgLayer int) (*Response, error) {
 	cmd := types.TemplateCommandCGRemove{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -92,7 +92,7 @@ func (b *CGBuilder) REMOVE(cgLayer int) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// CLEAR removes all templates on the video layer
+// CLEAR removes all templates on the video layer.
 func (b *CGBuilder) CLEAR() (*Response, error) {
 	cmd := types.TemplateCommandCGClear{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -103,7 +103,7 @@ func (b *CGBuilder) CLEAR() (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// UPDATE sends new data to the template on specified layer
+// UPDATE sends new data to the template on specified layer.
 func (b *CGBuilder) UPDATE(cgLayer int, data string) (*Response, error) {
 	cmd := types.TemplateCommandCGUpdate{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -116,7 +116,7 @@ func (b *CGBuilder) UPDATE(cgLayer int, data string) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// INVOKE invokes the given method on the template
+// INVOKE invokes the given method on the template.
 func (b *CGBuilder) INVOKE(cgLayer int, method string) (*Response, error) {
 	cmd := types.TemplateCommandCGInvoke{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -129,7 +129,7 @@ func (b *CGBuilder) INVOKE(cgLayer int, method string) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// INFO retrieves information about the template on the specified layer
+// INFO retrieves information about the template on the specified layer.
 func (b *CGBuilder) INFO(cgLayer *int) (*Response, error) {
 	cmd := types.TemplateCommandCGInfo{
 		TemplateCommandCG: types.TemplateCommandCG{
@@ -141,7 +141,7 @@ func (b *CGBuilder) INFO(cgLayer *int) (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// LayerBuilder provides a fluent interface for building layer-based commands
+// LayerBuilder provides a fluent interface for building layer-based commands.
 type LayerBuilder struct {
 	client       *Client
 	videoChannel int
@@ -149,7 +149,7 @@ type LayerBuilder struct {
 }
 
 // Layer creates a new layer command builder for the specified channel and layer
-// Example: client.Layer(1, 10).PLAY("myclip", nil)
+// Example: client.Layer(1, 10).PLAY("myclip", nil).
 func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
 	return &LayerBuilder{
 		client:       c,
@@ -158,7 +158,7 @@ func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
 	}
 }
 
-// LOAD loads a clip to the layer
+// LOAD loads a clip to the layer.
 func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) (*Response, error) {
 	cmd := types.CommandLoad{
 		BasicCommand: types.BasicCommand{
@@ -171,7 +171,7 @@ func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) (*Respon
 	return b.client.Send(cmd)
 }
 
-// PLAY plays content on the layer
+// PLAY plays content on the layer.
 func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) (*Response, error) {
 	cmd := types.CommandPlay{
 		BasicCommand: types.BasicCommand{
@@ -184,7 +184,7 @@ func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) (*Respo
 	return b.client.Send(cmd)
 }
 
-// PAUSE pauses playback on the layer
+// PAUSE pauses playback on the layer.
 func (b *LayerBuilder) PAUSE() (*Response, error) {
 	cmd := types.CommandPause{
 		BasicCommand: types.BasicCommand{
@@ -195,7 +195,7 @@ func (b *LayerBuilder) PAUSE() (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// RESUME resumes playback on the layer
+// RESUME resumes playback on the layer.
 func (b *LayerBuilder) RESUME() (*Response, error) {
 	cmd := types.CommandResume{
 		BasicCommand: types.BasicCommand{
@@ -206,7 +206,7 @@ func (b *LayerBuilder) RESUME() (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// STOP stops playback on the layer
+// STOP stops playback on the layer.
 func (b *LayerBuilder) STOP() (*Response, error) {
 	cmd := types.CommandStop{
 		BasicCommand: types.BasicCommand{
@@ -217,7 +217,7 @@ func (b *LayerBuilder) STOP() (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// CLEAR clears the layer
+// CLEAR clears the layer.
 func (b *LayerBuilder) CLEAR() (*Response, error) {
 	cmd := types.CommandClear{
 		BasicCommand: types.BasicCommand{
@@ -228,7 +228,7 @@ func (b *LayerBuilder) CLEAR() (*Response, error) {
 	return b.client.Send(cmd)
 }
 
-// CALL calls a function on the layer
+// CALL calls a function on the layer.
 func (b *LayerBuilder) CALL(params map[string]string) (*Response, error) {
 	cmd := types.CommandCall{
 		BasicCommand: types.BasicCommand{
@@ -242,7 +242,7 @@ func (b *LayerBuilder) CALL(params map[string]string) (*Response, error) {
 
 // Direct command methods on Client for commands that don't require a builder
 
-// SWAP swaps layers between channels
+// SWAP swaps layers between channels.
 func (c *Client) SWAP(channel1, channel2 int, layer1, layer2 *int, transform bool) (*Response, error) {
 	cmd := types.CommandSwap{
 		VideoChannel1: channel1,
@@ -254,8 +254,13 @@ func (c *Client) SWAP(channel1, channel2 int, layer1, layer2 *int, transform boo
 	return c.Send(cmd)
 }
 
-// ADD adds a consumer to the specified video channel
-func (c *Client) ADD(videoChannel int, consumerIdx *int, consumerName string, parameters map[string]string) (*Response, error) {
+// ADD adds a consumer to the specified video channel.
+func (c *Client) ADD(
+	videoChannel int,
+	consumerIdx *int,
+	consumerName string,
+	parameters map[string]string,
+) (*Response, error) {
 	cmd := types.CommandAdd{
 		VideoChannel: videoChannel,
 		ConsumerIdx:  consumerIdx,
@@ -265,7 +270,7 @@ func (c *Client) ADD(videoChannel int, consumerIdx *int, consumerName string, pa
 	return c.Send(cmd)
 }
 
-// REMOVE removes a consumer from the specified video channel
+// REMOVE removes a consumer from the specified video channel.
 func (c *Client) REMOVE(videoChannel int, consumerIdx *int, parameters *map[string]string) (*Response, error) {
 	cmd := types.CommandRemove{
 		VideoChannel: videoChannel,
@@ -275,7 +280,7 @@ func (c *Client) REMOVE(videoChannel int, consumerIdx *int, parameters *map[stri
 	return c.Send(cmd)
 }
 
-// PRINT sends a print command for the specified video channel
+// PRINT sends a print command for the specified video channel.
 func (c *Client) PRINT(videoChannel int) (*Response, error) {
 	cmd := types.CommandPrint{
 		VideoChannel: videoChannel,
@@ -283,7 +288,7 @@ func (c *Client) PRINT(videoChannel int) (*Response, error) {
 	return c.Send(cmd)
 }
 
-// LOGLEVEL sets the log level
+// LOGLEVEL sets the log level.
 func (c *Client) LOGLEVEL(level types.LogLevel) (*Response, error) {
 	cmd := types.CommandLogLevel{
 		Level: level,
@@ -291,7 +296,7 @@ func (c *Client) LOGLEVEL(level types.LogLevel) (*Response, error) {
 	return c.Send(cmd)
 }
 
-// SET changes the value of a channel variable
+// SET changes the value of a channel variable.
 func (c *Client) SET(videoChannel int, variable types.SetVariable, value string) (*Response, error) {
 	cmd := types.CommandSet{
 		VideoChannel: videoChannel,
@@ -301,7 +306,7 @@ func (c *Client) SET(videoChannel int, variable types.SetVariable, value string)
 	return c.Send(cmd)
 }
 
-// LOCK performs a lock operation on the specified channel
+// LOCK performs a lock operation on the specified channel.
 func (c *Client) LOCK(videoChannel int, action types.LockAction, secret *string) (*Response, error) {
 	cmd := types.CommandLock{
 		VideoChannel: videoChannel,
@@ -311,7 +316,7 @@ func (c *Client) LOCK(videoChannel int, action types.LockAction, secret *string)
 	return c.Send(cmd)
 }
 
-// PING sends a ping command
+// PING sends a ping command.
 func (c *Client) PING(token string) (*Response, error) {
 	cmd := types.CommandPing{
 		Token: token,
@@ -319,19 +324,19 @@ func (c *Client) PING(token string) (*Response, error) {
 	return c.Send(cmd)
 }
 
-// BYE closes the connection
+// BYE closes the connection.
 func (c *Client) BYE() (*Response, error) {
 	cmd := types.CommandBye{}
 	return c.Send(cmd)
 }
 
-// KILL kills the server
+// KILL kills the server.
 func (c *Client) KILL() (*Response, error) {
 	cmd := types.CommandKill{}
 	return c.Send(cmd)
 }
 
-// RESTART restarts the server
+// RESTART restarts the server.
 func (c *Client) RESTART() (*Response, error) {
 	cmd := types.CommandRestart{}
 	return c.Send(cmd)
@@ -341,7 +346,7 @@ func (c *Client) RESTART() (*Response, error) {
 
 var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
 
-// CINF returns information about a media file
+// CINF returns information about a media file.
 func (c *Client) CINF(filename string) (returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCINF{
 		Filename: filename,
@@ -360,7 +365,7 @@ func (c *Client) CINF(filename string) (returns.CINF, *Response, error) {
 	return cinf, resp, nil
 }
 
-// CLS lists media files in the media folder
+// CLS lists media files in the media folder.
 func (c *Client) CLS(directory *string) ([]returns.CINF, *Response, error) {
 	cmd := types.QueryCommandCLS{
 		Directory: directory,
@@ -425,7 +430,7 @@ func (c *Client) FLS() (*Response, error) {
 	return c.Send(cmd)
 }
 
-// TLS lists template files
+// TLS lists template files.
 func (c *Client) TLS(directory string) ([]string, *Response, error) {
 	cmd := types.QueryCommandTLS{
 		Directory: directory,
@@ -437,7 +442,7 @@ func (c *Client) TLS(directory string) ([]string, *Response, error) {
 	return resp.Data, resp, nil
 }
 
-// VERSION returns the version of specified component
+// VERSION returns the version of specified component.
 func (c *Client) VERSION() (string, *Response, error) {
 	return c.version("")
 }
@@ -558,11 +563,11 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 		return nil, nil, err
 	}
 
-	fullXml := strings.Join(resp.Data, "\n")
+	fullXML := strings.Join(resp.Data, "\n")
 	switch component {
 	case types.InfoComponentConfig:
 		var config returns.CasparConfig
-		err := xml.Unmarshal([]byte(fullXml), &config)
+		err := xml.Unmarshal([]byte(fullXML), &config)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -570,16 +575,16 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 
 	case types.InfoComponentPaths:
 		var paths returns.Paths
-		err := xml.Unmarshal([]byte(fullXml), &paths)
+		err := xml.Unmarshal([]byte(fullXML), &paths)
 		if err != nil {
 			return nil, nil, err
 		}
 		return resp, paths, nil
 
 	case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
-		parts := strings.Split(fullXml, " ")
+		parts := strings.Split(fullXML, " ")
 		if len(parts) != 3 {
-			return nil, nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXml)
+			return nil, nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXML)
 		}
 
 		videoChannel, err := strconv.Atoi(parts[0])
@@ -595,11 +600,11 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 		return resp, systemInfo, nil
 
 	default:
-		return resp, fullXml, nil
+		return resp, fullXML, nil
 	}
 }
 
-// INFOCHANNEL gets information about a channel or layer
+// INFOCHANNEL gets information about a channel or layer.
 func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
@@ -638,7 +643,7 @@ func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChan
 	return infoChannel, resp, nil
 }
 
-// INFOTEMPLATE gets information about the specified template
+// INFOTEMPLATE gets information about the specified template.
 func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, *Response, error) {
 	cmd := types.QueryCommandInfoTemplate{
 		Template: template,
@@ -665,7 +670,7 @@ func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, *Response, 
 	}, resp, nil
 }
 
-// INFODELAY gets delay information
+// INFOCHANNELDELAY gets delay information.
 func (c *Client) INFOCHANNELDELAY(videoChannel int, layer *int) (returns.InfoChannel, *Response, error) {
 	cmd := types.QueryCommandInfoDelay{
 		VideoChannel: videoChannel,

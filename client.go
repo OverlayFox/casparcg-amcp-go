@@ -2,6 +2,8 @@ package casparcg
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -12,7 +14,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
-// Client represents a connection to a CasparCG server
+// Client represents a connection to a CasparCG server.
 type Client struct {
 	host string
 	port int
@@ -20,14 +22,14 @@ type Client struct {
 	mu   sync.Mutex
 }
 
-// Response represents a response from the CasparCG server
+// Response represents a response from the CasparCG server.
 type Response struct {
 	Code    returns.ReturnCode
 	Message string
 	Data    []string
 }
 
-// NewClient creates a new CasparCG client
+// NewClient creates a new CasparCG client.
 func NewClient(host string, port int) *Client {
 	return &Client{
 		host: host,
@@ -35,13 +37,14 @@ func NewClient(host string, port int) *Client {
 	}
 }
 
-// Connect establishes a connection to the CasparCG server
-func (c *Client) Connect() error {
+// Connect establishes a connection to the CasparCG server.
+func (c *Client) Connect(ctx context.Context) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	var d net.Dialer
 	addr := net.JoinHostPort(c.host, strconv.Itoa(c.port))
-	conn, err := net.Dial("tcp", addr)
+	conn, err := d.DialContext(ctx, "tcp", addr)
 	if err != nil {
 		return fmt.Errorf("failed to connect to CasparCG server: %w", err)
 	}
@@ -50,7 +53,7 @@ func (c *Client) Connect() error {
 	return nil
 }
 
-// Close closes the connection to the CasparCG server
+// Close closes the connection to the CasparCG server.
 func (c *Client) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -61,13 +64,13 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// Send sends a command to the CasparCG server and returns the response
+// Send sends a command to the CasparCG server and returns the response.
 func (c *Client) Send(command interface{ String() string }) (*Response, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	if c.conn == nil {
-		return nil, fmt.Errorf("not connected to server")
+		return nil, errors.New("not connected to server")
 	}
 
 	cmdStr := command.String() + "\r\n"
@@ -79,7 +82,7 @@ func (c *Client) Send(command interface{ String() string }) (*Response, error) {
 	return c.readResponse()
 }
 
-// readResponse reads and parses a response from the CasparCG server
+// readResponse reads and parses a response from the CasparCG server.
 func (c *Client) readResponse() (*Response, error) {
 	reader := bufio.NewReader(c.conn)
 
@@ -93,7 +96,7 @@ func (c *Client) readResponse() (*Response, error) {
 	parts := strings.SplitN(firstLine, " ", 2)
 
 	if len(parts) < 1 {
-		return nil, fmt.Errorf("invalid response format")
+		return nil, errors.New("invalid response format")
 	}
 
 	response := &Response{

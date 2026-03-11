@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-// TemplateCommandInterface is the interface that all CG template commands implement.
-type TemplateCommandInterface interface {
-	String() string
-}
-
 // TemplateCommandCG is the base struct for all CG template commands. It contains the common fields for all CG commands.
 type TemplateCommandCG struct {
 	VideoChannel int

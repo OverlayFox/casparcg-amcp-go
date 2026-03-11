@@ -15,6 +15,11 @@ test:
 lint:
 	golangci-lint run 
 
+.PHONY: lint-fix
+lint-fix:
+	golangci-lint run --fix
+
+
 install-dev:
 	@echo "==> Installing development dependencies..."
 	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.11.2
