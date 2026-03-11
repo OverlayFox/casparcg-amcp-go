@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- check changelog running on main
 - a bunch of linter and formatter issues
 
 ## [0.0.1] 28-02-2026
