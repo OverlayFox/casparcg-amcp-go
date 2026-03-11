@@ -1,7 +1,7 @@
 {
   "go.lintTool": "golangci-lint",
   "go.lintOnSave": "package",
-  "go.lintFlags": ["--config=${workspaceFolder}/.golangci.yml"],
+  "go.lintFlags": ["--config=${workspaceFolder}/.golangci.yaml"],
   "[go]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
