@@ -20,17 +20,14 @@ func main() {
 	}()
 
 	clip := "BACKGROUNDLOOP"
-	resp, err := client.Layer(1, 10).PLAY(&clip, nil)
+	err = client.Layer(1, 10).PLAY(&clip, nil)
 	if err != nil {
 		panic(err)
 	}
-	println("CG ADD response:", resp.Code, resp.Message)
-
 	time.Sleep(2 * time.Second)
 
-	resp, err = client.Layer(1, 10).STOP()
+	err = client.Layer(1, 10).STOP()
 	if err != nil {
 		panic(err)
 	}
-	println("CG STOP response:", resp.Code, resp.Message)
 }

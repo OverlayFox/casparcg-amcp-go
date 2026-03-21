@@ -30,7 +30,7 @@ func (c *Client) CG(videoChannel, layer int) *CGBuilder {
 }
 
 // ADD prepares a template for displaying.
-func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) (*Response, error) {
+func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) error {
 	cmd := types.TemplateCommandCGAdd{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -41,11 +41,12 @@ func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *str
 		PlayOnLoad: playOnLoad,
 		Data:       data,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // PLAY plays and displays the template in the specified layer.
-func (b *CGBuilder) PLAY(cgLayer int) (*Response, error) {
+func (b *CGBuilder) PLAY(cgLayer int) error {
 	cmd := types.TemplateCommandCGPlay{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -53,11 +54,12 @@ func (b *CGBuilder) PLAY(cgLayer int) (*Response, error) {
 		},
 		CgLayer: cgLayer,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // STOP stops the template in the specified layer.
-func (b *CGBuilder) STOP(cgLayer int) (*Response, error) {
+func (b *CGBuilder) STOP(cgLayer int) error {
 	cmd := types.TemplateCommandCGStop{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -65,11 +67,12 @@ func (b *CGBuilder) STOP(cgLayer int) (*Response, error) {
 		},
 		CgLayer: cgLayer,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // NEXT triggers a "continue" in the template.
-func (b *CGBuilder) NEXT(cgLayer int) (*Response, error) {
+func (b *CGBuilder) NEXT(cgLayer int) error {
 	cmd := types.TemplateCommandCGNext{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -77,11 +80,12 @@ func (b *CGBuilder) NEXT(cgLayer int) (*Response, error) {
 		},
 		CgLayer: cgLayer,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // REMOVE removes the template from the specified layer.
-func (b *CGBuilder) REMOVE(cgLayer int) (*Response, error) {
+func (b *CGBuilder) REMOVE(cgLayer int) error {
 	cmd := types.TemplateCommandCGRemove{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -89,22 +93,24 @@ func (b *CGBuilder) REMOVE(cgLayer int) (*Response, error) {
 		},
 		CgLayer: cgLayer,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // CLEAR removes all templates on the video layer.
-func (b *CGBuilder) CLEAR() (*Response, error) {
+func (b *CGBuilder) CLEAR() error {
 	cmd := types.TemplateCommandCGClear{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // UPDATE sends new data to the template on specified layer.
-func (b *CGBuilder) UPDATE(cgLayer int, data string) (*Response, error) {
+func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
 	cmd := types.TemplateCommandCGUpdate{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -113,11 +119,12 @@ func (b *CGBuilder) UPDATE(cgLayer int, data string) (*Response, error) {
 		CgLayer: cgLayer,
 		Data:    data,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // INVOKE invokes the given method on the template.
-func (b *CGBuilder) INVOKE(cgLayer int, method string) (*Response, error) {
+func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
 	cmd := types.TemplateCommandCGInvoke{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -126,11 +133,12 @@ func (b *CGBuilder) INVOKE(cgLayer int, method string) (*Response, error) {
 		CgLayer: cgLayer,
 		Method:  method,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // INFO retrieves information about the template on the specified layer.
-func (b *CGBuilder) INFO(cgLayer *int) (*Response, error) {
+func (b *CGBuilder) INFO(cgLayer *int) error {
 	cmd := types.TemplateCommandCGInfo{
 		TemplateCommandCG: types.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -138,7 +146,8 @@ func (b *CGBuilder) INFO(cgLayer *int) (*Response, error) {
 		},
 		CgLayer: cgLayer,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // LayerBuilder provides a fluent interface for building layer-based commands.
@@ -159,7 +168,7 @@ func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
 }
 
 // LOAD loads a clip to the layer.
-func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) (*Response, error) {
+func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
 	cmd := types.CommandLoad{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -168,11 +177,12 @@ func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) (*Respon
 		Clip:       clip,
 		Parameters: parameters,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // PLAY plays content on the layer.
-func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) (*Response, error) {
+func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
 	cmd := types.CommandPlay{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -181,55 +191,60 @@ func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) (*Respo
 		Clip:       clip,
 		Parameters: parameters,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // PAUSE pauses playback on the layer.
-func (b *LayerBuilder) PAUSE() (*Response, error) {
+func (b *LayerBuilder) PAUSE() error {
 	cmd := types.CommandPause{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // RESUME resumes playback on the layer.
-func (b *LayerBuilder) RESUME() (*Response, error) {
+func (b *LayerBuilder) RESUME() error {
 	cmd := types.CommandResume{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // STOP stops playback on the layer.
-func (b *LayerBuilder) STOP() (*Response, error) {
+func (b *LayerBuilder) STOP() error {
 	cmd := types.CommandStop{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // CLEAR clears the layer.
-func (b *LayerBuilder) CLEAR() (*Response, error) {
+func (b *LayerBuilder) CLEAR() error {
 	cmd := types.CommandClear{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // CALL calls a function on the layer.
-func (b *LayerBuilder) CALL(params map[string]string) (*Response, error) {
+func (b *LayerBuilder) CALL(params map[string]string) error {
 	cmd := types.CommandCall{
 		BasicCommand: types.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -237,13 +252,14 @@ func (b *LayerBuilder) CALL(params map[string]string) (*Response, error) {
 		},
 		Params: params,
 	}
-	return b.client.Send(cmd)
+	_, err := b.client.Send(cmd)
+	return err
 }
 
 // Direct command methods on Client for commands that don't require a builder
 
 // SWAP swaps layers between channels.
-func (c *Client) SWAP(channel1, channel2 int, layer1, layer2 *int, transform bool) (*Response, error) {
+func (c *Client) SWAP(channel1, channel2 int, layer1, layer2 *int, transform bool) error {
 	cmd := types.CommandSwap{
 		VideoChannel1: channel1,
 		Layer1:        layer1,
@@ -251,7 +267,8 @@ func (c *Client) SWAP(channel1, channel2 int, layer1, layer2 *int, transform boo
 		Layer2:        layer2,
 		Transform:     transform,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // ADD adds a consumer to the specified video channel.
@@ -260,86 +277,99 @@ func (c *Client) ADD(
 	consumerIdx *int,
 	consumerName string,
 	parameters map[string]string,
-) (*Response, error) {
+) error {
 	cmd := types.CommandAdd{
 		VideoChannel: videoChannel,
 		ConsumerIdx:  consumerIdx,
 		ConsumerName: consumerName,
 		Parameters:   parameters,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // REMOVE removes a consumer from the specified video channel.
-func (c *Client) REMOVE(videoChannel int, consumerIdx *int, parameters *map[string]string) (*Response, error) {
+func (c *Client) REMOVE(videoChannel int, consumerIdx *int, parameters *map[string]string) error {
 	cmd := types.CommandRemove{
 		VideoChannel: videoChannel,
 		ConsumerIdx:  consumerIdx,
 		Parameters:   parameters,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // PRINT sends a print command for the specified video channel.
-func (c *Client) PRINT(videoChannel int) (*Response, error) {
+func (c *Client) PRINT(videoChannel int) error {
 	cmd := types.CommandPrint{
 		VideoChannel: videoChannel,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // LOGLEVEL sets the log level.
-func (c *Client) LOGLEVEL(level types.LogLevel) (*Response, error) {
+func (c *Client) LOGLEVEL(level types.LogLevel) error {
 	cmd := types.CommandLogLevel{
 		Level: level,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // SET changes the value of a channel variable.
-func (c *Client) SET(videoChannel int, variable types.SetVariable, value string) (*Response, error) {
+func (c *Client) SET(videoChannel int, variable types.SetVariable, value string) error {
 	cmd := types.CommandSet{
 		VideoChannel: videoChannel,
 		Variable:     variable,
 		Value:        value,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // LOCK performs a lock operation on the specified channel.
-func (c *Client) LOCK(videoChannel int, action types.LockAction, secret *string) (*Response, error) {
+func (c *Client) LOCK(videoChannel int, action types.LockAction, secret *string) error {
 	cmd := types.CommandLock{
 		VideoChannel: videoChannel,
 		Action:       action,
 		Secret:       secret,
 	}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // PING sends a ping command.
-func (c *Client) PING(token string) (*Response, error) {
+func (c *Client) PING(token string) (string, error) {
 	cmd := types.CommandPing{
 		Token: token,
 	}
-	return c.Send(cmd)
+	data, err := c.Send(cmd)
+	if err != nil {
+		return "", err
+	}
+	return data[0], nil
 }
 
 // BYE closes the connection.
-func (c *Client) BYE() (*Response, error) {
+func (c *Client) BYE() error {
 	cmd := types.CommandBye{}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // KILL kills the server.
-func (c *Client) KILL() (*Response, error) {
+func (c *Client) KILL() error {
 	cmd := types.CommandKill{}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // RESTART restarts the server.
-func (c *Client) RESTART() (*Response, error) {
+func (c *Client) RESTART() error {
 	cmd := types.CommandRestart{}
-	return c.Send(cmd)
+	_, err := c.Send(cmd)
+	return err
 }
 
 // Query command methods
@@ -347,45 +377,45 @@ func (c *Client) RESTART() (*Response, error) {
 var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
 
 // CINF returns information about a media file.
-func (c *Client) CINF(filename string) (returns.CINF, *Response, error) {
+func (c *Client) CINF(filename string) (returns.CINF, error) {
 	cmd := types.QueryCommandCINF{
 		Filename: filename,
 	}
 	resp, err := c.Send(cmd)
 	if err != nil {
-		return returns.CINF{}, nil, err
+		return returns.CINF{}, err
 	}
 
-	matches := reCINF.FindStringSubmatch(resp.Data[0])
+	matches := reCINF.FindStringSubmatch(resp[0])
 	cinf, err := matchesToCINF(matches)
 	if err != nil {
-		return returns.CINF{}, resp, err
+		return returns.CINF{}, err
 	}
 
-	return cinf, resp, nil
+	return cinf, nil
 }
 
 // CLS lists media files in the media folder.
-func (c *Client) CLS(directory *string) ([]returns.CINF, *Response, error) {
+func (c *Client) CLS(directory *string) ([]returns.CINF, error) {
 	cmd := types.QueryCommandCLS{
 		Directory: directory,
 	}
 	resp, err := c.Send(cmd)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	cls := []returns.CINF{}
-	for _, file := range resp.Data {
+	for _, file := range resp {
 		matches := reCINF.FindStringSubmatch(file)
 		cinf, err := matchesToCINF(matches)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		cls = append(cls, cinf)
 	}
 
-	return cls, resp, nil
+	return cls, nil
 }
 
 func matchesToCINF(matches []string) (returns.CINF, error) {
@@ -425,171 +455,178 @@ func matchesToCINF(matches []string) (returns.CINF, error) {
 
 // FLS lists all fonts
 // TODO: implement DTO for FLS response
-func (c *Client) FLS() (*Response, error) {
+func (c *Client) FLS() ([]string, error) {
 	cmd := types.QueryCommandFLS{}
 	return c.Send(cmd)
 }
 
 // TLS lists template files.
-func (c *Client) TLS(directory string) ([]string, *Response, error) {
+func (c *Client) TLS(directory string) ([]string, error) {
 	cmd := types.QueryCommandTLS{
 		Directory: directory,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return resp.Data, resp, nil
+	return data, nil
 }
 
 // VERSION returns the version of specified component.
-func (c *Client) VERSION() (string, *Response, error) {
+func (c *Client) VERSION() (string, error) {
 	return c.version("")
 }
 
-func (c *Client) VERSIONSERVER() (string, *Response, error) {
+func (c *Client) VERSIONSERVER() (string, error) {
 	return c.version(types.VersionInfoServer)
 }
 
-func (c *Client) VERSIONFLASH() (string, *Response, error) {
+func (c *Client) VERSIONFLASH() (string, error) {
 	return c.version(types.VersionInfoFlash)
 }
 
-func (c *Client) VERSIONTEMPLATEHOST() (string, *Response, error) {
+func (c *Client) VERSIONTEMPLATEHOST() (string, error) {
 	return c.version(types.VersionInfoTemplateHost)
 }
 
-func (c *Client) VERSIONCEF() (string, *Response, error) {
+func (c *Client) VERSIONCEF() (string, error) {
 	return c.version(types.VersionInfoCEF)
 }
 
-func (c *Client) version(component types.VersionInfo) (string, *Response, error) {
+func (c *Client) version(component types.VersionInfo) (string, error) {
 	cmd := types.QueryCommandVersion{
 		Component: component,
 	}
 	resp, err := c.Send(cmd)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
-	if len(resp.Data) == 0 {
-		return "", resp, nil
+	if len(resp) == 0 {
+		return "", nil
 	}
-	return strings.TrimSpace(resp.Data[0]), resp, nil
+	return strings.TrimSpace(resp[0]), nil
 }
 
-func (c *Client) INFO() (*Response, error) {
-	resp, _, err := c.info("")
-	return resp, err
+func (c *Client) INFO() (types.InfoComponent, error) {
+	data, err := c.info("")
+	if err != nil {
+		config, ok := data.(types.InfoComponent)
+		if !ok {
+			return "", fmt.Errorf("unexpected data type for config info: %T", data)
+		}
+		return config, nil
+	}
+	return "", err
 }
 
-func (c *Client) INFOCONFIG() (returns.CasparConfig, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentConfig)
-	if data != nil {
+func (c *Client) INFOCONFIG() (returns.CasparConfig, error) {
+	data, err := c.info(types.InfoComponentConfig)
+	if err != nil {
 		config, ok := data.(returns.CasparConfig)
 		if !ok {
-			return returns.CasparConfig{}, nil, fmt.Errorf("unexpected data type for config info: %T", data)
+			return returns.CasparConfig{}, fmt.Errorf("unexpected data type for config info: %T", data)
 		}
-		return config, resp, nil
+		return config, nil
 	}
-	return returns.CasparConfig{}, resp, err
+	return returns.CasparConfig{}, err
 }
 
-func (c *Client) INFOPATHS() (returns.Paths, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentPaths)
-	if data != nil {
+func (c *Client) INFOPATHS() (returns.Paths, error) {
+	data, err := c.info(types.InfoComponentPaths)
+	if err != nil {
 		paths, ok := data.(returns.Paths)
 		if !ok {
-			return returns.Paths{}, nil, fmt.Errorf("unexpected data type for paths info: %T", data)
+			return returns.Paths{}, fmt.Errorf("unexpected data type for paths info: %T", data)
 		}
-		return paths, resp, nil
+		return paths, nil
 	}
-	return returns.Paths{}, resp, err
+	return returns.Paths{}, err
 }
 
-func (c *Client) INFOSYSTEM() (returns.GenericInfo, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentSystem)
-	if data != nil {
+func (c *Client) INFOSYSTEM() (returns.GenericInfo, error) {
+	data, err := c.info(types.InfoComponentSystem)
+	if err != nil {
 		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for system info: %T", data)
+			return returns.GenericInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
 		}
-		return systemInfo, resp, nil
+		return systemInfo, nil
 	}
-	return returns.GenericInfo{}, resp, err
+	return returns.GenericInfo{}, err
 }
 
-func (c *Client) INFOSERVER() (returns.GenericInfo, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentServer)
-	if data != nil {
+func (c *Client) INFOSERVER() (returns.GenericInfo, error) {
+	data, err := c.info(types.InfoComponentServer)
+	if err != nil {
 		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for server info: %T", data)
+			return returns.GenericInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
 		}
-		return systemInfo, resp, nil
+		return systemInfo, nil
 	}
-	return returns.GenericInfo{}, resp, err
+	return returns.GenericInfo{}, err
 }
 
-func (c *Client) INFOQUEUES() (returns.GenericInfo, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentQueues)
-	if data != nil {
+func (c *Client) INFOQUEUES() (returns.GenericInfo, error) {
+	data, err := c.info(types.InfoComponentQueues)
+	if err != nil {
 		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for queues info: %T", data)
+			return returns.GenericInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
 		}
-		return systemInfo, resp, nil
+		return systemInfo, nil
 	}
-	return returns.GenericInfo{}, resp, err
+	return returns.GenericInfo{}, err
 }
 
-func (c *Client) INFOTHREADS() (returns.GenericInfo, *Response, error) {
-	resp, data, err := c.info(types.InfoComponentThreads)
-	if data != nil {
+func (c *Client) INFOTHREADS() (returns.GenericInfo, error) {
+	data, err := c.info(types.InfoComponentThreads)
+	if err != nil {
 		systemInfo, ok := data.(returns.GenericInfo)
 		if !ok {
-			return returns.GenericInfo{}, nil, fmt.Errorf("unexpected data type for threads info: %T", data)
+			return returns.GenericInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
 		}
-		return systemInfo, resp, nil
+		return systemInfo, nil
 	}
-	return returns.GenericInfo{}, resp, err
+	return returns.GenericInfo{}, err
 }
 
-func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
+func (c *Client) info(component types.InfoComponent) (any, error) {
 	cmd := types.QueryCommandInfo{
 		Component: component,
 	}
 	resp, err := c.Send(cmd)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	fullXML := strings.Join(resp.Data, "\n")
+	fullXML := strings.Join(resp, "\n")
 	switch component {
 	case types.InfoComponentConfig:
 		var config returns.CasparConfig
 		err := xml.Unmarshal([]byte(fullXML), &config)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		return resp, config, nil
+		return config, nil
 
 	case types.InfoComponentPaths:
 		var paths returns.Paths
 		err := xml.Unmarshal([]byte(fullXML), &paths)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		return resp, paths, nil
+		return paths, nil
 
 	case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
 		parts := strings.Split(fullXML, " ")
 		if len(parts) != 3 {
-			return nil, nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXML)
+			return nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXML)
 		}
 
 		videoChannel, err := strconv.Atoi(parts[0])
 		if err != nil {
-			return nil, nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
+			return nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
 		}
 
 		systemInfo := returns.GenericInfo{
@@ -597,114 +634,114 @@ func (c *Client) info(component types.InfoComponent) (*Response, any, error) {
 			VideoMode:    types.VideoMode(parts[1]),
 			Status:       parts[2],
 		}
-		return resp, systemInfo, nil
+		return systemInfo, nil
 
 	default:
-		return resp, fullXML, nil
+		return nil, fmt.Errorf("unknown info component: %s", component)
 	}
 }
 
 // INFOCHANNEL gets information about a channel or layer.
-func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, *Response, error) {
+func (c *Client) INFOCHANNEL(videoChannel int) (returns.InfoChannel, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
 		Layer:        nil,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return returns.InfoChannel{}, nil, err
+		return returns.InfoChannel{}, err
 	}
 
 	var infoChannel returns.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {
-		return returns.InfoChannel{}, resp, err
+		return returns.InfoChannel{}, err
 	}
 
-	return infoChannel, resp, nil
+	return infoChannel, nil
 }
 
-func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
+func (c *Client) INFOCHANNELLAYER(videoChannel int, layer int) (returns.InfoChannel, error) {
 	cmd := types.QueryCommandInfoChannel{
 		VideoChannel: videoChannel,
 		Layer:        &layer,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return returns.InfoChannel{}, nil, err
+		return returns.InfoChannel{}, err
 	}
 
 	var infoChannel returns.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {
-		return returns.InfoChannel{}, resp, err
+		return returns.InfoChannel{}, err
 	}
 
-	return infoChannel, resp, nil
+	return infoChannel, nil
 }
 
 // INFOTEMPLATE gets information about the specified template.
-func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, *Response, error) {
+func (c *Client) INFOTEMPLATE(template string) (returns.GenericInfo, error) {
 	cmd := types.QueryCommandInfoTemplate{
 		Template: template,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return returns.GenericInfo{}, nil, err
+		return returns.GenericInfo{}, err
 	}
 
-	parts := strings.Split(resp.Data[0], " ")
+	parts := strings.Split(data[0], " ")
 	if len(parts) != 3 {
-		return returns.GenericInfo{}, nil, fmt.Errorf("unexpected format for template info: %s", resp.Data[0])
+		return returns.GenericInfo{}, fmt.Errorf("unexpected format for template info: %s", data[0])
 	}
 
 	videoChannel, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return returns.GenericInfo{}, nil, fmt.Errorf("invalid video channel in template info: %s", parts[0])
+		return returns.GenericInfo{}, fmt.Errorf("invalid video channel in template info: %s", parts[0])
 	}
 
 	return returns.GenericInfo{
 		VideoChannel: videoChannel,
 		VideoMode:    types.VideoMode(parts[1]),
 		Status:       parts[2],
-	}, resp, nil
+	}, nil
 }
 
 // INFOCHANNELDELAY gets delay information.
-func (c *Client) INFOCHANNELDELAY(videoChannel int, layer *int) (returns.InfoChannel, *Response, error) {
+func (c *Client) INFOCHANNELDELAY(videoChannel int, layer *int) (returns.InfoChannel, error) {
 	cmd := types.QueryCommandInfoDelay{
 		VideoChannel: videoChannel,
 		Layer:        layer,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return returns.InfoChannel{}, nil, err
+		return returns.InfoChannel{}, err
 	}
 
 	var infoChannel returns.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {
-		return returns.InfoChannel{}, resp, err
+		return returns.InfoChannel{}, err
 	}
 
-	return infoChannel, resp, nil
+	return infoChannel, nil
 }
 
-func (c *Client) INFOCHANNELLAYERDELAY(videoChannel int, layer int) (returns.InfoChannel, *Response, error) {
+func (c *Client) INFOCHANNELLAYERDELAY(videoChannel int, layer int) (returns.InfoChannel, error) {
 	cmd := types.QueryCommandInfoDelay{
 		VideoChannel: videoChannel,
 		Layer:        &layer,
 	}
-	resp, err := c.Send(cmd)
+	data, err := c.Send(cmd)
 	if err != nil {
-		return returns.InfoChannel{}, nil, err
+		return returns.InfoChannel{}, err
 	}
 
 	var infoChannel returns.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(resp.Data, "\n")), &infoChannel)
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {
-		return returns.InfoChannel{}, resp, err
+		return returns.InfoChannel{}, err
 	}
 
-	return infoChannel, resp, nil
+	return infoChannel, nil
 }

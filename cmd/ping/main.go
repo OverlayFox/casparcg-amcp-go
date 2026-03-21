@@ -24,5 +24,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	println(resp.Message)
+	println("PING response:", resp)
 }

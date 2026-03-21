@@ -20,7 +20,7 @@ func main() {
 		}
 	}()
 
-	data, _, err := client.VERSION()
+	data, err := client.VERSION()
 	if err != nil {
 		panic(err)
 	}
