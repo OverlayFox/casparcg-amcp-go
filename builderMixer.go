@@ -226,3 +226,34 @@ func (b *MixerBuilder) SetBrightness(brightness float32, fade *types.Fade) error
 	_, err := b.client.Send(cmd)
 	return err
 }
+
+func (b *MixerBuilder) GetSaturation() (float32, error) {
+	cmd := types.MixerCommandSaturation{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+
+	return returns.FloatFromResponse(resp)
+}
+
+func (b *MixerBuilder) SetSaturation(saturation float32, fade *types.Fade) error {
+	cmd := types.MixerCommandSaturation{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Saturation: &saturation,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}

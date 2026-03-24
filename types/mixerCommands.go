@@ -177,3 +177,26 @@ func (c MixerCommandBrightness) String() string {
 	}
 	return cmd
 }
+
+type MixerCommandSaturation struct {
+	MixerCommand
+
+	Saturation *float32
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandSaturation) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d SATURATION", c.VideoChannel, c.Layer)
+	if c.Saturation != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Saturation)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}
