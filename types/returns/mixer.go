@@ -1,0 +1,67 @@
+package returns
+
+import (
+	"fmt"
+	"strconv"
+)
+
+type MixerChromaInfo struct {
+	Enabled                 bool
+	TargetHue               float32
+	HueWidth                float32
+	MinSaturation           float32
+	MinBrightness           float32
+	Softness                float32
+	SpillSuppress           float32
+	SpillSuppressSaturation float32
+	ShowMask                bool
+}
+
+func MixerChromaInfoFromResponse(data []string) (MixerChromaInfo, error) {
+	if len(data) < 9 {
+		return MixerChromaInfo{}, fmt.Errorf("unexpected response length: got %d, expected at least 9", len(data))
+	}
+
+	enabled := data[0] == "1"
+	targetHue, err := strconv.ParseFloat(data[1], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid TargetHue value: %w", err)
+	}
+	hueWidth, err := strconv.ParseFloat(data[2], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid HueWidth value: %w", err)
+	}
+	minSaturation, err := strconv.ParseFloat(data[3], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid MinSaturation value: %w", err)
+	}
+	minBrightness, err := strconv.ParseFloat(data[4], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid MinBrightness value: %w", err)
+	}
+	softness, err := strconv.ParseFloat(data[5], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid Softness value: %w", err)
+	}
+	spillSuppress, err := strconv.ParseFloat(data[6], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid SpillSuppress value: %w", err)
+	}
+	spillSuppressSaturation, err := strconv.ParseFloat(data[7], 32)
+	if err != nil {
+		return MixerChromaInfo{}, fmt.Errorf("invalid SpillSuppressSaturation value: %w", err)
+	}
+	showMask := data[8] == "1"
+
+	return MixerChromaInfo{
+		Enabled:                 enabled,
+		TargetHue:               float32(targetHue),
+		HueWidth:                float32(hueWidth),
+		MinSaturation:           float32(minSaturation),
+		MinBrightness:           float32(minBrightness),
+		Softness:                float32(softness),
+		SpillSuppress:           float32(spillSuppress),
+		SpillSuppressSaturation: float32(spillSuppressSaturation),
+		ShowMask:                showMask,
+	}, nil
+}
