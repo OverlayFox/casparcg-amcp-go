@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://pkg.go.dev/github.com/OverlayFox/casparcg-amcp-go"><img src="https://pkg.go.dev/badge/github.com/OverlayFox/casparcg-amcp-go.svg" alt="Go Reference"></a>
-  <a href="https://goreportcard.com/report/github.com/OverlayFox/casparcg-amcp-go"><img src="https://goreportcard.com/badge/github.com/OverlayFox/casparcg-amcp-go" alt="Go Report Card"></a>
+  <a href="https://pkg.go.dev/github.com/overlayfox/casparcg-amcp-go"><img src="https://pkg.go.dev/badge/github.com/overlayfox/casparcg-amcp-go.svg" alt="Go Reference"></a>
+  <a href="https://goreportcard.com/report/github.com/overlayfox/casparcg-amcp-go"><img src="https://goreportcard.com/badge/github.com/overlayfox/casparcg-amcp-go" alt="Go Report Card"></a>
   <a href="https://casparcg.com/"><img src="https://img.shields.io/badge/CasparCG-AMCP-blue.svg" alt="CasparCG AMCP"></a>
   <a href="https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/go.yml"><img src="https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/go.yml/badge.svg" alt="Build Status"></a>
   <a href="https://go.dev/dl/"><img src="https://img.shields.io/badge/Go-%3E%3D1.21-blue?logo=go" alt="Minimum Go Version"></a>
