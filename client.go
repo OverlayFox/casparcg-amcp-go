@@ -10,8 +10,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
 // Client represents a connection to a CasparCG server.
@@ -20,13 +18,6 @@ type Client struct {
 	port int
 	conn net.Conn
 	mu   sync.Mutex
-}
-
-// Response represents a response from the CasparCG server.
-type Response struct {
-	Code    returns.ReturnCode
-	Message string
-	Data    []string
 }
 
 // NewClient creates a new CasparCG client.
@@ -65,7 +56,7 @@ func (c *Client) Close() error {
 }
 
 // Send sends a command to the CasparCG server and returns the response.
-func (c *Client) Send(command interface{ String() string }) (*Response, error) {
+func (c *Client) Send(command interface{ String() string }) ([]string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -83,48 +74,58 @@ func (c *Client) Send(command interface{ String() string }) (*Response, error) {
 }
 
 // readResponse reads and parses a response from the CasparCG server.
-func (c *Client) readResponse() (*Response, error) {
+func (c *Client) readResponse() ([]string, error) {
 	reader := bufio.NewReader(c.conn)
 
 	// Read the first line to get the response code
 	rawFirstLine, err := reader.ReadString('\n')
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return nil, CasparCGError{
+			Code:    0,
+			Message: fmt.Sprintf("failed to read response: %v", err),
+		}
 	}
 
 	firstLine := strings.TrimSpace(rawFirstLine)
 	parts := strings.SplitN(firstLine, " ", 2)
 
 	if len(parts) < 1 {
-		return nil, errors.New("invalid response format")
-	}
-
-	response := &Response{
-		Data: []string{},
+		return nil, CasparCGError{
+			Code:    0,
+			Message: "invalid response format",
+		}
 	}
 
 	// Try to parse the first part as a numeric code
 	code, err := strconv.Atoi(parts[0])
 	if err != nil {
-		response.Code = returns.ReturnCode(0)
-		response.Message = firstLine
-		return response, nil
+		return nil, CasparCGError{
+			Code:    0,
+			Message: fmt.Sprintf("could not parse response code: %v", err),
+		}
 	}
-	response.Code = returns.ReturnCode(code)
+
+	casparErr := CasparCGError{}
+	casparErr.Code = code
 	if len(parts) > 1 {
-		response.Message = parts[1]
+		casparErr.Message = parts[1]
 	}
 
 	// Almost any response code can be followed by multiline data.
 	// Which is why we check for the presence of data for 10 milliseconds after receiving the first line.
 	// If no data is received, we assume there is none and return the response.
-	if response.Code >= 200 && response.Code < 300 {
+	if casparErr.Code >= 200 && casparErr.Code < 300 {
 		if err := c.conn.SetReadDeadline(time.Now().Add(10 * time.Millisecond)); err != nil {
-			return nil, fmt.Errorf("failed to set read deadline: %w", err)
+			return nil, CasparCGError{
+				Code:    0,
+				Message: fmt.Sprintf("failed to set read deadline: %v", err),
+			}
 		}
 		defer func() {
 			_ = c.conn.SetReadDeadline(time.Time{})
 		}()
+
+		data := make([]string, 0)
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil {
@@ -137,9 +138,9 @@ func (c *Client) readResponse() (*Response, error) {
 				break
 			}
 
-			response.Data = append(response.Data, strings.TrimSpace(line))
+			data = append(data, strings.TrimSpace(line))
 		}
+		return data, nil
 	}
-
-	return response, nil
+	return nil, casparErr
 }

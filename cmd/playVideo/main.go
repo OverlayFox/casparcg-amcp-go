@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -20,17 +22,22 @@ func main() {
 	}()
 
 	clip := "BACKGROUNDLOOP"
-	resp, err := client.Layer(1, 10).PLAY(&clip, nil)
+	err = client.Layer(1, 10).PLAY(&clip, nil)
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
-	println("CG ADD response:", resp.Code, resp.Message)
-
 	time.Sleep(2 * time.Second)
 
-	resp, err = client.Layer(1, 10).STOP()
+	err = client.Layer(1, 10).STOP()
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
-	println("CG STOP response:", resp.Code, resp.Message)
 }
