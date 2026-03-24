@@ -35,6 +35,11 @@ Commands are built directly based on the official [AMCP Protocol Documentation](
 
 ---
 
+## 🧩 Examples
+
+Examples can be found in the [`./cmd/`](./cmd/) directory to see how to use this package. <br>
+These are more starting points than full implementations.
+
 ## 🚀 Getting Started
 
 ### Installation
