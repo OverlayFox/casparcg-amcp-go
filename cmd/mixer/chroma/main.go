@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
+	"github.com/overlayfox/casparcg-amcp-go/types"
 	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
@@ -42,7 +43,7 @@ func main() {
 		SpillSuppress:           0.1,
 		SpillSuppressSaturation: 0.7,
 		ShowMask:                false,
-	}, &casparcg.ChromaFade{
+	}, &types.Fade{
 		Duration: 25, // in frames
 		Tween:    "linear",
 	})

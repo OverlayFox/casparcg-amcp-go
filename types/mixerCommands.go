@@ -10,6 +10,11 @@ type MixerCommand struct {
 	Layer        int // defaults to 9999
 }
 
+type Fade struct {
+	Duration int // in frames
+	Tween    TweenType
+}
+
 type MixerCommandKeyer struct {
 	MixerCommand
 
@@ -140,6 +145,29 @@ func (c MixerCommandOpacity) String() string {
 	cmd := fmt.Sprintf("MIXER %d-%d OPACITY", c.VideoChannel, c.Layer)
 	if c.Opacity != nil {
 		cmd += " " + fmt.Sprintf("%f", *c.Opacity)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}
+
+type MixerCommandBrightness struct {
+	MixerCommand
+
+	Brightness *float32
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandBrightness) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d BRIGHTNESS", c.VideoChannel, c.Layer)
+	if c.Brightness != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Brightness)
 	}
 	if c.Duration != nil {
 		cmd += " " + strconv.Itoa(*c.Duration)

@@ -20,33 +20,33 @@ func main() {
 		}
 	}()
 
-	opacity, err := client.Mixer(1, 1).GetOpacity()
+	brightness, err := client.Mixer(1, 1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Opacity: %f\n", opacity)
+	fmt.Printf("Brightness: %f\n", brightness)
 
-	err = client.Mixer(1, 1).SetOpacity(0.4, nil)
+	err = client.Mixer(1, 1).SetBrightness(2, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	opacity, err = client.Mixer(1, 1).GetOpacity()
+	brightness, err = client.Mixer(1, 1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Opacity: %f\n", opacity)
+	fmt.Printf("Brightness: %f\n", brightness)
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetOpacity(1.0, nil)
+	err = client.Mixer(1, 1).SetBrightness(1.0, nil)
 	if err != nil {
 		panic(err)
 	}
 
-	opacity, err = client.Mixer(1, 1).GetOpacity()
+	brightness, err = client.Mixer(1, 1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Opacity: %f\n", opacity)
+	fmt.Printf("Brightness: %f\n", brightness)
 }

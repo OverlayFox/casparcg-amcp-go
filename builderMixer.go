@@ -33,7 +33,7 @@ func (b *MixerBuilder) GetKeyerState() (bool, error) {
 		return false, err
 	}
 
-	return returns.MixerKeyerInfoFromResponse(resp)
+	return returns.BoolFromResponse(resp)
 }
 
 // Keyer replaces layer n+1's alpha with the R (red) channel of layer n, and hides the RGB channels of layer n.
@@ -65,12 +65,7 @@ func (b *MixerBuilder) GetChromaInfo() (returns.MixerChromaInfo, error) {
 	return returns.MixerChromaInfoFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
-type ChromaFade struct {
-	Duration int // in frames
-	Tween    types.TweenType
-}
-
-func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *ChromaFade) error {
+func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *types.Fade) error {
 	enable := true
 	cmd := types.MixerCommandChroma{
 		MixerCommand: types.MixerCommand{
@@ -97,7 +92,7 @@ func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *Chroma
 	return err
 }
 
-func (b *MixerBuilder) ChromaDisable(fade *ChromaFade) error {
+func (b *MixerBuilder) ChromaDisable(fade *types.Fade) error {
 	enable := false
 	cmd := types.MixerCommandChroma{
 		MixerCommand: types.MixerCommand{
@@ -155,7 +150,7 @@ func (b *MixerBuilder) GetInvertState() (bool, error) {
 		return false, err
 	}
 
-	return returns.MixerInvertStateFromResponse(resp)
+	return returns.BoolFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetInvert(state bool) error {
@@ -182,16 +177,51 @@ func (b *MixerBuilder) GetOpacity() (float32, error) {
 		return 0, err
 	}
 
-	return returns.MixerOpacityFromResponse(resp)
+	return returns.FloatFromResponse(resp)
 }
 
-func (b *MixerBuilder) SetOpacity(opacity float32) error {
+func (b *MixerBuilder) SetOpacity(opacity float32, fade *types.Fade) error {
 	cmd := types.MixerCommandOpacity{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 		Opacity: &opacity,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+func (b *MixerBuilder) GetBrightness() (float32, error) {
+	cmd := types.MixerCommandBrightness{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+
+	return returns.FloatFromResponse(resp)
+}
+
+func (b *MixerBuilder) SetBrightness(brightness float32, fade *types.Fade) error {
+	cmd := types.MixerCommandBrightness{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Brightness: &brightness,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
 	}
 	_, err := b.client.Send(cmd)
 	return err
