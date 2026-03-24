@@ -21,21 +21,36 @@ func (c *Client) Mixer(videoChannel, layer int) *MixerBuilder {
 	}
 }
 
-// KEYER replaces layer n+1's alpha with the R (red) channel of layer n, and hides the RGB channels of layer n.
-// If show is true then the specified layer will not be rendered, instead it will be used as the key for the layer above.
-func (b *MixerBuilder) KEYER(show bool) error {
+func (b *MixerBuilder) GetKeyerState() (bool, error) {
 	cmd := types.MixerCommandKeyer{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
-		Show: show,
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return false, err
+	}
+
+	return returns.MixerKeyerInfoFromResponse(resp)
+}
+
+// Keyer replaces layer n+1's alpha with the R (red) channel of layer n, and hides the RGB channels of layer n.
+// If show is true then the specified layer will not be rendered, instead it will be used as the key for the layer above.
+func (b *MixerBuilder) Keyer(show bool) error {
+	cmd := types.MixerCommandKeyer{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Show: &show,
 	}
 	_, err := b.client.Send(cmd)
 	return err
 }
 
-func (b *MixerBuilder) ChromaInfo() (returns.MixerChromaInfo, error) {
+func (b *MixerBuilder) GetChromaInfo() (returns.MixerChromaInfo, error) {
 	cmd := types.MixerCommandChroma{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,

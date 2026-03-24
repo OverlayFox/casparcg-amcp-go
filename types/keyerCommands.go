@@ -13,15 +13,17 @@ type MixerCommand struct {
 type MixerCommandKeyer struct {
 	MixerCommand
 
-	Show bool
+	Show *bool
 }
 
 func (c MixerCommandKeyer) String() string {
 	cmd := fmt.Sprintf("MIXER %d-%d KEYER", c.VideoChannel, c.Layer)
-	if c.Show {
-		cmd += " 1"
-	} else {
-		cmd += " 0"
+	if c.Show != nil {
+		if *c.Show {
+			cmd += " 1"
+		} else {
+			cmd += " 0"
+		}
 	}
 	return cmd
 }

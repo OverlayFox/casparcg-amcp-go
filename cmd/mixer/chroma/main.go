@@ -22,7 +22,7 @@ func main() {
 		}
 	}()
 
-	info, err := client.Mixer(1, 1).ChromaInfo()
+	info, err := client.Mixer(1, 1).GetChromaInfo()
 	if err != nil {
 		panic(err)
 	}
@@ -50,8 +50,27 @@ func main() {
 		panic(err)
 	}
 
+	err = client.Mixer(1, 1).Keyer(true)
+	if err != nil {
+		panic(err)
+	}
+	enabled, err := client.Mixer(1, 1).GetKeyerState()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Keyer enabled: %t\n", enabled)
+	err = client.Mixer(1, 1).Keyer(false)
+	if err != nil {
+		panic(err)
+	}
+	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Keyer enabled: %t\n", enabled)
+
 	time.Sleep(600 * time.Millisecond)
-	info, err = client.Mixer(1, 1).ChromaInfo()
+	info, err = client.Mixer(1, 1).GetChromaInfo()
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +85,7 @@ func main() {
 		panic(err)
 	}
 
-	info, err = client.Mixer(1, 1).ChromaInfo()
+	info, err = client.Mixer(1, 1).GetChromaInfo()
 	if err != nil {
 		panic(err)
 	}
