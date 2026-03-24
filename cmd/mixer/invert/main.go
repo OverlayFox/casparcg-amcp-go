@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 )
@@ -25,7 +26,7 @@ func main() {
 	}
 	fmt.Printf("Invert state: %t\n", invertState)
 
-	err = client.Mixer(1, 1).Invert(true)
+	err = client.Mixer(1, 1).SetInvert(true)
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +37,9 @@ func main() {
 	}
 	fmt.Printf("Invert state: %t\n", invertState)
 
-	err = client.Mixer(1, 1).Invert(false)
+	time.Sleep(1 * time.Second)
+
+	err = client.Mixer(1, 1).SetInvert(false)
 	if err != nil {
 		panic(err)
 	}

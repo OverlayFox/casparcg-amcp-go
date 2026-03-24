@@ -131,7 +131,7 @@ func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
 	return returns.MixerBlendModeFromResponse(resp)
 }
 
-func (b *MixerBuilder) BlendMode(mode types.BlendMode) error {
+func (b *MixerBuilder) SetBlendMode(mode types.BlendMode) error {
 	cmd := types.MixerCommandBlend{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
@@ -158,13 +158,40 @@ func (b *MixerBuilder) GetInvertState() (bool, error) {
 	return returns.MixerInvertStateFromResponse(resp)
 }
 
-func (b *MixerBuilder) Invert(state bool) error {
+func (b *MixerBuilder) SetInvert(state bool) error {
 	cmd := types.MixerCommandInvert{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 		Invert: &state,
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+func (b *MixerBuilder) GetOpacity() (float32, error) {
+	cmd := types.MixerCommandOpacity{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+
+	return returns.MixerOpacityFromResponse(resp)
+}
+
+func (b *MixerBuilder) SetOpacity(opacity float32) error {
+	cmd := types.MixerCommandOpacity{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Opacity: &opacity,
 	}
 	_, err := b.client.Send(cmd)
 	return err

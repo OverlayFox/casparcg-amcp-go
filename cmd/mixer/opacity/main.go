@@ -20,33 +20,33 @@ func main() {
 		}
 	}()
 
-	enabled, err := client.Mixer(1, 1).GetKeyerState()
+	opacity, err := client.Mixer(1, 1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Keyer enabled: %t\n", enabled)
+	fmt.Printf("Opacity: %f\n", opacity)
 
-	err = client.Mixer(1, 1).Keyer(true)
+	err = client.Mixer(1, 1).SetOpacity(0.4)
 	if err != nil {
 		panic(err)
 	}
 
-	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	opacity, err = client.Mixer(1, 1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Keyer enabled: %t\n", enabled)
+	fmt.Printf("Opacity: %f\n", opacity)
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).Keyer(false)
+	err = client.Mixer(1, 1).SetOpacity(1.0)
 	if err != nil {
 		panic(err)
 	}
 
-	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	opacity, err = client.Mixer(1, 1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Keyer enabled: %t\n", enabled)
+	fmt.Printf("Opacity: %f\n", opacity)
 }

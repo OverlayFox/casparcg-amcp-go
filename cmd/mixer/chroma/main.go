@@ -70,6 +70,7 @@ func main() {
 	fmt.Printf("Keyer enabled: %t\n", enabled)
 
 	time.Sleep(600 * time.Millisecond)
+
 	info, err = client.Mixer(1, 1).GetChromaInfo()
 	if err != nil {
 		panic(err)

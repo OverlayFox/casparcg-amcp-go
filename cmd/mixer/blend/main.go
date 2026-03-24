@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 	"github.com/overlayfox/casparcg-amcp-go/types"
@@ -26,7 +27,7 @@ func main() {
 	}
 	fmt.Printf("Blend mode: %s\n", mode)
 
-	err = client.Mixer(1, 1).BlendMode(types.BlendModeScreen)
+	err = client.Mixer(1, 1).SetBlendMode(types.BlendModeScreen)
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +38,9 @@ func main() {
 	}
 	fmt.Printf("Blend mode: %s\n", mode)
 
-	err = client.Mixer(1, 1).BlendMode(types.BlendModeNormal)
+	time.Sleep(1 * time.Second)
+
+	err = client.Mixer(1, 1).SetBlendMode(types.BlendModeNormal)
 	if err != nil {
 		panic(err)
 	}
