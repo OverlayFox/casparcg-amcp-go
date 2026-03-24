@@ -115,3 +115,30 @@ func (b *MixerBuilder) ChromaDisable(fade *ChromaFade) error {
 	_, err := b.client.Send(cmd)
 	return err
 }
+
+func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
+	cmd := types.MixerCommandBlend{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	return returns.MixerBlendModeFromResponse(resp)
+}
+
+func (b *MixerBuilder) BlendMode(mode types.BlendMode) error {
+	cmd := types.MixerCommandBlend{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		BlendMode: &mode,
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}

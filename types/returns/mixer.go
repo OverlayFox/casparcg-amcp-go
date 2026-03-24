@@ -3,6 +3,8 @@ package returns
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 type MixerKeyerInfo struct {
@@ -75,4 +77,11 @@ func MixerChromaInfoFromResponse(data []string) (MixerChromaInfo, error) {
 		SpillSuppressSaturation: float32(spillSuppressSaturation),
 		ShowMask:                showMask,
 	}, nil
+}
+
+func MixerBlendModeFromResponse(data []string) (types.BlendMode, error) {
+	if len(data) < 1 {
+		return "", fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
+	}
+	return types.ParseBlendMode(data[0])
 }

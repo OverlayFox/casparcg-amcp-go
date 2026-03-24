@@ -94,3 +94,37 @@ func (c MixerCommandChroma) String() string {
 
 	return cmd
 }
+
+type BlendMode string
+
+const (
+	BlendModeNormal BlendMode = "normal"
+	BlendModeScreen BlendMode = "screen"
+)
+
+func ParseBlendMode(s string) (BlendMode, error) {
+	validBlendModes := map[BlendMode]any{
+		BlendModeNormal: nil,
+		BlendModeScreen: nil,
+	}
+
+	mode := BlendMode(s)
+	if _, ok := validBlendModes[mode]; !ok {
+		return "", fmt.Errorf("invalid blend mode: %s", s)
+	}
+	return mode, nil
+}
+
+type MixerCommandBlend struct {
+	MixerCommand
+
+	BlendMode *BlendMode
+}
+
+func (c MixerCommandBlend) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d BLEND", c.VideoChannel, c.Layer)
+	if c.BlendMode != nil {
+		cmd += " " + string(*c.BlendMode)
+	}
+	return cmd
+}
