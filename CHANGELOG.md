@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 24-03-2026
+
 ### Removed
 
 - removed direct CasparCG Server return and wrapped error code in custom error object
