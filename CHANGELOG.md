@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.vscode` settings
 - `.golangci.yaml` linting and formatting
 - `.github/workflows` enforcement of updating changelog
+- added examples explanation to `ReadMe.md`
 
 ### Updated
 
