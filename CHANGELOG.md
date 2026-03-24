@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- added following commands:
+  - Mixer:
+    - KEYER
+    - CHROMA
+    - BLEND
+    - INVERT
+
 ### Changed
 
 - changed URLs in ReadMe to point to correct package

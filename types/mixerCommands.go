@@ -43,7 +43,7 @@ type MixerCommandChroma struct {
 	ShowMask                *bool
 
 	FadeDuration *int
-	FadeTween    *string
+	Tween        *TweenType
 }
 
 func (c MixerCommandChroma) String() string {
@@ -88,31 +88,11 @@ func (c MixerCommandChroma) String() string {
 	if c.FadeDuration != nil {
 		cmd += " " + strconv.Itoa(*c.FadeDuration)
 	}
-	if c.FadeTween != nil {
-		cmd += " " + *c.FadeTween
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
 	}
 
 	return cmd
-}
-
-type BlendMode string
-
-const (
-	BlendModeNormal BlendMode = "normal"
-	BlendModeScreen BlendMode = "screen"
-)
-
-func ParseBlendMode(s string) (BlendMode, error) {
-	validBlendModes := map[BlendMode]any{
-		BlendModeNormal: nil,
-		BlendModeScreen: nil,
-	}
-
-	mode := BlendMode(s)
-	if _, ok := validBlendModes[mode]; !ok {
-		return "", fmt.Errorf("invalid blend mode: %s", s)
-	}
-	return mode, nil
 }
 
 type MixerCommandBlend struct {
@@ -124,7 +104,7 @@ type MixerCommandBlend struct {
 func (c MixerCommandBlend) String() string {
 	cmd := fmt.Sprintf("MIXER %d-%d BLEND", c.VideoChannel, c.Layer)
 	if c.BlendMode != nil {
-		cmd += " " + string(*c.BlendMode)
+		cmd += " " + c.BlendMode.String()
 	}
 	return cmd
 }
@@ -143,6 +123,29 @@ func (c MixerCommandInvert) String() string {
 		} else {
 			cmd += " 0"
 		}
+	}
+	return cmd
+}
+
+type MixerCommandOpacity struct {
+	MixerCommand
+
+	Opacity *float32
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandOpacity) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d OPACITY", c.VideoChannel, c.Layer)
+	if c.Opacity != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Opacity)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
 	}
 	return cmd
 }

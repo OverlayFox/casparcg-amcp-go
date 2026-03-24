@@ -67,7 +67,7 @@ func (b *MixerBuilder) GetChromaInfo() (returns.MixerChromaInfo, error) {
 
 type ChromaFade struct {
 	Duration int // in frames
-	Tween    string
+	Tween    types.TweenType
 }
 
 func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *ChromaFade) error {
@@ -90,7 +90,7 @@ func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *Chroma
 
 	if fade != nil {
 		cmd.FadeDuration = &fade.Duration
-		cmd.FadeTween = &fade.Tween
+		cmd.Tween = &fade.Tween
 	}
 
 	_, err := b.client.Send(cmd)
@@ -109,7 +109,7 @@ func (b *MixerBuilder) ChromaDisable(fade *ChromaFade) error {
 
 	if fade != nil {
 		cmd.FadeDuration = &fade.Duration
-		cmd.FadeTween = &fade.Tween
+		cmd.Tween = &fade.Tween
 	}
 
 	_, err := b.client.Send(cmd)

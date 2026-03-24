@@ -135,3 +135,51 @@ const (
 	DecklinkKeyerInternal               DecklinkKeyer = "internal"
 	DecklinkKeyerDefault                DecklinkKeyer = "default"
 )
+
+type TweenType string
+
+const (
+	TweenTypeLinear     TweenType = "linear"
+	TweenTypeEaseInSine TweenType = "easeinsine"
+)
+
+var validTweenTypes = map[TweenType]any{
+	TweenTypeLinear:     nil,
+	TweenTypeEaseInSine: nil,
+}
+
+func ParseTweenType(s string) (TweenType, error) {
+	tweenType := TweenType(s)
+	if _, ok := validTweenTypes[tweenType]; !ok {
+		return "", fmt.Errorf("invalid tween type: %s", s)
+	}
+	return tweenType, nil
+}
+
+func (t TweenType) String() string {
+	return string(t)
+}
+
+type BlendMode string
+
+const (
+	BlendModeNormal BlendMode = "normal"
+	BlendModeScreen BlendMode = "screen"
+)
+
+var validBlendModes = map[BlendMode]any{
+	BlendModeNormal: nil,
+	BlendModeScreen: nil,
+}
+
+func ParseBlendMode(s string) (BlendMode, error) {
+	mode := BlendMode(s)
+	if _, ok := validBlendModes[mode]; !ok {
+		return "", fmt.Errorf("invalid blend mode: %s", s)
+	}
+	return mode, nil
+}
+
+func (b BlendMode) String() string {
+	return string(b)
+}
