@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 )
@@ -22,6 +24,10 @@ func main() {
 
 	resp, err := client.PING("")
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
 	println("PING response:", resp)

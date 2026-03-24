@@ -1,4 +1,4 @@
-package types
+package casparcg
 
 type CasparCGError struct {
 	Code    int

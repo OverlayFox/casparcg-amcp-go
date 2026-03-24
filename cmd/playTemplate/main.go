@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -21,12 +23,20 @@ func main() {
 
 	err = client.CG(1, 10).ADD(1, "TITLE", true, nil)
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
 	time.Sleep(2 * time.Second)
 
 	err = client.CG(1, 10).STOP(1)
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
 }

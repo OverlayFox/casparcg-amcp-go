@@ -10,8 +10,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 // Client represents a connection to a CasparCG server.
@@ -82,7 +80,7 @@ func (c *Client) readResponse() ([]string, error) {
 	// Read the first line to get the response code
 	rawFirstLine, err := reader.ReadString('\n')
 	if err != nil {
-		return nil, types.CasparCGError{
+		return nil, CasparCGError{
 			Code:    0,
 			Message: fmt.Sprintf("failed to read response: %v", err),
 		}
@@ -92,7 +90,7 @@ func (c *Client) readResponse() ([]string, error) {
 	parts := strings.SplitN(firstLine, " ", 2)
 
 	if len(parts) < 1 {
-		return nil, types.CasparCGError{
+		return nil, CasparCGError{
 			Code:    0,
 			Message: "invalid response format",
 		}
@@ -101,13 +99,13 @@ func (c *Client) readResponse() ([]string, error) {
 	// Try to parse the first part as a numeric code
 	code, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return nil, types.CasparCGError{
+		return nil, CasparCGError{
 			Code:    0,
 			Message: fmt.Sprintf("could not parse response code: %v", err),
 		}
 	}
 
-	casparErr := types.CasparCGError{}
+	casparErr := CasparCGError{}
 	casparErr.Code = code
 	if len(parts) > 1 {
 		casparErr.Message = parts[1]
@@ -118,7 +116,7 @@ func (c *Client) readResponse() ([]string, error) {
 	// If no data is received, we assume there is none and return the response.
 	if casparErr.Code >= 200 && casparErr.Code < 300 {
 		if err := c.conn.SetReadDeadline(time.Now().Add(10 * time.Millisecond)); err != nil {
-			return nil, types.CasparCGError{
+			return nil, CasparCGError{
 				Code:    0,
 				Message: fmt.Sprintf("failed to set read deadline: %v", err),
 			}

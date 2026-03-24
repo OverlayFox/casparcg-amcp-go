@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -22,6 +23,10 @@ func main() {
 
 	data, err := client.VERSION()
 	if err != nil {
+		var casparErr casparcg.CasparCGError
+		if errors.As(err, &casparErr) {
+			fmt.Printf("CasparCG error: %d - %s\n", casparErr.Code, casparErr.Message)
+		}
 		panic(err)
 	}
 
