@@ -7,8 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- removed direct CasparCG Server return and wrapped error code in custom error object
+
+### Changed
+
+- split up `builder.go` into multiple subfiles
+
 ### Added
 
+- custom error object for CasparCG server returns
 - `.vscode` settings
 - `.golangci.yaml` linting and formatting
 - `.github/workflows` enforcement of updating changelog
