@@ -33,7 +33,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).ChromaEnable(returns.MixerChromaInfo{
+	err = client.Mixer(1, 1).ChromaEnable(returns.MixerInfoChroma{
 		Enabled:                 true,
 		TargetHue:               120,
 		HueWidth:                0.1,

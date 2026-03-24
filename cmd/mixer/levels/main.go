@@ -7,7 +7,6 @@ import (
 
 	"github.com/overlayfox/casparcg-amcp-go"
 	"github.com/overlayfox/casparcg-amcp-go/types"
-	"github.com/overlayfox/casparcg-amcp-go/types/returns"
 )
 
 func main() {
@@ -28,7 +27,7 @@ func main() {
 	}
 	fmt.Printf("Levels: %+v\n", originalLevels)
 
-	newLevels := returns.MixerLevelsInfo{
+	newLevels := types.MixerInfoLevels{
 		MinInput:  0.0627,
 		MaxInput:  0.922,
 		Gamma:     1,

@@ -50,7 +50,7 @@ func (b *MixerBuilder) Keyer(show bool) error {
 	return err
 }
 
-func (b *MixerBuilder) GetChromaInfo() (returns.MixerChromaInfo, error) {
+func (b *MixerBuilder) GetChromaInfo() (returns.MixerInfoChroma, error) {
 	cmd := types.MixerCommandChroma{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
@@ -59,13 +59,13 @@ func (b *MixerBuilder) GetChromaInfo() (returns.MixerChromaInfo, error) {
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return returns.MixerChromaInfo{}, err
+		return returns.MixerInfoChroma{}, err
 	}
 
-	return returns.MixerChromaInfoFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return returns.MixerInfoChromaFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
-func (b *MixerBuilder) ChromaEnable(params returns.MixerChromaInfo, fade *types.Fade) error {
+func (b *MixerBuilder) ChromaEnable(params returns.MixerInfoChroma, fade *types.Fade) error {
 	enable := true
 	cmd := types.MixerCommandChroma{
 		MixerCommand: types.MixerCommand{
@@ -289,7 +289,7 @@ func (b *MixerBuilder) SetContrast(contrast float32, fade *types.Fade) error {
 	return err
 }
 
-func (b *MixerBuilder) GetLevels() (returns.MixerLevelsInfo, error) {
+func (b *MixerBuilder) GetLevels() (types.MixerInfoLevels, error) {
 	cmd := types.MixerCommandLevels{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
@@ -298,13 +298,13 @@ func (b *MixerBuilder) GetLevels() (returns.MixerLevelsInfo, error) {
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return returns.MixerLevelsInfo{}, err
+		return types.MixerInfoLevels{}, err
 	}
 
-	return returns.MixerLevelsInfoFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return types.MixerInfoLevelsFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
-func (b *MixerBuilder) SetLevels(params returns.MixerLevelsInfo, fade *types.Fade) error {
+func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels, fade *types.Fade) error {
 	cmd := types.MixerCommandLevels{
 		MixerCommand: types.MixerCommand{
 			VideoChannel: b.videoChannel,
@@ -315,6 +315,42 @@ func (b *MixerBuilder) SetLevels(params returns.MixerLevelsInfo, fade *types.Fad
 		Gamma:     &params.Gamma,
 		MinOutput: &params.MinOutput,
 		MaxOutput: &params.MaxOutput,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+func (b *MixerBuilder) GetFill() (returns.MixerInfoFill, error) {
+	cmd := types.MixerCommandFill{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return returns.MixerInfoFill{}, err
+	}
+
+	return returns.MixerInfoFillFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+// SetFill scales/positions the video stream on the specified layer.
+// The positioning and scaling is done around the anchor point set by MIXER ANCHOR.
+func (b *MixerBuilder) SetFill(params types.MixerParamsFill, fade *types.Fade) error {
+	cmd := types.MixerCommandFill{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		X:      params.X,
+		Y:      params.Y,
+		XScale: params.XScale,
+		YScale: params.YScale,
 	}
 	if fade != nil {
 		cmd.Duration = &fade.Duration

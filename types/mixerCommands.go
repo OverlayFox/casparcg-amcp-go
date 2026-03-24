@@ -10,11 +10,6 @@ type MixerCommand struct {
 	Layer        int // defaults to 9999
 }
 
-type Fade struct {
-	Duration int // in frames
-	Tween    TweenType
-}
-
 type MixerCommandKeyer struct {
 	MixerCommand
 
@@ -253,6 +248,41 @@ func (c MixerCommandLevels) String() string {
 	}
 	if c.MaxOutput != nil {
 		cmd += " " + fmt.Sprintf("%f", *c.MaxOutput)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}
+
+type MixerCommandFill struct {
+	MixerCommand
+
+	X      *float32 // X the new x position, 0 = left edge of monitor, 0.5 = middle of monitor, 1.0 = right edge of monitor. Higher and lower values allowed.
+	Y      *float32 // Y the new y position, 0 = top edge of monitor, 0.5 = middle of monitor, 1.0 = bottom edge of monitor. Higher and lower values allowed.
+	XScale *float32 // XScale the new x scale, 1.0 = original size, 0.5 = half size, 2.0 = double size. Higher and lower values allowed.
+	YScale *float32 // YScale the new y scale, 1.0 = original size, 0.5 = half size, 2.0 = double size. Higher and lower values allowed.
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandFill) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d FILL", c.VideoChannel, c.Layer)
+	if c.X != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.X)
+	}
+	if c.Y != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Y)
+	}
+	if c.XScale != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.XScale)
+	}
+	if c.YScale != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.YScale)
 	}
 	if c.Duration != nil {
 		cmd += " " + strconv.Itoa(*c.Duration)

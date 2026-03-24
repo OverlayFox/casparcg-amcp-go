@@ -7,7 +7,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
-type MixerChromaInfo struct {
+type MixerInfoChroma struct {
 	Enabled                 bool
 	TargetHue               float32
 	HueWidth                float32
@@ -19,43 +19,43 @@ type MixerChromaInfo struct {
 	ShowMask                bool
 }
 
-func MixerChromaInfoFromResponse(data []string) (MixerChromaInfo, error) {
+func MixerInfoChromaFromResponse(data []string) (MixerInfoChroma, error) {
 	if len(data) < 9 {
-		return MixerChromaInfo{}, fmt.Errorf("unexpected response length: got %d, expected at least 9", len(data))
+		return MixerInfoChroma{}, fmt.Errorf("unexpected response length: got %d, expected at least 9", len(data))
 	}
 
 	enabled := data[0] == "1"
 	targetHue, err := strconv.ParseFloat(data[1], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid TargetHue value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid TargetHue value: %w", err)
 	}
 	hueWidth, err := strconv.ParseFloat(data[2], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid HueWidth value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid HueWidth value: %w", err)
 	}
 	minSaturation, err := strconv.ParseFloat(data[3], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid MinSaturation value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid MinSaturation value: %w", err)
 	}
 	minBrightness, err := strconv.ParseFloat(data[4], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid MinBrightness value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid MinBrightness value: %w", err)
 	}
 	softness, err := strconv.ParseFloat(data[5], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid Softness value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid Softness value: %w", err)
 	}
 	spillSuppress, err := strconv.ParseFloat(data[6], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid SpillSuppress value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid SpillSuppress value: %w", err)
 	}
 	spillSuppressSaturation, err := strconv.ParseFloat(data[7], 32)
 	if err != nil {
-		return MixerChromaInfo{}, fmt.Errorf("invalid SpillSuppressSaturation value: %w", err)
+		return MixerInfoChroma{}, fmt.Errorf("invalid SpillSuppressSaturation value: %w", err)
 	}
 	showMask := data[8] == "1"
 
-	return MixerChromaInfo{
+	return MixerInfoChroma{
 		Enabled:                 enabled,
 		TargetHue:               float32(targetHue),
 		HueWidth:                float32(hueWidth),
@@ -93,47 +93,39 @@ func FloatFromResponse(data []string) (float32, error) {
 	return float32(opacity), nil
 }
 
-type MixerLevelsInfo struct {
-	MinInput float32
-	MaxInput float32
-
-	Gamma float32
-
-	MinOutput float32
-	MaxOutput float32
+type MixerInfoFill struct {
+	X      float32
+	Y      float32
+	XScale float32
+	YScale float32
 }
 
-func MixerLevelsInfoFromResponse(data []string) (MixerLevelsInfo, error) {
-	if len(data) < 5 {
-		return MixerLevelsInfo{}, fmt.Errorf("unexpected response length: got %d, expected at least 5", len(data))
+func MixerInfoFillFromResponse(data []string) (MixerInfoFill, error) {
+	if len(data) < 4 {
+		return MixerInfoFill{}, fmt.Errorf("unexpected response length: got %d, expected at least 4", len(data))
 	}
 
-	minInput, err := strconv.ParseFloat(data[0], 32)
+	x, err := strconv.ParseFloat(data[0], 32)
 	if err != nil {
-		return MixerLevelsInfo{}, fmt.Errorf("invalid MinInput value: %w", err)
+		return MixerInfoFill{}, fmt.Errorf("invalid X value: %w", err)
 	}
-	maxInput, err := strconv.ParseFloat(data[1], 32)
+	y, err := strconv.ParseFloat(data[1], 32)
 	if err != nil {
-		return MixerLevelsInfo{}, fmt.Errorf("invalid MaxInput value: %w", err)
+		return MixerInfoFill{}, fmt.Errorf("invalid Y value: %w", err)
 	}
-	gamma, err := strconv.ParseFloat(data[2], 32)
+	xScale, err := strconv.ParseFloat(data[2], 32)
 	if err != nil {
-		return MixerLevelsInfo{}, fmt.Errorf("invalid Gamma value: %w", err)
+		return MixerInfoFill{}, fmt.Errorf("invalid XScale value: %w", err)
 	}
-	minOutput, err := strconv.ParseFloat(data[3], 32)
+	yScale, err := strconv.ParseFloat(data[3], 32)
 	if err != nil {
-		return MixerLevelsInfo{}, fmt.Errorf("invalid MinOutput value: %w", err)
-	}
-	maxOutput, err := strconv.ParseFloat(data[4], 32)
-	if err != nil {
-		return MixerLevelsInfo{}, fmt.Errorf("invalid MaxOutput value: %w", err)
+		return MixerInfoFill{}, fmt.Errorf("invalid YScale value: %w", err)
 	}
 
-	return MixerLevelsInfo{
-		MinInput:  float32(minInput),
-		MaxInput:  float32(maxInput),
-		Gamma:     float32(gamma),
-		MinOutput: float32(minOutput),
-		MaxOutput: float32(maxOutput),
+	return MixerInfoFill{
+		X:      float32(x),
+		Y:      float32(y),
+		XScale: float32(xScale),
+		YScale: float32(yScale),
 	}, nil
 }
