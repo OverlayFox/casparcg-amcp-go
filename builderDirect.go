@@ -127,8 +127,6 @@ func (c *Client) RESTART() error {
 	return err
 }
 
-// Query command methods
-
 var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d/]+)$`)
 
 // CINF returns information about a media file.
