@@ -200,3 +200,65 @@ func (c MixerCommandSaturation) String() string {
 	}
 	return cmd
 }
+
+type MixerCommandContrast struct {
+	MixerCommand
+
+	Contrast *float32
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandContrast) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d CONTRAST", c.VideoChannel, c.Layer)
+	if c.Contrast != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Contrast)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}
+
+type MixerCommandLevels struct {
+	MixerCommand
+
+	MinInput  *float32 // MinInput and MaxInput define the input range (between 0 and 1) to accept RGB values within.
+	MaxInput  *float32
+	Gamma     *float32 // Gamma adjusts the gamma of the image.
+	MinOutput *float32 // MinOutput and MaxOutput define the output range (between 0 and 1) to scale the accepted input RGB values to.
+	MaxOutput *float32
+
+	Duration *int
+	Tween    *TweenType
+}
+
+func (c MixerCommandLevels) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d LEVELS", c.VideoChannel, c.Layer)
+	if c.MinInput != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.MinInput)
+	}
+	if c.MaxInput != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.MaxInput)
+	}
+	if c.Gamma != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.Gamma)
+	}
+	if c.MinOutput != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.MinOutput)
+	}
+	if c.MaxOutput != nil {
+		cmd += " " + fmt.Sprintf("%f", *c.MaxOutput)
+	}
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}

@@ -257,3 +257,69 @@ func (b *MixerBuilder) SetSaturation(saturation float32, fade *types.Fade) error
 	_, err := b.client.Send(cmd)
 	return err
 }
+
+func (b *MixerBuilder) GetContrast() (float32, error) {
+	cmd := types.MixerCommandContrast{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+
+	return returns.FloatFromResponse(resp)
+}
+
+func (b *MixerBuilder) SetContrast(contrast float32, fade *types.Fade) error {
+	cmd := types.MixerCommandContrast{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Contrast: &contrast,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+func (b *MixerBuilder) GetLevels() (returns.MixerLevelsInfo, error) {
+	cmd := types.MixerCommandLevels{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return returns.MixerLevelsInfo{}, err
+	}
+
+	return returns.MixerLevelsInfoFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+func (b *MixerBuilder) SetLevels(params returns.MixerLevelsInfo, fade *types.Fade) error {
+	cmd := types.MixerCommandLevels{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		MinInput:  &params.MinInput,
+		MaxInput:  &params.MaxInput,
+		Gamma:     &params.Gamma,
+		MinOutput: &params.MinOutput,
+		MaxOutput: &params.MaxOutput,
+	}
+	if fade != nil {
+		cmd.Duration = &fade.Duration
+		cmd.Tween = &fade.Tween
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}
