@@ -128,3 +128,21 @@ func (c MixerCommandBlend) String() string {
 	}
 	return cmd
 }
+
+type MixerCommandInvert struct {
+	MixerCommand
+
+	Invert *bool
+}
+
+func (c MixerCommandInvert) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d INVERT", c.VideoChannel, c.Layer)
+	if c.Invert != nil {
+		if *c.Invert {
+			cmd += " 1"
+		} else {
+			cmd += " 0"
+		}
+	}
+	return cmd
+}

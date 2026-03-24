@@ -142,3 +142,30 @@ func (b *MixerBuilder) BlendMode(mode types.BlendMode) error {
 	_, err := b.client.Send(cmd)
 	return err
 }
+
+func (b *MixerBuilder) GetInvertState() (bool, error) {
+	cmd := types.MixerCommandInvert{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return false, err
+	}
+
+	return returns.MixerInvertStateFromResponse(resp)
+}
+
+func (b *MixerBuilder) Invert(state bool) error {
+	cmd := types.MixerCommandInvert{
+		MixerCommand: types.MixerCommand{
+			VideoChannel: b.videoChannel,
+			Layer:        b.layer,
+		},
+		Invert: &state,
+	}
+	_, err := b.client.Send(cmd)
+	return err
+}

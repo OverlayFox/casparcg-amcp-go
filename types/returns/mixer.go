@@ -85,3 +85,10 @@ func MixerBlendModeFromResponse(data []string) (types.BlendMode, error) {
 	}
 	return types.ParseBlendMode(data[0])
 }
+
+func MixerInvertStateFromResponse(data []string) (bool, error) {
+	if len(data) < 1 {
+		return false, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
+	}
+	return data[0] == "1", nil
+}
