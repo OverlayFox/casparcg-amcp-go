@@ -1,5 +1,11 @@
 package casparcg
 
+import "errors"
+
+var (
+	ErrValueOutOfRange = errors.New("value out of range")
+)
+
 type CasparCGError struct {
 	Code    int
 	Message string

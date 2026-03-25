@@ -141,8 +141,8 @@ func MixerClipFromResponse(data []string) (MixerClip, error) {
 }
 
 type MixerAnchor struct {
-	X float32
-	Y float32
+	X float32 // X defines the x anchor point, 0 = left edge of layer, 0.5 = middle of layer, 1.0 = right edge of layer. Higher and lower values allowed.
+	Y float32 // Y defines the y anchor point, 0 = top edge of layer, 0.5 = middle of layer, 1.0 = bottom edge of layer. Higher and lower values allowed.
 }
 
 func MixerAnchorFromResponse(data []string) (MixerAnchor, error) {

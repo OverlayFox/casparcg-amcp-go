@@ -121,8 +121,10 @@ func (b *MixerBuilder) GetChroma() (responses.MixerChroma, error) {
 }
 
 // SetChroma configures chroma key parameters and returns a ChromaBuilder.
+//
 // Use .Enable() or .Disable() to apply the settings.
-// Use mixer.Fade() before calling SetChroma to apply a transition.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetChroma(params responses.MixerChroma) *ChromaBuilder {
 	return &ChromaBuilder{
 		mixer:  b,
@@ -140,7 +142,6 @@ func (c *ChromaBuilder) Disable() error {
 	return c.mixer.applyChroma(false, nil)
 }
 
-// applyChroma is a helper method to enable/disable chroma with optional parameters.
 func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerChroma) error {
 	cmd := commands.MixerCommandChroma{
 		MixerCommand: b.baseMixerCommand(),
@@ -176,6 +177,10 @@ func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
 
 // SetBlendMode sets the blend mode for the layer.
 func (b *MixerBuilder) SetBlendMode(mode types.BlendMode) error {
+	if err := mode.Validate(); err != nil {
+		return err
+	}
+
 	cmd := commands.MixerCommandBlend{
 		MixerCommand: b.baseMixerCommand(),
 		BlendMode:    &mode,
@@ -207,9 +212,16 @@ func (b *MixerBuilder) GetOpacity() (float32, error) {
 	})
 }
 
-// SetOpacity sets the opacity value for the layer (0.0 to 1.0).
+// SetOpacity sets the opacity value for the layer.
+//
+// opacity: float32 - The new opacity value, 0.0 = completely transparent, 1.0 = fully opaque.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetOpacity(opacity float32) error {
+	if err := inRange("opacity", opacity, 0.0, 1.0); err != nil {
+		return err
+	}
+
 	cmd := commands.MixerCommandOpacity{
 		MixerCommand: b.baseMixerCommand(),
 		Opacity:      &opacity,
@@ -226,8 +238,15 @@ func (b *MixerBuilder) GetBrightness() (float32, error) {
 }
 
 // SetBrightness sets the brightness value for the layer.
+//
+// brightness: float32 - The new brightness value, 0.5 = original brightness, 0.0 = completely dark, 1.0 = double brightness.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetBrightness(brightness float32) error {
+	if err := inRange("brightness", brightness, 0.0, 1.0); err != nil {
+		return err
+	}
+
 	cmd := commands.MixerCommandBrightness{
 		MixerCommand: b.baseMixerCommand(),
 		Brightness:   &brightness,
@@ -244,8 +263,15 @@ func (b *MixerBuilder) GetSaturation() (float32, error) {
 }
 
 // SetSaturation sets the saturation value for the layer.
+//
+// saturation: float32 - The new saturation value, 0.5 = original saturation, 0.0 = completely desaturated (gray), 1.0 = double saturation.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetSaturation(saturation float32) error {
+	if err := inRange("saturation", saturation, 0.0, 1.0); err != nil {
+		return err
+	}
+
 	cmd := commands.MixerCommandSaturation{
 		MixerCommand: b.baseMixerCommand(),
 		Saturation:   &saturation,
@@ -262,8 +288,15 @@ func (b *MixerBuilder) GetContrast() (float32, error) {
 }
 
 // SetContrast sets the contrast value for the layer.
+//
+// contrast: float32 - The new contrast value, 0.5 = original contrast, 0.0 = completely gray, 1.0 = double contrast.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetContrast(contrast float32) error {
+	if err := inRange("contrast", contrast, 0.0, 1.0); err != nil {
+		return err
+	}
+
 	cmd := commands.MixerCommandContrast{
 		MixerCommand: b.baseMixerCommand(),
 		Contrast:     &contrast,
@@ -285,6 +318,7 @@ func (b *MixerBuilder) GetLevels() (types.MixerLevels, error) {
 }
 
 // SetLevels adjusts the input/output levels and gamma for the layer.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetLevels(params types.MixerLevels) error {
 	cmd := commands.MixerCommandLevels{
@@ -313,14 +347,15 @@ func (b *MixerBuilder) GetFill() (responses.MixerFill, error) {
 
 // SetFill scales and positions the video stream on the specified layer.
 // The positioning and scaling is performed around the anchor point set by MIXER ANCHOR.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetFill(params types.MixerParamsFill) error {
 	cmd := commands.MixerCommandFill{
 		MixerCommand: b.baseMixerCommand(),
-		X:            params.X,
-		Y:            params.Y,
-		XScale:       params.XScale,
-		YScale:       params.YScale,
+		X:            &params.X,
+		Y:            &params.Y,
+		XScale:       &params.XScale,
+		YScale:       &params.YScale,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
@@ -339,6 +374,8 @@ func (b *MixerBuilder) GetClip() (responses.MixerClip, error) {
 }
 
 // SetClip defines the rectangular viewport where a layer is rendered thru on the screen without being affected by MIXER FILL, MIXER ROTATION and MIXER PERSPECTIVE.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
 	cmd := commands.MixerClip{
 		MixerCommand: b.baseMixerCommand(),
@@ -363,7 +400,9 @@ func (b *MixerBuilder) GetAnchor() (responses.MixerAnchor, error) {
 	return responses.MixerAnchorFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
-// SetAnchor sets the anchor point of the specified layer.
+// SetAnchor changes the anchor point of the specified layer.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
 	cmd := commands.MixerAnchor{
 		MixerCommand: b.baseMixerCommand(),
@@ -374,6 +413,7 @@ func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
 	return b.sendCommand(cmd)
 }
 
+// GetCrop retrieves the current crop settings for the layer.
 func (b *MixerBuilder) GetCrop() (responses.MixerCrop, error) {
 	cmd := commands.MixerCrop{
 		MixerCommand: b.baseMixerCommand(),
@@ -385,6 +425,9 @@ func (b *MixerBuilder) GetCrop() (responses.MixerCrop, error) {
 	return responses.MixerCropFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
+// SetCrop sets the crop values for the layer.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
 	cmd := commands.MixerCrop{
 		MixerCommand: b.baseMixerCommand(),
@@ -399,6 +442,9 @@ func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
 	return b.sendCommand(cmd)
 }
 
+// GetRotation retrieves the current rotation angle for the layer in degrees.
+//
+// 0 = no rotation, 90 = 90 degrees clockwise, -90 = 90 degrees counterclockwise. Higher and lower values allowed.
 func (b *MixerBuilder) GetRotation() (float32, error) {
 	cmd := commands.MixerRotation{
 		MixerCommand: b.baseMixerCommand(),
@@ -410,6 +456,11 @@ func (b *MixerBuilder) GetRotation() (float32, error) {
 	return responses.FloatFromResponse(resp)
 }
 
+// SetRotation sets the rotation angle for the layer in degrees.
+//
+// rotation: float32 - The new rotation angle, 0 = no rotation, 90 = 90 degrees clockwise, -90 = 90 degrees counterclockwise. Higher and lower values allowed.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetRotation(rotation float32) error {
 	cmd := commands.MixerRotation{
 		MixerCommand: b.baseMixerCommand(),
@@ -419,6 +470,7 @@ func (b *MixerBuilder) SetRotation(rotation float32) error {
 	return b.sendCommand(cmd)
 }
 
+// GetPerspective retrieves the current perspective settings for the layer.
 func (b *MixerBuilder) GetPerspective() (responses.MixerPerspective, error) {
 	cmd := commands.MixerPerspective{
 		MixerCommand: b.baseMixerCommand(),
@@ -430,6 +482,9 @@ func (b *MixerBuilder) GetPerspective() (responses.MixerPerspective, error) {
 	return responses.MixerPerspectiveFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
+// SetPerspective sets the perspective transformation for the layer.
+//
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
 	cmd := commands.MixerPerspective{
 		MixerCommand: b.baseMixerCommand(),
@@ -480,6 +535,7 @@ func (b *MixerBuilder) GetVolume() (float32, error) {
 // SetVolume sets the audio volume for the layer.
 //
 // volume: float32 - The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+//
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetVolume(volume float32) error {
 	cmd := commands.MixerVolume{

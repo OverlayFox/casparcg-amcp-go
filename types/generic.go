@@ -184,6 +184,13 @@ func (b BlendMode) String() string {
 	return string(b)
 }
 
+func (b BlendMode) Validate() error {
+	if _, ok := validBlendModes[b]; !ok {
+		return fmt.Errorf("invalid blend mode: %s", b)
+	}
+	return nil
+}
+
 type VersionInfo string
 
 const (

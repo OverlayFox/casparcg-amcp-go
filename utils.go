@@ -44,3 +44,10 @@ func matchesToCINF(matches []string) (responses.CINF, error) {
 		FrameRate:    cinfFrameRate,
 	}, nil
 }
+
+func inRange(valueName string, value, min, max float32) error {
+	if value < min || value > max {
+		return fmt.Errorf("%w: %s must be between %f and %f", ErrValueOutOfRange, valueName, min, max)
+	}
+	return nil
+}
