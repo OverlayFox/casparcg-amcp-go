@@ -25,6 +25,12 @@ func (c *Client) Mixer(videoChannel, layer int) *MixerBuilder {
 	}
 }
 
+// sendCommand abstracts sending a command that does not expect a response value.
+func (b *MixerBuilder) sendCommand(cmd interface{ String() string }) error {
+	_, err := b.client.Send(cmd)
+	return err
+}
+
 // Fade sets a fade transition to be applied to the next setter operation.
 // The fade is automatically cleared after being used, so it only applies to one operation.
 // Returns the builder for method chaining.
@@ -48,12 +54,6 @@ func (b *MixerBuilder) getFloat32Value(cmd interface{ String() string }) (float3
 		return 0, err
 	}
 	return responses.FloatFromResponse(resp)
-}
-
-// setFloat32Value sets a float32 value using the provided command.
-func (b *MixerBuilder) setFloat32Value(cmd interface{ String() string }) error {
-	_, err := b.client.Send(cmd)
-	return err
 }
 
 // getBoolValue retrieves a boolean value using the provided command.
@@ -159,7 +159,7 @@ func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerChroma) e
 	}
 
 	b.applyFade(func(d *int) { cmd.FadeDuration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetBlendMode retrieves the current blend mode for the layer.
@@ -215,7 +215,7 @@ func (b *MixerBuilder) SetOpacity(opacity float32) error {
 		Opacity:      &opacity,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetBrightness retrieves the current brightness value for the layer.
@@ -233,7 +233,7 @@ func (b *MixerBuilder) SetBrightness(brightness float32) error {
 		Brightness:   &brightness,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetSaturation retrieves the current saturation value for the layer.
@@ -251,7 +251,7 @@ func (b *MixerBuilder) SetSaturation(saturation float32) error {
 		Saturation:   &saturation,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetContrast retrieves the current contrast value for the layer.
@@ -269,7 +269,7 @@ func (b *MixerBuilder) SetContrast(contrast float32) error {
 		Contrast:     &contrast,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetLevels retrieves the current levels settings for the layer.
@@ -296,7 +296,7 @@ func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels) error {
 		MaxOutput:    &params.MaxOutput,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetFill retrieves the current fill (position and scale) settings for the layer.
@@ -323,7 +323,7 @@ func (b *MixerBuilder) SetFill(params types.MixerParamsFill) error {
 		YScale:       params.YScale,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
 }
 
 // GetClip retrieves the current clip (position and scale) settings for the layer.
@@ -348,5 +348,28 @@ func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
 		Height:       params.Height,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.setFloat32Value(cmd)
+	return b.sendCommand(cmd)
+}
+
+// GetAnchor retrieves the current anchor point settings for the layer.
+func (b *MixerBuilder) GetAnchor() (responses.MixerAnchor, error) {
+	cmd := commands.MixerAnchor{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.MixerAnchor{}, err
+	}
+	return responses.MixerAnchorFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+// SetAnchor sets the anchor point of the specified layer.
+func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
+	cmd := commands.MixerAnchor{
+		MixerCommand: b.baseMixerCommand(),
+		X:            params.X,
+		Y:            params.Y,
+	}
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
 }

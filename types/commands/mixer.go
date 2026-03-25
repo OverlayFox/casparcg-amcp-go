@@ -321,3 +321,26 @@ func (c MixerClip) String() string {
 	}
 	return cmd
 }
+
+type MixerAnchor struct {
+	MixerCommand
+
+	X float32 // X: The x anchor point, 0 = left edge of layer, 0.5 = middle of layer, 1.0 = right edge of layer. Higher and lower values allowed.
+	Y float32 // Y: The y anchor point, 0 = top edge of layer, 0.5 = middle of layer, 1.0 = bottom edge of layer. Higher and lower values allowed.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerAnchor) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d ANCHOR", c.VideoChannel, c.Layer)
+	cmd += " " + fmt.Sprintf("%f", c.X)
+	cmd += " " + fmt.Sprintf("%f", c.Y)
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}

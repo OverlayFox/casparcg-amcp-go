@@ -166,3 +166,28 @@ func MixerClipFromResponse(data []string) (MixerClip, error) {
 		Height: float32(height),
 	}, nil
 }
+
+type MixerAnchor struct {
+	X float32
+	Y float32
+}
+
+func MixerAnchorFromResponse(data []string) (MixerAnchor, error) {
+	if len(data) < 2 {
+		return MixerAnchor{}, fmt.Errorf("unexpected response length: got %d, expected at least 2", len(data))
+	}
+
+	x, err := strconv.ParseFloat(data[0], 32)
+	if err != nil {
+		return MixerAnchor{}, fmt.Errorf("invalid X value: %w", err)
+	}
+	y, err := strconv.ParseFloat(data[1], 32)
+	if err != nil {
+		return MixerAnchor{}, fmt.Errorf("invalid Y value: %w", err)
+	}
+
+	return MixerAnchor{
+		X: float32(x),
+		Y: float32(y),
+	}, nil
+}
