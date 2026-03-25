@@ -290,6 +290,17 @@ func (c MixerPerspective) String() string {
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
+type MixerMipMap struct {
+	MixerCommand
+
+	Enable *bool
+}
+
+func (c MixerMipMap) String() string {
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "MIPMAP")
+	return appendBool(cmd, c.Enable)
+}
+
 //
 // Helper functions
 //

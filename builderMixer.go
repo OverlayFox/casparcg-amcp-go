@@ -445,3 +445,18 @@ func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
 }
+
+func (b *MixerBuilder) GetMipMap() (bool, error) {
+	cmd := commands.MixerMipMap{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	return b.getBoolValue(cmd)
+}
+
+func (b *MixerBuilder) SetMipMap(enable bool) error {
+	cmd := commands.MixerMipMap{
+		MixerCommand: b.baseMixerCommand(),
+		Enable:       &enable,
+	}
+	return b.setBoolValue(cmd)
+}
