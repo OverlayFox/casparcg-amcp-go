@@ -61,3 +61,10 @@ func MixerInfoLevelsFromResponse(data []string) (MixerInfoLevels, error) {
 		MaxOutput: float32(maxOutput),
 	}, nil
 }
+
+type MixerCrop struct {
+	LeftEdge   *float32
+	TopEdge    *float32
+	RightEdge  *float32
+	BottomEdge *float32
+}

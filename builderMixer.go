@@ -373,3 +373,34 @@ func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
 }
+
+func (b *MixerBuilder) GetCrop() (responses.MixerCrop, error) {
+	cmd := commands.MixerCrop{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.MixerCrop{}, err
+	}
+	return responses.MixerCropFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
+	cmd := commands.MixerCrop{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	if params.LeftEdge != nil {
+		cmd.LeftEdge = *params.LeftEdge
+	}
+	if params.TopEdge != nil {
+		cmd.TopEdge = *params.TopEdge
+	}
+	if params.RightEdge != nil {
+		cmd.RightEdge = *params.RightEdge
+	}
+	if params.BottomEdge != nil {
+		cmd.BottomEdge = *params.BottomEdge
+	}
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}

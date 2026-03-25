@@ -344,3 +344,30 @@ func (c MixerAnchor) String() string {
 	}
 	return cmd
 }
+
+type MixerCrop struct {
+	MixerCommand
+
+	LeftEdge   float32 // LeftEdge: A value between 0 and 1 defining how far into the layer to crop from the left edge.
+	TopEdge    float32 // TopEdge: A value between 0 and 1 defining how far into the layer to crop from the top edge.
+	RightEdge  float32 // RightEdge: A value between 0 and 1 defining how far into the layer to crop from the right edge.
+	BottomEdge float32 // BottomEdge: A value between 0 and 1 defining how far into the layer to crop from the bottom edge.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerCrop) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d CROP", c.VideoChannel, c.Layer)
+	cmd += " " + fmt.Sprintf("%f", c.LeftEdge)
+	cmd += " " + fmt.Sprintf("%f", c.TopEdge)
+	cmd += " " + fmt.Sprintf("%f", c.RightEdge)
+	cmd += " " + fmt.Sprintf("%f", c.BottomEdge)
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}

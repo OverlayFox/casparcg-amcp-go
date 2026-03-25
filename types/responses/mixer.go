@@ -191,3 +191,40 @@ func MixerAnchorFromResponse(data []string) (MixerAnchor, error) {
 		Y: float32(y),
 	}, nil
 }
+
+type MixerCrop struct {
+	LeftEdge   float32
+	TopEdge    float32
+	RightEdge  float32
+	BottomEdge float32
+}
+
+func MixerCropFromResponse(data []string) (MixerCrop, error) {
+	if len(data) < 4 {
+		return MixerCrop{}, fmt.Errorf("unexpected response length: got %d, expected at least 4", len(data))
+	}
+
+	leftEdge, err := strconv.ParseFloat(data[0], 32)
+	if err != nil {
+		return MixerCrop{}, fmt.Errorf("invalid LeftEdge value: %w", err)
+	}
+	topEdge, err := strconv.ParseFloat(data[1], 32)
+	if err != nil {
+		return MixerCrop{}, fmt.Errorf("invalid TopEdge value: %w", err)
+	}
+	rightEdge, err := strconv.ParseFloat(data[2], 32)
+	if err != nil {
+		return MixerCrop{}, fmt.Errorf("invalid RightEdge value: %w", err)
+	}
+	bottomEdge, err := strconv.ParseFloat(data[3], 32)
+	if err != nil {
+		return MixerCrop{}, fmt.Errorf("invalid BottomEdge value: %w", err)
+	}
+
+	return MixerCrop{
+		LeftEdge:   float32(leftEdge),
+		TopEdge:    float32(topEdge),
+		RightEdge:  float32(rightEdge),
+		BottomEdge: float32(bottomEdge),
+	}, nil
+}
