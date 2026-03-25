@@ -26,7 +26,7 @@ func main() {
 	}
 	fmt.Printf("Opacity: %f\n", opacity)
 
-	err = client.Mixer(1, 1).SetOpacity(0.4, nil)
+	err = client.Mixer(1, 1).SetOpacity(0.4)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetOpacity(1.0, nil)
+	err = client.Mixer(1, 1).SetOpacity(1.0)
 	if err != nil {
 		panic(err)
 	}

@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	enabled, err := client.Mixer(1, 1).GetKeyerState()
+	enabled, err := client.Mixer(1, 1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Keyer enabled: %t\n", enabled)
 
-	err = client.Mixer(1, 1).Keyer(true)
+	err = client.Mixer(1, 1).SetKeyer(true)
 	if err != nil {
 		panic(err)
 	}
 
-	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	enabled, err = client.Mixer(1, 1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).Keyer(false)
+	err = client.Mixer(1, 1).SetKeyer(false)
 	if err != nil {
 		panic(err)
 	}
 
-	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	enabled, err = client.Mixer(1, 1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}

@@ -34,7 +34,7 @@ func main() {
 		MinOutput: 0,
 		MaxOutput: 1,
 	}
-	err = client.Mixer(1, 1).SetLevels(newLevels, &types.Fade{Duration: 25, Tween: types.TweenTypeEaseInSine})
+	err = client.Mixer(1, 1).SetLevels(newLevels)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 
-	err = client.Mixer(1, 1).SetLevels(originalLevels, nil)
+	err = client.Mixer(1, 1).SetLevels(originalLevels)
 	if err != nil {
 		panic(err)
 	}

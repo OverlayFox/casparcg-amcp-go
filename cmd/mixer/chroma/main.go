@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
-	"github.com/overlayfox/casparcg-amcp-go/types"
 	"github.com/overlayfox/casparcg-amcp-go/types/responses"
 )
 
@@ -23,7 +22,7 @@ func main() {
 		}
 	}()
 
-	info, err := client.Mixer(1, 1).GetChromaInfo()
+	info, err := client.Mixer(1, 1).GetChroma()
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +32,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).ChromaEnable(responses.MixerInfoChroma{
+	err = client.Mixer(1, 1).SetChroma(responses.MixerInfoChroma{
 		Enabled:                 true,
 		TargetHue:               120,
 		HueWidth:                0.1,
@@ -43,28 +42,25 @@ func main() {
 		SpillSuppress:           0.1,
 		SpillSuppressSaturation: 0.7,
 		ShowMask:                false,
-	}, &types.Fade{
-		Duration: 25, // in frames
-		Tween:    "linear",
-	})
+	}).Enable()
 	if err != nil {
 		panic(err)
 	}
 
-	err = client.Mixer(1, 1).Keyer(true)
+	err = client.Mixer(1, 1).SetKeyer(true)
 	if err != nil {
 		panic(err)
 	}
-	enabled, err := client.Mixer(1, 1).GetKeyerState()
+	enabled, err := client.Mixer(1, 1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Keyer enabled: %t\n", enabled)
-	err = client.Mixer(1, 1).Keyer(false)
+	err = client.Mixer(1, 1).SetKeyer(false)
 	if err != nil {
 		panic(err)
 	}
-	enabled, err = client.Mixer(1, 1).GetKeyerState()
+	enabled, err = client.Mixer(1, 1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +68,7 @@ func main() {
 
 	time.Sleep(600 * time.Millisecond)
 
-	info, err = client.Mixer(1, 1).GetChromaInfo()
+	info, err = client.Mixer(1, 1).GetChroma()
 	if err != nil {
 		panic(err)
 	}
@@ -82,12 +78,12 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).ChromaDisable(nil)
+	err = client.Mixer(1, 1).SetChroma(responses.MixerInfoChroma{}).Disable()
 	if err != nil {
 		panic(err)
 	}
 
-	info, err = client.Mixer(1, 1).GetChromaInfo()
+	info, err = client.Mixer(1, 1).GetChroma()
 	if err != nil {
 		panic(err)
 	}

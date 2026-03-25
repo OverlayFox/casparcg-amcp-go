@@ -33,7 +33,7 @@ func main() {
 		XScale: float32Ptr(1.2),
 		YScale: float32Ptr(1.2),
 	}
-	err = client.Mixer(1, 1).SetFill(newFill, &types.Fade{Duration: 25, Tween: types.TweenTypeEaseInSine})
+	err = client.Mixer(1, 1).SetFill(newFill)
 
 	if err != nil {
 		panic(err)
@@ -52,7 +52,7 @@ func main() {
 		Y:      &originalFill.Y,
 		XScale: &originalFill.XScale,
 		YScale: &originalFill.YScale,
-	}, nil)
+	})
 	if err != nil {
 		panic(err)
 	}

@@ -26,7 +26,7 @@ func main() {
 	}
 	fmt.Printf("Brightness: %f\n", brightness)
 
-	err = client.Mixer(1, 1).SetBrightness(2, nil)
+	err = client.Mixer(1, 1).SetBrightness(2)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetBrightness(1.0, nil)
+	err = client.Mixer(1, 1).SetBrightness(1.0)
 	if err != nil {
 		panic(err)
 	}

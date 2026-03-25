@@ -26,7 +26,7 @@ func main() {
 	}
 	fmt.Printf("Saturation: %f\n", saturation)
 
-	err = client.Mixer(1, 1).SetSaturation(0, nil)
+	err = client.Mixer(1, 1).SetSaturation(0)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetSaturation(1.0, nil)
+	err = client.Mixer(1, 1).SetSaturation(1.0)
 	if err != nil {
 		panic(err)
 	}

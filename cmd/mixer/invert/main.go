@@ -20,7 +20,7 @@ func main() {
 		}
 	}()
 
-	invertState, err := client.Mixer(1, 1).GetInvertState()
+	invertState, err := client.Mixer(1, 1).GetInvert()
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	invertState, err = client.Mixer(1, 1).GetInvertState()
+	invertState, err = client.Mixer(1, 1).GetInvert()
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	invertState, err = client.Mixer(1, 1).GetInvertState()
+	invertState, err = client.Mixer(1, 1).GetInvert()
 	if err != nil {
 		panic(err)
 	}
