@@ -316,6 +316,17 @@ func (c MixerVolume) String() string {
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
+type MixerMasterVolume struct {
+	MixerCommand
+
+	Volume *float32 // Volume: The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+}
+
+func (c MixerMasterVolume) String() string {
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "VOLUME")
+	return appendFloat(cmd, c.Volume)
+}
+
 //
 // Helper functions
 //

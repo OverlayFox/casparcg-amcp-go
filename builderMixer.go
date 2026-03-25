@@ -480,11 +480,37 @@ func (b *MixerBuilder) GetVolume() (float32, error) {
 // SetVolume sets the audio volume for the layer.
 //
 // volume: float32 - The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+// Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerBuilder) SetVolume(volume float32) error {
 	cmd := commands.MixerVolume{
 		MixerCommand: b.baseMixerCommand(),
 		Volume:       &volume,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}
+
+// GetMasterVolume retrieves the current master audio volume for the video channel.
+//
+// 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerBuilder) GetMasterVolume() (float32, error) {
+	cmd := commands.MixerMasterVolume{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+	return responses.FloatFromResponse(resp)
+}
+
+// SetMasterVolume sets the master audio volume for the video channel.
+//
+// volume: float32 - The new master volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerBuilder) SetMasterVolume(volume float32) error {
+	cmd := commands.MixerMasterVolume{
+		MixerCommand: b.baseMixerCommand(),
+		Volume:       &volume,
+	}
 	return b.sendCommand(cmd)
 }
