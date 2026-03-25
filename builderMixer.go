@@ -105,25 +105,25 @@ func (b *MixerBuilder) SetKeyer(show bool) error {
 // ChromaBuilder provides a fluent interface for chroma key operations.
 type ChromaBuilder struct {
 	mixer  *MixerBuilder
-	params responses.MixerInfoChroma
+	params responses.MixerChroma
 }
 
 // GetChroma retrieves the current chroma key settings for the layer.
-func (b *MixerBuilder) GetChroma() (responses.MixerInfoChroma, error) {
+func (b *MixerBuilder) GetChroma() (responses.MixerChroma, error) {
 	cmd := commands.MixerCommandChroma{
 		MixerCommand: b.baseMixerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return responses.MixerInfoChroma{}, err
+		return responses.MixerChroma{}, err
 	}
-	return responses.MixerInfoChromaFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return responses.MixerChromaFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
 // SetChroma configures chroma key parameters and returns a ChromaBuilder.
 // Use .Enable() or .Disable() to apply the settings.
 // Use mixer.Fade() before calling SetChroma to apply a transition.
-func (b *MixerBuilder) SetChroma(params responses.MixerInfoChroma) *ChromaBuilder {
+func (b *MixerBuilder) SetChroma(params responses.MixerChroma) *ChromaBuilder {
 	return &ChromaBuilder{
 		mixer:  b,
 		params: params,
@@ -141,7 +141,7 @@ func (c *ChromaBuilder) Disable() error {
 }
 
 // applyChroma is a helper method to enable/disable chroma with optional parameters.
-func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerInfoChroma) error {
+func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerChroma) error {
 	cmd := commands.MixerCommandChroma{
 		MixerCommand: b.baseMixerCommand(),
 		Enable:       &enable,
@@ -300,15 +300,15 @@ func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels) error {
 }
 
 // GetFill retrieves the current fill (position and scale) settings for the layer.
-func (b *MixerBuilder) GetFill() (responses.MixerInfoFill, error) {
+func (b *MixerBuilder) GetFill() (responses.MixerFill, error) {
 	cmd := commands.MixerCommandFill{
 		MixerCommand: b.baseMixerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return responses.MixerInfoFill{}, err
+		return responses.MixerFill{}, err
 	}
-	return responses.MixerInfoFillFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return responses.MixerFillFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
 // SetFill scales and positions the video stream on the specified layer.
@@ -321,6 +321,31 @@ func (b *MixerBuilder) SetFill(params types.MixerParamsFill) error {
 		Y:            params.Y,
 		XScale:       params.XScale,
 		YScale:       params.YScale,
+	}
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.setFloat32Value(cmd)
+}
+
+// GetClip retrieves the current clip (position and scale) settings for the layer.
+func (b *MixerBuilder) GetClip() (responses.MixerClip, error) {
+	cmd := commands.MixerClip{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.MixerClip{}, err
+	}
+	return responses.MixerClipFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+// SetClip defines the rectangular viewport where a layer is rendered thru on the screen without being affected by MIXER FILL, MIXER ROTATION and MIXER PERSPECTIVE.
+func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
+	cmd := commands.MixerClip{
+		MixerCommand: b.baseMixerCommand(),
+		X:            params.X,
+		Y:            params.Y,
+		Width:        params.Width,
+		Height:       params.Height,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.setFloat32Value(cmd)

@@ -294,3 +294,30 @@ func (c MixerCommandFill) String() string {
 	}
 	return cmd
 }
+
+type MixerClip struct {
+	MixerCommand
+
+	X      float32 // X: The new x position, 0 = left edge of monitor, 0.5 = middle of monitor, 1.0 = right edge of monitor. Higher and lower values allowed.
+	Y      float32 // Y: The new y position, 0 = top edge of monitor, 0.5 = middle of monitor, 1.0 = bottom edge of monitor. Higher and lower values allowed.
+	Width  float32 // Width: The new width, 1 = 1x the screen width, 0.5 = half the screen width. Higher and lower values allowed. Negative values flips the layer.
+	Height float32 // Height: The new height, 1 = 1x the screen height, 0.5 = half the screen height. Higher and lower values allowed. Negative values flips the layer.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerClip) String() string {
+	cmd := fmt.Sprintf("MIXER %d-%d CLIP", c.VideoChannel, c.Layer)
+	cmd += " " + fmt.Sprintf("%f", c.X)
+	cmd += " " + fmt.Sprintf("%f", c.Y)
+	cmd += " " + fmt.Sprintf("%f", c.Width)
+	cmd += " " + fmt.Sprintf("%f", c.Height)
+	if c.Duration != nil {
+		cmd += " " + strconv.Itoa(*c.Duration)
+	}
+	if c.Tween != nil {
+		cmd += " " + c.Tween.String()
+	}
+	return cmd
+}

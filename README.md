@@ -22,7 +22,7 @@
 
 `casparcg-amcp-go` provides a clean, concurrent interface to communicate with [CasparCG](https://casparcg.com/) servers using [Go](https://go.dev/). It abstracts away the raw socket communication, handling connection management, command parsing, and response mapping so you can focus on building your broadcast logic.
 
-Commands are built directly based on the official [AMCP Protocol Documentation](https://github.com/CasparCG/help/wiki/AMCP-Protocol).
+Commands are built directly based on the official [AMCP Protocol Documentation](https://casparcg.com/docs/wiki/protocols/amcp-protocol).
 
 ### ✨ Features
 

@@ -32,7 +32,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).SetChroma(responses.MixerInfoChroma{
+	err = client.Mixer(1, 1).SetChroma(responses.MixerChroma{
 		Enabled:                 true,
 		TargetHue:               120,
 		HueWidth:                0.1,
@@ -78,7 +78,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).SetChroma(responses.MixerInfoChroma{}).Disable()
+	err = client.Mixer(1, 1).SetChroma(responses.MixerChroma{}).Disable()
 	if err != nil {
 		panic(err)
 	}
