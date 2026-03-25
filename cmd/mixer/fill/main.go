@@ -28,10 +28,10 @@ func main() {
 	fmt.Printf("Fill: %+v\n", originalFill)
 
 	newFill := types.MixerParamsFill{
-		X:      float32Ptr(0.5),
-		Y:      float32Ptr(0.5),
-		XScale: float32Ptr(1.2),
-		YScale: float32Ptr(1.2),
+		X:      0.5,
+		Y:      0.5,
+		XScale: 1.2,
+		YScale: 1.2,
 	}
 	err = client.Mixer(1, 1).SetFill(newFill)
 
@@ -48,10 +48,10 @@ func main() {
 	time.Sleep(2 * time.Second)
 
 	err = client.Mixer(1, 1).SetFill(types.MixerParamsFill{
-		X:      &originalFill.X,
-		Y:      &originalFill.Y,
-		XScale: &originalFill.XScale,
-		YScale: &originalFill.YScale,
+		X:      originalFill.X,
+		Y:      originalFill.Y,
+		XScale: originalFill.XScale,
+		YScale: originalFill.YScale,
 	})
 	if err != nil {
 		panic(err)
@@ -62,8 +62,4 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("Fill: %+v\n", fill)
-}
-
-func float32Ptr(f float32) *float32 {
-	return &f
 }

@@ -570,3 +570,22 @@ func (b *MixerBuilder) SetMasterVolume(volume float32) error {
 	}
 	return b.sendCommand(cmd)
 }
+
+// GetStraightAlphaOutput retrieves the current straight alpha output state for the channel.
+func (b *MixerBuilder) GetStraightAlphaOutput() (bool, error) {
+	cmd := commands.MixerStraightAlphaOutput{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	return b.getBoolValue(cmd)
+}
+
+// SetStraightAlphaOutput enables or disables straight alpha output for the channel.
+//
+// This only works per video channel, not per layer.
+func (b *MixerBuilder) SetStraightAlphaOutput(enable bool) error {
+	cmd := commands.MixerStraightAlphaOutput{
+		MixerCommand: b.baseMixerCommand(),
+		Enable:       &enable,
+	}
+	return b.setBoolValue(cmd)
+}

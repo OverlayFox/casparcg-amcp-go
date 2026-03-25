@@ -327,6 +327,17 @@ func (c MixerMasterVolume) String() string {
 	return appendFloat(cmd, c.Volume)
 }
 
+type MixerStraightAlphaOutput struct {
+	MixerCommand
+
+	Enable *bool
+}
+
+func (c MixerStraightAlphaOutput) String() string {
+	cmd := fmt.Sprintf("MIXER %d STRAIGHT_ALPHA_OUTPUT", c.VideoChannel)
+	return appendBool(cmd, c.Enable)
+}
+
 //
 // Helper functions
 //
