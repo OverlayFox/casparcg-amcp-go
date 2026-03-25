@@ -171,7 +171,7 @@ func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
 	if err != nil {
 		return "", err
 	}
-	return responses.MixerBlendModeFromResponse(resp)
+	return responses.BlendModeFromResponse(resp)
 }
 
 // SetBlendMode sets the blend mode for the layer.
@@ -273,20 +273,20 @@ func (b *MixerBuilder) SetContrast(contrast float32) error {
 }
 
 // GetLevels retrieves the current levels settings for the layer.
-func (b *MixerBuilder) GetLevels() (types.MixerInfoLevels, error) {
+func (b *MixerBuilder) GetLevels() (types.MixerLevels, error) {
 	cmd := commands.MixerCommandLevels{
 		MixerCommand: b.baseMixerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return types.MixerInfoLevels{}, err
+		return types.MixerLevels{}, err
 	}
 	return types.MixerInfoLevelsFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
 // SetLevels adjusts the input/output levels and gamma for the layer.
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels) error {
+func (b *MixerBuilder) SetLevels(params types.MixerLevels) error {
 	cmd := commands.MixerCommandLevels{
 		MixerCommand: b.baseMixerCommand(),
 		MinInput:     &params.MinInput,
@@ -342,10 +342,10 @@ func (b *MixerBuilder) GetClip() (responses.MixerClip, error) {
 func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
 	cmd := commands.MixerClip{
 		MixerCommand: b.baseMixerCommand(),
-		X:            params.X,
-		Y:            params.Y,
-		Width:        params.Width,
-		Height:       params.Height,
+		X:            &params.X,
+		Y:            &params.Y,
+		Width:        &params.Width,
+		Height:       &params.Height,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
@@ -367,8 +367,8 @@ func (b *MixerBuilder) GetAnchor() (responses.MixerAnchor, error) {
 func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
 	cmd := commands.MixerAnchor{
 		MixerCommand: b.baseMixerCommand(),
-		X:            params.X,
-		Y:            params.Y,
+		X:            &params.X,
+		Y:            &params.Y,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
@@ -389,18 +389,59 @@ func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
 	cmd := commands.MixerCrop{
 		MixerCommand: b.baseMixerCommand(),
 	}
-	if params.LeftEdge != nil {
-		cmd.LeftEdge = *params.LeftEdge
+
+	cmd.LeftEdge = &params.LeftEdge
+	cmd.TopEdge = &params.TopEdge
+	cmd.RightEdge = &params.RightEdge
+	cmd.BottomEdge = &params.BottomEdge
+
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}
+
+func (b *MixerBuilder) GetRotation() (float32, error) {
+	cmd := commands.MixerRotation{
+		MixerCommand: b.baseMixerCommand(),
 	}
-	if params.TopEdge != nil {
-		cmd.TopEdge = *params.TopEdge
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
 	}
-	if params.RightEdge != nil {
-		cmd.RightEdge = *params.RightEdge
+	return responses.FloatFromResponse(resp)
+}
+
+func (b *MixerBuilder) SetRotation(rotation float32) error {
+	cmd := commands.MixerRotation{
+		MixerCommand: b.baseMixerCommand(),
+		Angle:        &rotation,
 	}
-	if params.BottomEdge != nil {
-		cmd.BottomEdge = *params.BottomEdge
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}
+
+func (b *MixerBuilder) GetPerspective() (responses.MixerPerspective, error) {
+	cmd := commands.MixerPerspective{
+		MixerCommand: b.baseMixerCommand(),
 	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.MixerPerspective{}, err
+	}
+	return responses.MixerPerspectiveFromResponse(strings.Split(strings.Join(resp, ""), " "))
+}
+
+func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
+	cmd := commands.MixerPerspective{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	cmd.TopLeftX = &params.TopLeftX
+	cmd.TopLeftY = &params.TopLeftY
+	cmd.TopRightX = &params.TopRightX
+	cmd.TopRightY = &params.TopRightY
+	cmd.BottomLeftX = &params.BottomLeftX
+	cmd.BottomLeftY = &params.BottomLeftY
+	cmd.BottomRightX = &params.BottomRightX
+	cmd.BottomRightY = &params.BottomRightY
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
 	return b.sendCommand(cmd)
 }

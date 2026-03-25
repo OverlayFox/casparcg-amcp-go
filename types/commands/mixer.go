@@ -19,15 +19,8 @@ type MixerCommandKeyer struct {
 }
 
 func (c MixerCommandKeyer) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d KEYER", c.VideoChannel, c.Layer)
-	if c.Show != nil {
-		if *c.Show {
-			cmd += " 1"
-		} else {
-			cmd += " 0"
-		}
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "KEYER")
+	return appendBool(cmd, c.Show)
 }
 
 type MixerCommandChroma struct {
@@ -49,52 +42,17 @@ type MixerCommandChroma struct {
 }
 
 func (c MixerCommandChroma) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d CHROMA", c.VideoChannel, c.Layer)
-	if c.Enable != nil {
-		if *c.Enable {
-			cmd += " 1"
-		} else {
-			cmd += " 0"
-		}
-	}
-
-	if c.TargetHue != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.TargetHue)
-	}
-	if c.HueWidth != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.HueWidth)
-	}
-	if c.MinSaturation != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MinSaturation)
-	}
-	if c.MinBrightness != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MinBrightness)
-	}
-	if c.Softness != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Softness)
-	}
-	if c.SpillSuppress != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.SpillSuppress)
-	}
-	if c.SpillSuppressSaturation != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.SpillSuppressSaturation)
-	}
-	if c.ShowMask != nil {
-		if *c.ShowMask {
-			cmd += " 1"
-		} else {
-			cmd += " 0"
-		}
-	}
-
-	if c.FadeDuration != nil {
-		cmd += " " + strconv.Itoa(*c.FadeDuration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CHROMA")
+	cmd = appendBool(cmd, c.Enable)
+	cmd = appendFloat(cmd, c.TargetHue)
+	cmd = appendFloat(cmd, c.HueWidth)
+	cmd = appendFloat(cmd, c.MinSaturation)
+	cmd = appendFloat(cmd, c.MinBrightness)
+	cmd = appendFloat(cmd, c.Softness)
+	cmd = appendFloat(cmd, c.SpillSuppress)
+	cmd = appendFloat(cmd, c.SpillSuppressSaturation)
+	cmd = appendBool(cmd, c.ShowMask)
+	return appendDurationTween(cmd, c.FadeDuration, c.Tween)
 }
 
 type MixerCommandBlend struct {
@@ -104,7 +62,7 @@ type MixerCommandBlend struct {
 }
 
 func (c MixerCommandBlend) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d BLEND", c.VideoChannel, c.Layer)
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "BLEND")
 	if c.BlendMode != nil {
 		cmd += " " + c.BlendMode.String()
 	}
@@ -118,15 +76,8 @@ type MixerCommandInvert struct {
 }
 
 func (c MixerCommandInvert) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d INVERT", c.VideoChannel, c.Layer)
-	if c.Invert != nil {
-		if *c.Invert {
-			cmd += " 1"
-		} else {
-			cmd += " 0"
-		}
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "INVERT")
+	return appendBool(cmd, c.Invert)
 }
 
 type MixerCommandOpacity struct {
@@ -139,17 +90,9 @@ type MixerCommandOpacity struct {
 }
 
 func (c MixerCommandOpacity) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d OPACITY", c.VideoChannel, c.Layer)
-	if c.Opacity != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Opacity)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "OPACITY")
+	cmd = appendFloat(cmd, c.Opacity)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCommandBrightness struct {
@@ -162,17 +105,9 @@ type MixerCommandBrightness struct {
 }
 
 func (c MixerCommandBrightness) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d BRIGHTNESS", c.VideoChannel, c.Layer)
-	if c.Brightness != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Brightness)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "BRIGHTNESS")
+	cmd = appendFloat(cmd, c.Brightness)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCommandSaturation struct {
@@ -185,17 +120,9 @@ type MixerCommandSaturation struct {
 }
 
 func (c MixerCommandSaturation) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d SATURATION", c.VideoChannel, c.Layer)
-	if c.Saturation != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Saturation)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "SATURATION")
+	cmd = appendFloat(cmd, c.Saturation)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCommandContrast struct {
@@ -208,17 +135,9 @@ type MixerCommandContrast struct {
 }
 
 func (c MixerCommandContrast) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d CONTRAST", c.VideoChannel, c.Layer)
-	if c.Contrast != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Contrast)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CONTRAST")
+	cmd = appendFloat(cmd, c.Contrast)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCommandLevels struct {
@@ -235,29 +154,13 @@ type MixerCommandLevels struct {
 }
 
 func (c MixerCommandLevels) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d LEVELS", c.VideoChannel, c.Layer)
-	if c.MinInput != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MinInput)
-	}
-	if c.MaxInput != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MaxInput)
-	}
-	if c.Gamma != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Gamma)
-	}
-	if c.MinOutput != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MinOutput)
-	}
-	if c.MaxOutput != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.MaxOutput)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "LEVELS")
+	cmd = appendFloat(cmd, c.MinInput)
+	cmd = appendFloat(cmd, c.MaxInput)
+	cmd = appendFloat(cmd, c.Gamma)
+	cmd = appendFloat(cmd, c.MinOutput)
+	cmd = appendFloat(cmd, c.MaxOutput)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCommandFill struct {
@@ -273,101 +176,151 @@ type MixerCommandFill struct {
 }
 
 func (c MixerCommandFill) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d FILL", c.VideoChannel, c.Layer)
-	if c.X != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.X)
-	}
-	if c.Y != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.Y)
-	}
-	if c.XScale != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.XScale)
-	}
-	if c.YScale != nil {
-		cmd += " " + fmt.Sprintf("%f", *c.YScale)
-	}
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "FILL")
+	cmd = appendFloat(cmd, c.X)
+	cmd = appendFloat(cmd, c.Y)
+	cmd = appendFloat(cmd, c.XScale)
+	cmd = appendFloat(cmd, c.YScale)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerClip struct {
 	MixerCommand
 
-	X      float32 // X: The new x position, 0 = left edge of monitor, 0.5 = middle of monitor, 1.0 = right edge of monitor. Higher and lower values allowed.
-	Y      float32 // Y: The new y position, 0 = top edge of monitor, 0.5 = middle of monitor, 1.0 = bottom edge of monitor. Higher and lower values allowed.
-	Width  float32 // Width: The new width, 1 = 1x the screen width, 0.5 = half the screen width. Higher and lower values allowed. Negative values flips the layer.
-	Height float32 // Height: The new height, 1 = 1x the screen height, 0.5 = half the screen height. Higher and lower values allowed. Negative values flips the layer.
+	X      *float32 // X: The new x position, 0 = left edge of monitor, 0.5 = middle of monitor, 1.0 = right edge of monitor. Higher and lower values allowed.
+	Y      *float32 // Y: The new y position, 0 = top edge of monitor, 0.5 = middle of monitor, 1.0 = bottom edge of monitor. Higher and lower values allowed.
+	Width  *float32 // Width: The new width, 1 = 1x the screen width, 0.5 = half the screen width. Higher and lower values allowed. Negative values flips the layer.
+	Height *float32 // Height: The new height, 1 = 1x the screen height, 0.5 = half the screen height. Higher and lower values allowed. Negative values flips the layer.
 
 	Duration *int
 	Tween    *types.TweenType
 }
 
 func (c MixerClip) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d CLIP", c.VideoChannel, c.Layer)
-	cmd += " " + fmt.Sprintf("%f", c.X)
-	cmd += " " + fmt.Sprintf("%f", c.Y)
-	cmd += " " + fmt.Sprintf("%f", c.Width)
-	cmd += " " + fmt.Sprintf("%f", c.Height)
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CLIP")
+	cmd = appendFloat(cmd, c.X)
+	cmd = appendFloat(cmd, c.Y)
+	cmd = appendFloat(cmd, c.Width)
+	cmd = appendFloat(cmd, c.Height)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerAnchor struct {
 	MixerCommand
 
-	X float32 // X: The x anchor point, 0 = left edge of layer, 0.5 = middle of layer, 1.0 = right edge of layer. Higher and lower values allowed.
-	Y float32 // Y: The y anchor point, 0 = top edge of layer, 0.5 = middle of layer, 1.0 = bottom edge of layer. Higher and lower values allowed.
+	X *float32 // X: The x anchor point, 0 = left edge of layer, 0.5 = middle of layer, 1.0 = right edge of layer. Higher and lower values allowed.
+	Y *float32 // Y: The y anchor point, 0 = top edge of layer, 0.5 = middle of layer, 1.0 = bottom edge of layer. Higher and lower values allowed.
 
 	Duration *int
 	Tween    *types.TweenType
 }
 
 func (c MixerAnchor) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d ANCHOR", c.VideoChannel, c.Layer)
-	cmd += " " + fmt.Sprintf("%f", c.X)
-	cmd += " " + fmt.Sprintf("%f", c.Y)
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
-	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
-	}
-	return cmd
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "ANCHOR")
+	cmd = appendFloat(cmd, c.X)
+	cmd = appendFloat(cmd, c.Y)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerCrop struct {
 	MixerCommand
 
-	LeftEdge   float32 // LeftEdge: A value between 0 and 1 defining how far into the layer to crop from the left edge.
-	TopEdge    float32 // TopEdge: A value between 0 and 1 defining how far into the layer to crop from the top edge.
-	RightEdge  float32 // RightEdge: A value between 0 and 1 defining how far into the layer to crop from the right edge.
-	BottomEdge float32 // BottomEdge: A value between 0 and 1 defining how far into the layer to crop from the bottom edge.
+	LeftEdge   *float32 // LeftEdge: A value between 0 and 1 defining how far into the layer to crop from the left edge.
+	TopEdge    *float32 // TopEdge: A value between 0 and 1 defining how far into the layer to crop from the top edge.
+	RightEdge  *float32 // RightEdge: A value between 0 and 1 defining how far into the layer to crop from the right edge.
+	BottomEdge *float32 // BottomEdge: A value between 0 and 1 defining how far into the layer to crop from the bottom edge.
 
 	Duration *int
 	Tween    *types.TweenType
 }
 
 func (c MixerCrop) String() string {
-	cmd := fmt.Sprintf("MIXER %d-%d CROP", c.VideoChannel, c.Layer)
-	cmd += " " + fmt.Sprintf("%f", c.LeftEdge)
-	cmd += " " + fmt.Sprintf("%f", c.TopEdge)
-	cmd += " " + fmt.Sprintf("%f", c.RightEdge)
-	cmd += " " + fmt.Sprintf("%f", c.BottomEdge)
-	if c.Duration != nil {
-		cmd += " " + strconv.Itoa(*c.Duration)
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CROP")
+	cmd = appendFloat(cmd, c.LeftEdge)
+	cmd = appendFloat(cmd, c.TopEdge)
+	cmd = appendFloat(cmd, c.RightEdge)
+	cmd = appendFloat(cmd, c.BottomEdge)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
+}
+
+type MixerRotation struct {
+	MixerCommand
+
+	Angle *float32 // Angle: The absolute rotation angle in degrees going from 0 to 360.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerRotation) String() string {
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "ROTATION")
+	cmd = appendFloat(cmd, c.Angle)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
+}
+
+type MixerPerspective struct {
+	MixerCommand
+
+	TopLeftX *float32 // TopLeftX: Defines the x coordinate of the top left corner.
+	TopLeftY *float32 // TopLeftY: Defines the y coordinate of the top left corner.
+
+	TopRightX *float32 // TopRightX: Defines the x coordinate of the top right corner.
+	TopRightY *float32 // TopRightY: Defines the y coordinate of the top right corner.
+
+	BottomLeftX *float32 // BottomLeftX: Defines the x coordinate of the bottom left corner.
+	BottomLeftY *float32 // BottomLeftY: Defines the y coordinate of the bottom left corner.
+
+	BottomRightX *float32 // BottomRightX: Defines the x coordinate of the bottom right corner.
+	BottomRightY *float32 // BottomRightY: Defines the y coordinate of the bottom right corner.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerPerspective) String() string {
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "PERSPECTIVE")
+	cmd = appendFloat(cmd, c.TopLeftX)
+	cmd = appendFloat(cmd, c.TopLeftY)
+	cmd = appendFloat(cmd, c.TopRightX)
+	cmd = appendFloat(cmd, c.TopRightY)
+	cmd = appendFloat(cmd, c.BottomLeftX)
+	cmd = appendFloat(cmd, c.BottomLeftY)
+	cmd = appendFloat(cmd, c.BottomRightX)
+	cmd = appendFloat(cmd, c.BottomRightY)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
+}
+
+//
+// Helper functions
+//
+
+func baseMixerCmd(channel, layer int, name string) string {
+	return fmt.Sprintf("MIXER %d-%d %s", channel, layer, name)
+}
+
+func appendFloat(cmd string, value *float32) string {
+	if value != nil {
+		return cmd + " " + fmt.Sprintf("%f", *value)
 	}
-	if c.Tween != nil {
-		cmd += " " + c.Tween.String()
+	return cmd
+}
+
+func appendBool(cmd string, value *bool) string {
+	if value != nil {
+		if *value {
+			return cmd + " 1"
+		}
+		return cmd + " 0"
+	}
+	return cmd
+}
+
+func appendDurationTween(cmd string, duration *int, tween *types.TweenType) string {
+	if duration != nil {
+		cmd += " " + strconv.Itoa(*duration)
+	}
+	if tween != nil {
+		cmd += " " + tween.String()
 	}
 	return cmd
 }

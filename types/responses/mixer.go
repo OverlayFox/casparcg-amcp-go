@@ -3,8 +3,6 @@ package responses
 import (
 	"fmt"
 	"strconv"
-
-	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 type MixerChroma struct {
@@ -66,31 +64,6 @@ func MixerChromaFromResponse(data []string) (MixerChroma, error) {
 		SpillSuppressSaturation: float32(spillSuppressSaturation),
 		ShowMask:                showMask,
 	}, nil
-}
-
-func MixerBlendModeFromResponse(data []string) (types.BlendMode, error) {
-	if len(data) < 1 {
-		return "", fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
-	}
-	return types.ParseBlendMode(data[0])
-}
-
-func BoolFromResponse(data []string) (bool, error) {
-	if len(data) < 1 {
-		return false, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
-	}
-	return data[0] == "1", nil
-}
-
-func FloatFromResponse(data []string) (float32, error) {
-	if len(data) < 1 {
-		return 0, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
-	}
-	opacity, err := strconv.ParseFloat(data[0], 32)
-	if err != nil {
-		return 0, fmt.Errorf("invalid opacity value: %w", err)
-	}
-	return float32(opacity), nil
 }
 
 type MixerFill struct {
@@ -226,5 +199,69 @@ func MixerCropFromResponse(data []string) (MixerCrop, error) {
 		TopEdge:    float32(topEdge),
 		RightEdge:  float32(rightEdge),
 		BottomEdge: float32(bottomEdge),
+	}, nil
+}
+
+type MixerPerspective struct {
+	TopLeftX float32 // TopLeftX: Defines the x coordinate of the top left corner.
+	TopLeftY float32 // TopLeftY: Defines the y coordinate of the top left corner.
+
+	TopRightX float32 // TopRightX: Defines the x coordinate of the top right corner.
+	TopRightY float32 // TopRightY: Defines the y coordinate of the top right corner.
+
+	BottomLeftX float32 // BottomLeftX: Defines the x coordinate of the bottom left corner.
+	BottomLeftY float32 // BottomLeftY: Defines the y coordinate of the bottom left corner.
+
+	BottomRightX float32 // BottomRightX: Defines the x coordinate of the bottom right corner.
+	BottomRightY float32 // BottomRightY: Defines the y coordinate of the bottom right corner.
+}
+
+func MixerPerspectiveFromResponse(data []string) (MixerPerspective, error) {
+	if len(data) < 8 {
+		return MixerPerspective{}, fmt.Errorf("unexpected response length: got %d, expected at least 8", len(data))
+	}
+
+	topLeftX, err := strconv.ParseFloat(data[0], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid TopLeftX value: %w", err)
+	}
+	topLeftY, err := strconv.ParseFloat(data[1], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid TopLeftY value: %w", err)
+	}
+	topRightX, err := strconv.ParseFloat(data[2], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid TopRightX value: %w", err)
+	}
+	topRightY, err := strconv.ParseFloat(data[3], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid TopRightY value: %w", err)
+	}
+	bottomLeftX, err := strconv.ParseFloat(data[4], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid BottomLeftX value: %w", err)
+	}
+	bottomLeftY, err := strconv.ParseFloat(data[5], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid BottomLeftY value: %w", err)
+	}
+	bottomRightX, err := strconv.ParseFloat(data[6], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid BottomRightX value: %w", err)
+	}
+	bottomRightY, err := strconv.ParseFloat(data[7], 32)
+	if err != nil {
+		return MixerPerspective{}, fmt.Errorf("invalid BottomRightY value: %w", err)
+	}
+
+	return MixerPerspective{
+		TopLeftX:     float32(topLeftX),
+		TopLeftY:     float32(topLeftY),
+		TopRightX:    float32(topRightX),
+		TopRightY:    float32(topRightY),
+		BottomLeftX:  float32(bottomLeftX),
+		BottomLeftY:  float32(bottomLeftY),
+		BottomRightX: float32(bottomRightX),
+		BottomRightY: float32(bottomRightY),
 	}, nil
 }

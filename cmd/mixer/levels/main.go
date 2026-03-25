@@ -27,7 +27,7 @@ func main() {
 	}
 	fmt.Printf("Levels: %+v\n", originalLevels)
 
-	newLevels := types.MixerInfoLevels{
+	newLevels := types.MixerLevels{
 		MinInput:  0.0627,
 		MaxInput:  0.922,
 		Gamma:     1,
