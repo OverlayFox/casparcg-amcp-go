@@ -446,6 +446,7 @@ func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
 	return b.sendCommand(cmd)
 }
 
+// GetMipMap retrieves the current mipmap state for the layer.
 func (b *MixerBuilder) GetMipMap() (bool, error) {
 	cmd := commands.MixerMipMap{
 		MixerCommand: b.baseMixerCommand(),
@@ -453,10 +454,37 @@ func (b *MixerBuilder) GetMipMap() (bool, error) {
 	return b.getBoolValue(cmd)
 }
 
+// SetMipMap enables or disables mipmapping for the layer.
 func (b *MixerBuilder) SetMipMap(enable bool) error {
 	cmd := commands.MixerMipMap{
 		MixerCommand: b.baseMixerCommand(),
 		Enable:       &enable,
 	}
 	return b.setBoolValue(cmd)
+}
+
+// GetVolume retrieves the current audio volume for the layer.
+//
+// 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerBuilder) GetVolume() (float32, error) {
+	cmd := commands.MixerVolume{
+		MixerCommand: b.baseMixerCommand(),
+	}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return 0, err
+	}
+	return responses.FloatFromResponse(resp)
+}
+
+// SetVolume sets the audio volume for the layer.
+//
+// volume: float32 - The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerBuilder) SetVolume(volume float32) error {
+	cmd := commands.MixerVolume{
+		MixerCommand: b.baseMixerCommand(),
+		Volume:       &volume,
+	}
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
 }

@@ -301,6 +301,21 @@ func (c MixerMipMap) String() string {
 	return appendBool(cmd, c.Enable)
 }
 
+type MixerVolume struct {
+	MixerCommand
+
+	Volume *float32 // Volume: The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerVolume) String() string {
+	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "VOLUME")
+	cmd = appendFloat(cmd, c.Volume)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
+}
+
 //
 // Helper functions
 //
