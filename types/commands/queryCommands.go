@@ -1,7 +1,9 @@
-package types
+package commands
 
 import (
 	"strconv"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 // QueryCommandCINF returns information about a media file.
@@ -47,18 +49,9 @@ func (c QueryCommandTLS) String() string {
 	return "TLS"
 }
 
-type VersionInfo string
-
-const (
-	VersionInfoServer       VersionInfo = "SERVER"
-	VersionInfoFlash        VersionInfo = "FLASH"
-	VersionInfoTemplateHost VersionInfo = "TEMPLATE_HOST"
-	VersionInfoCEF          VersionInfo = "CEF"
-)
-
 // QueryCommandVersion returns the version of specified component.
 type QueryCommandVersion struct {
-	Component VersionInfo
+	Component types.VersionInfo
 }
 
 func (c QueryCommandVersion) String() string {
@@ -68,20 +61,9 @@ func (c QueryCommandVersion) String() string {
 	return "VERSION"
 }
 
-type InfoComponent string
-
-const (
-	InfoComponentConfig  InfoComponent = "CONFIG"
-	InfoComponentPaths   InfoComponent = "PATHS"
-	InfoComponentSystem  InfoComponent = "SYSTEM"
-	InfoComponentServer  InfoComponent = "SERVER"
-	InfoComponentQueues  InfoComponent = "QUEUES"
-	InfoComponentThreads InfoComponent = "THREADS"
-)
-
 // QueryCommandInfo retrieves a list of available channels.
 type QueryCommandInfo struct {
-	Component InfoComponent
+	Component types.InfoComponent
 }
 
 func (c QueryCommandInfo) String() string {

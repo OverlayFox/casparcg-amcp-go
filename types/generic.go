@@ -183,3 +183,38 @@ func ParseBlendMode(s string) (BlendMode, error) {
 func (b BlendMode) String() string {
 	return string(b)
 }
+
+type VersionInfo string
+
+const (
+	VersionInfoServer       VersionInfo = "SERVER"
+	VersionInfoFlash        VersionInfo = "FLASH"
+	VersionInfoTemplateHost VersionInfo = "TEMPLATE_HOST"
+	VersionInfoCEF          VersionInfo = "CEF"
+)
+
+type InfoComponent string
+
+const (
+	InfoComponentConfig  InfoComponent = "CONFIG"
+	InfoComponentPaths   InfoComponent = "PATHS"
+	InfoComponentSystem  InfoComponent = "SYSTEM"
+	InfoComponentServer  InfoComponent = "SERVER"
+	InfoComponentQueues  InfoComponent = "QUEUES"
+	InfoComponentThreads InfoComponent = "THREADS"
+)
+
+type SetVariable string
+
+const (
+	SetVariableMode          SetVariable = "MODE"
+	SetVariableChannelLayout SetVariable = "CHANNEL_LAYOUT"
+)
+
+type LockAction string
+
+const (
+	LockActionAcquire LockAction = "ACQUIRE"
+	LockActionRelease LockAction = "RELEASE"
+	LockActionClear   LockAction = "CLEAR"
+)

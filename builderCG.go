@@ -1,6 +1,8 @@
 package casparcg
 
-import "github.com/overlayfox/casparcg-amcp-go/types"
+import (
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+)
 
 // CGBuilder provides a fluent interface for building CG (template) commands.
 type CGBuilder struct {
@@ -21,8 +23,8 @@ func (c *Client) CG(videoChannel, layer int) *CGBuilder {
 
 // ADD prepares a template for displaying.
 func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) error {
-	cmd := types.TemplateCommandCGAdd{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGAdd{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -37,8 +39,8 @@ func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *str
 
 // PLAY plays and displays the template in the specified layer.
 func (b *CGBuilder) PLAY(cgLayer int) error {
-	cmd := types.TemplateCommandCGPlay{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGPlay{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -50,8 +52,8 @@ func (b *CGBuilder) PLAY(cgLayer int) error {
 
 // STOP stops the template in the specified layer.
 func (b *CGBuilder) STOP(cgLayer int) error {
-	cmd := types.TemplateCommandCGStop{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGStop{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -63,8 +65,8 @@ func (b *CGBuilder) STOP(cgLayer int) error {
 
 // NEXT triggers a "continue" in the template.
 func (b *CGBuilder) NEXT(cgLayer int) error {
-	cmd := types.TemplateCommandCGNext{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGNext{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -76,8 +78,8 @@ func (b *CGBuilder) NEXT(cgLayer int) error {
 
 // REMOVE removes the template from the specified layer.
 func (b *CGBuilder) REMOVE(cgLayer int) error {
-	cmd := types.TemplateCommandCGRemove{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGRemove{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -89,8 +91,8 @@ func (b *CGBuilder) REMOVE(cgLayer int) error {
 
 // CLEAR removes all templates on the video layer.
 func (b *CGBuilder) CLEAR() error {
-	cmd := types.TemplateCommandCGClear{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGClear{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -101,8 +103,8 @@ func (b *CGBuilder) CLEAR() error {
 
 // UPDATE sends new data to the template on specified layer.
 func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
-	cmd := types.TemplateCommandCGUpdate{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGUpdate{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -115,8 +117,8 @@ func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
 
 // INVOKE invokes the given method on the template.
 func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
-	cmd := types.TemplateCommandCGInvoke{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGInvoke{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -129,8 +131,8 @@ func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
 
 // INFO retrieves information about the template on the specified layer.
 func (b *CGBuilder) INFO(cgLayer *int) error {
-	cmd := types.TemplateCommandCGInfo{
-		TemplateCommandCG: types.TemplateCommandCG{
+	cmd := commands.TemplateCommandCGInfo{
+		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},

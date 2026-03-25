@@ -8,7 +8,7 @@ import (
 
 	"github.com/overlayfox/casparcg-amcp-go"
 	"github.com/overlayfox/casparcg-amcp-go/types"
-	"github.com/overlayfox/casparcg-amcp-go/types/returns"
+	"github.com/overlayfox/casparcg-amcp-go/types/responses"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).ChromaEnable(returns.MixerInfoChroma{
+	err = client.Mixer(1, 1).ChromaEnable(responses.MixerInfoChroma{
 		Enabled:                 true,
 		TargetHue:               120,
 		HueWidth:                0.1,

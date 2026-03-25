@@ -1,6 +1,8 @@
 package casparcg
 
-import "github.com/overlayfox/casparcg-amcp-go/types"
+import (
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+)
 
 // LayerBuilder provides a fluent interface for building layer-based commands.
 type LayerBuilder struct {
@@ -21,8 +23,8 @@ func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
 
 // LOAD loads a clip to the layer.
 func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
-	cmd := types.CommandLoad{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandLoad{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -35,8 +37,8 @@ func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
 
 // PLAY plays content on the layer.
 func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
-	cmd := types.CommandPlay{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandPlay{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -49,8 +51,8 @@ func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
 
 // PAUSE pauses playback on the layer.
 func (b *LayerBuilder) PAUSE() error {
-	cmd := types.CommandPause{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandPause{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -61,8 +63,8 @@ func (b *LayerBuilder) PAUSE() error {
 
 // RESUME resumes playback on the layer.
 func (b *LayerBuilder) RESUME() error {
-	cmd := types.CommandResume{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandResume{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -73,8 +75,8 @@ func (b *LayerBuilder) RESUME() error {
 
 // STOP stops playback on the layer.
 func (b *LayerBuilder) STOP() error {
-	cmd := types.CommandStop{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandStop{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -85,8 +87,8 @@ func (b *LayerBuilder) STOP() error {
 
 // CLEAR clears the layer.
 func (b *LayerBuilder) CLEAR() error {
-	cmd := types.CommandClear{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandClear{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -97,8 +99,8 @@ func (b *LayerBuilder) CLEAR() error {
 
 // CALL calls a function on the layer.
 func (b *LayerBuilder) CALL(params map[string]string) error {
-	cmd := types.CommandCall{
-		BasicCommand: types.BasicCommand{
+	cmd := commands.CommandCall{
+		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},

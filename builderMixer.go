@@ -4,7 +4,8 @@ import (
 	"strings"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
-	"github.com/overlayfox/casparcg-amcp-go/types/returns"
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+	"github.com/overlayfox/casparcg-amcp-go/types/responses"
 )
 
 type MixerBuilder struct {
@@ -22,8 +23,8 @@ func (c *Client) Mixer(videoChannel, layer int) *MixerBuilder {
 }
 
 func (b *MixerBuilder) GetKeyerState() (bool, error) {
-	cmd := types.MixerCommandKeyer{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandKeyer{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -33,14 +34,14 @@ func (b *MixerBuilder) GetKeyerState() (bool, error) {
 		return false, err
 	}
 
-	return returns.BoolFromResponse(resp)
+	return responses.BoolFromResponse(resp)
 }
 
 // Keyer replaces layer n+1's alpha with the R (red) channel of layer n, and hides the RGB channels of layer n.
 // If show is true then the specified layer will not be rendered, instead it will be used as the key for the layer above.
 func (b *MixerBuilder) Keyer(show bool) error {
-	cmd := types.MixerCommandKeyer{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandKeyer{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -50,25 +51,25 @@ func (b *MixerBuilder) Keyer(show bool) error {
 	return err
 }
 
-func (b *MixerBuilder) GetChromaInfo() (returns.MixerInfoChroma, error) {
-	cmd := types.MixerCommandChroma{
-		MixerCommand: types.MixerCommand{
+func (b *MixerBuilder) GetChromaInfo() (responses.MixerInfoChroma, error) {
+	cmd := commands.MixerCommandChroma{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return returns.MixerInfoChroma{}, err
+		return responses.MixerInfoChroma{}, err
 	}
 
-	return returns.MixerInfoChromaFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return responses.MixerInfoChromaFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
-func (b *MixerBuilder) ChromaEnable(params returns.MixerInfoChroma, fade *types.Fade) error {
+func (b *MixerBuilder) ChromaEnable(params responses.MixerInfoChroma, fade *types.Fade) error {
 	enable := true
-	cmd := types.MixerCommandChroma{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandChroma{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -94,8 +95,8 @@ func (b *MixerBuilder) ChromaEnable(params returns.MixerInfoChroma, fade *types.
 
 func (b *MixerBuilder) ChromaDisable(fade *types.Fade) error {
 	enable := false
-	cmd := types.MixerCommandChroma{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandChroma{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -112,8 +113,8 @@ func (b *MixerBuilder) ChromaDisable(fade *types.Fade) error {
 }
 
 func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
-	cmd := types.MixerCommandBlend{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandBlend{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -123,12 +124,12 @@ func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
 		return "", err
 	}
 
-	return returns.MixerBlendModeFromResponse(resp)
+	return responses.MixerBlendModeFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetBlendMode(mode types.BlendMode) error {
-	cmd := types.MixerCommandBlend{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandBlend{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -139,8 +140,8 @@ func (b *MixerBuilder) SetBlendMode(mode types.BlendMode) error {
 }
 
 func (b *MixerBuilder) GetInvertState() (bool, error) {
-	cmd := types.MixerCommandInvert{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandInvert{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -150,12 +151,12 @@ func (b *MixerBuilder) GetInvertState() (bool, error) {
 		return false, err
 	}
 
-	return returns.BoolFromResponse(resp)
+	return responses.BoolFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetInvert(state bool) error {
-	cmd := types.MixerCommandInvert{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandInvert{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -166,8 +167,8 @@ func (b *MixerBuilder) SetInvert(state bool) error {
 }
 
 func (b *MixerBuilder) GetOpacity() (float32, error) {
-	cmd := types.MixerCommandOpacity{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandOpacity{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -177,12 +178,12 @@ func (b *MixerBuilder) GetOpacity() (float32, error) {
 		return 0, err
 	}
 
-	return returns.FloatFromResponse(resp)
+	return responses.FloatFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetOpacity(opacity float32, fade *types.Fade) error {
-	cmd := types.MixerCommandOpacity{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandOpacity{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -197,8 +198,8 @@ func (b *MixerBuilder) SetOpacity(opacity float32, fade *types.Fade) error {
 }
 
 func (b *MixerBuilder) GetBrightness() (float32, error) {
-	cmd := types.MixerCommandBrightness{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandBrightness{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -208,12 +209,12 @@ func (b *MixerBuilder) GetBrightness() (float32, error) {
 		return 0, err
 	}
 
-	return returns.FloatFromResponse(resp)
+	return responses.FloatFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetBrightness(brightness float32, fade *types.Fade) error {
-	cmd := types.MixerCommandBrightness{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandBrightness{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -228,8 +229,8 @@ func (b *MixerBuilder) SetBrightness(brightness float32, fade *types.Fade) error
 }
 
 func (b *MixerBuilder) GetSaturation() (float32, error) {
-	cmd := types.MixerCommandSaturation{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandSaturation{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -239,12 +240,12 @@ func (b *MixerBuilder) GetSaturation() (float32, error) {
 		return 0, err
 	}
 
-	return returns.FloatFromResponse(resp)
+	return responses.FloatFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetSaturation(saturation float32, fade *types.Fade) error {
-	cmd := types.MixerCommandSaturation{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandSaturation{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -259,8 +260,8 @@ func (b *MixerBuilder) SetSaturation(saturation float32, fade *types.Fade) error
 }
 
 func (b *MixerBuilder) GetContrast() (float32, error) {
-	cmd := types.MixerCommandContrast{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandContrast{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -270,12 +271,12 @@ func (b *MixerBuilder) GetContrast() (float32, error) {
 		return 0, err
 	}
 
-	return returns.FloatFromResponse(resp)
+	return responses.FloatFromResponse(resp)
 }
 
 func (b *MixerBuilder) SetContrast(contrast float32, fade *types.Fade) error {
-	cmd := types.MixerCommandContrast{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandContrast{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -290,8 +291,8 @@ func (b *MixerBuilder) SetContrast(contrast float32, fade *types.Fade) error {
 }
 
 func (b *MixerBuilder) GetLevels() (types.MixerInfoLevels, error) {
-	cmd := types.MixerCommandLevels{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandLevels{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -305,8 +306,8 @@ func (b *MixerBuilder) GetLevels() (types.MixerInfoLevels, error) {
 }
 
 func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels, fade *types.Fade) error {
-	cmd := types.MixerCommandLevels{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandLevels{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
@@ -324,26 +325,26 @@ func (b *MixerBuilder) SetLevels(params types.MixerInfoLevels, fade *types.Fade)
 	return err
 }
 
-func (b *MixerBuilder) GetFill() (returns.MixerInfoFill, error) {
-	cmd := types.MixerCommandFill{
-		MixerCommand: types.MixerCommand{
+func (b *MixerBuilder) GetFill() (responses.MixerInfoFill, error) {
+	cmd := commands.MixerCommandFill{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
-		return returns.MixerInfoFill{}, err
+		return responses.MixerInfoFill{}, err
 	}
 
-	return returns.MixerInfoFillFromResponse(strings.Split(strings.Join(resp, ""), " "))
+	return responses.MixerInfoFillFromResponse(strings.Split(strings.Join(resp, ""), " "))
 }
 
 // SetFill scales/positions the video stream on the specified layer.
 // The positioning and scaling is done around the anchor point set by MIXER ANCHOR.
 func (b *MixerBuilder) SetFill(params types.MixerParamsFill, fade *types.Fade) error {
-	cmd := types.MixerCommandFill{
-		MixerCommand: types.MixerCommand{
+	cmd := commands.MixerCommandFill{
+		MixerCommand: commands.MixerCommand{
 			VideoChannel: b.videoChannel,
 			Layer:        b.layer,
 		},

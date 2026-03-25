@@ -1,4 +1,4 @@
-package returns
+package responses
 
 import "github.com/overlayfox/casparcg-amcp-go/types"
 

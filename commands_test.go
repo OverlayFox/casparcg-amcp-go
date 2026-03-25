@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
 )
 
 func TestCommandSerialization(t *testing.T) {
@@ -14,8 +15,8 @@ func TestCommandSerialization(t *testing.T) {
 	}{
 		{
 			name: "CG STOP",
-			command: types.TemplateCommandCGStop{
-				TemplateCommandCG: types.TemplateCommandCG{
+			command: commands.TemplateCommandCGStop{
+				TemplateCommandCG: commands.TemplateCommandCG{
 					VideoChannel: 1,
 					Layer:        12,
 				},
@@ -25,8 +26,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY with clip",
-			command: types.CommandPlay{
-				BasicCommand: types.BasicCommand{
+			command: commands.CommandPlay{
+				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -36,8 +37,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY without clip",
-			command: types.CommandPlay{
-				BasicCommand: types.BasicCommand{
+			command: commands.CommandPlay{
+				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -46,8 +47,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOAD",
-			command: types.CommandLoad{
-				BasicCommand: types.BasicCommand{
+			command: commands.CommandLoad{
+				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        11,
 				},
@@ -57,8 +58,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PAUSE",
-			command: types.CommandPause{
-				BasicCommand: types.BasicCommand{
+			command: commands.CommandPause{
+				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -67,8 +68,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "STOP",
-			command: types.CommandStop{
-				BasicCommand: types.BasicCommand{
+			command: commands.CommandStop{
+				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -77,27 +78,27 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "CLS without directory",
-			command: types.QueryCommandCLS{
+			command: commands.QueryCommandCLS{
 				Directory: nil,
 			},
 			expected: "CLS",
 		},
 		{
 			name: "CLS with directory",
-			command: types.QueryCommandCLS{
+			command: commands.QueryCommandCLS{
 				Directory: strPtr("subfolder"),
 			},
 			expected: `CLS "subfolder"`,
 		},
 		{
 			name:     "VERSION",
-			command:  types.QueryCommandVersion{},
+			command:  commands.QueryCommandVersion{},
 			expected: "VERSION",
 		},
 		{
 			name: "CG ADD with data",
-			command: types.TemplateCommandCGAdd{
-				TemplateCommandCG: types.TemplateCommandCG{
+			command: commands.TemplateCommandCGAdd{
+				TemplateCommandCG: commands.TemplateCommandCG{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -110,8 +111,8 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "CG CLEAR",
-			command: types.TemplateCommandCGClear{
-				TemplateCommandCG: types.TemplateCommandCG{
+			command: commands.TemplateCommandCGClear{
+				TemplateCommandCG: commands.TemplateCommandCG{
 					VideoChannel: 1,
 					Layer:        10,
 				},
@@ -120,14 +121,14 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOGLEVEL",
-			command: types.CommandLogLevel{
+			command: commands.CommandLogLevel{
 				Level: types.LogLevelInfo,
 			},
 			expected: "LOG LEVEL info",
 		},
 		{
 			name: "SWAP layers",
-			command: types.CommandSwap{
+			command: commands.CommandSwap{
 				VideoChannel1: 1,
 				Layer1:        intPtr(10),
 				VideoChannel2: 1,
@@ -138,7 +139,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP with transforms",
-			command: types.CommandSwap{
+			command: commands.CommandSwap{
 				VideoChannel1: 1,
 				Layer1:        intPtr(10),
 				VideoChannel2: 2,

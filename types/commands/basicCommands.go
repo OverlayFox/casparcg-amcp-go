@@ -1,9 +1,11 @@
-package types
+package commands
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 type CommandInterface interface {
@@ -168,25 +170,18 @@ func (c CommandPrint) String() string {
 }
 
 type CommandLogLevel struct {
-	Level LogLevel
+	Level types.LogLevel
 }
 
 func (c CommandLogLevel) String() string {
 	return "LOG LEVEL " + string(c.Level)
 }
 
-type SetVariable string
-
-const (
-	SetVariableMode          SetVariable = "MODE"
-	SetVariableChannelLayout SetVariable = "CHANNEL_LAYOUT"
-)
-
 // CommandSet changes the value of a channel variable.
 type CommandSet struct {
 	VideoChannel int
 
-	Variable SetVariable
+	Variable types.SetVariable
 	Value    string
 }
 
@@ -194,17 +189,9 @@ func (c CommandSet) String() string {
 	return fmt.Sprintf("SET %d %s %s", c.VideoChannel, c.Variable, c.Value)
 }
 
-type LockAction string
-
-const (
-	LockActionAcquire LockAction = "ACQUIRE"
-	LockActionRelease LockAction = "RELEASE"
-	LockActionClear   LockAction = "CLEAR"
-)
-
 type CommandLock struct {
 	VideoChannel int
-	Action       LockAction
+	Action       types.LockAction
 	Secret       *string
 }
 

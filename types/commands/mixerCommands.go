@@ -1,8 +1,10 @@
-package types
+package commands
 
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 type MixerCommand struct {
@@ -43,7 +45,7 @@ type MixerCommandChroma struct {
 	ShowMask                *bool
 
 	FadeDuration *int
-	Tween        *TweenType
+	Tween        *types.TweenType
 }
 
 func (c MixerCommandChroma) String() string {
@@ -98,7 +100,7 @@ func (c MixerCommandChroma) String() string {
 type MixerCommandBlend struct {
 	MixerCommand
 
-	BlendMode *BlendMode
+	BlendMode *types.BlendMode
 }
 
 func (c MixerCommandBlend) String() string {
@@ -133,7 +135,7 @@ type MixerCommandOpacity struct {
 	Opacity *float32
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandOpacity) String() string {
@@ -156,7 +158,7 @@ type MixerCommandBrightness struct {
 	Brightness *float32
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandBrightness) String() string {
@@ -179,7 +181,7 @@ type MixerCommandSaturation struct {
 	Saturation *float32
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandSaturation) String() string {
@@ -202,7 +204,7 @@ type MixerCommandContrast struct {
 	Contrast *float32
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandContrast) String() string {
@@ -229,7 +231,7 @@ type MixerCommandLevels struct {
 	MaxOutput *float32
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandLevels) String() string {
@@ -267,7 +269,7 @@ type MixerCommandFill struct {
 	YScale *float32 // YScale the new y scale, 1.0 = original size, 0.5 = half size, 2.0 = double size. Higher and lower values allowed.
 
 	Duration *int
-	Tween    *TweenType
+	Tween    *types.TweenType
 }
 
 func (c MixerCommandFill) String() string {
