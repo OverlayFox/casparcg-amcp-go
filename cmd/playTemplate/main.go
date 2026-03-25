@@ -21,7 +21,7 @@ func main() {
 		}
 	}()
 
-	err = client.CG(1, 10).ADD(1, "TITLE", true, nil)
+	err = client.CG(1, 10).Add(1, "TITLE", true, nil)
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
@@ -31,7 +31,7 @@ func main() {
 	}
 	time.Sleep(2 * time.Second)
 
-	err = client.CG(1, 10).STOP(1)
+	err = client.CG(1, 10).Stop(1)
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {

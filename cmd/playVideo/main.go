@@ -22,7 +22,7 @@ func main() {
 	}()
 
 	clip := "BACKGROUNDLOOP"
-	err = client.Layer(1, 10).PLAY(&clip, nil)
+	err = client.Layer(1, 10).Play(&clip, nil)
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
@@ -32,7 +32,7 @@ func main() {
 	}
 	time.Sleep(2 * time.Second)
 
-	err = client.Layer(1, 10).STOP()
+	err = client.Layer(1, 10).Stop()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {

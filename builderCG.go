@@ -21,8 +21,8 @@ func (c *Client) CG(videoChannel, layer int) *CGBuilder {
 	}
 }
 
-// ADD prepares a template for displaying.
-func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) error {
+// Add prepares a template for displaying.
+func (b *CGBuilder) Add(cgLayer int, template string, playOnLoad bool, data *string) error {
 	cmd := commands.TemplateCommandCGAdd{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -37,8 +37,8 @@ func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *str
 	return err
 }
 
-// PLAY plays and displays the template in the specified layer.
-func (b *CGBuilder) PLAY(cgLayer int) error {
+// Play plays and displays the template in the specified layer.
+func (b *CGBuilder) Play(cgLayer int) error {
 	cmd := commands.TemplateCommandCGPlay{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -50,8 +50,8 @@ func (b *CGBuilder) PLAY(cgLayer int) error {
 	return err
 }
 
-// STOP stops the template in the specified layer.
-func (b *CGBuilder) STOP(cgLayer int) error {
+// Stop stops the template in the specified layer.
+func (b *CGBuilder) Stop(cgLayer int) error {
 	cmd := commands.TemplateCommandCGStop{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -63,8 +63,8 @@ func (b *CGBuilder) STOP(cgLayer int) error {
 	return err
 }
 
-// NEXT triggers a "continue" in the template.
-func (b *CGBuilder) NEXT(cgLayer int) error {
+// Next triggers a "continue" in the template.
+func (b *CGBuilder) Next(cgLayer int) error {
 	cmd := commands.TemplateCommandCGNext{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -76,8 +76,8 @@ func (b *CGBuilder) NEXT(cgLayer int) error {
 	return err
 }
 
-// REMOVE removes the template from the specified layer.
-func (b *CGBuilder) REMOVE(cgLayer int) error {
+// Remove removes the template from the specified layer.
+func (b *CGBuilder) Remove(cgLayer int) error {
 	cmd := commands.TemplateCommandCGRemove{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -89,8 +89,8 @@ func (b *CGBuilder) REMOVE(cgLayer int) error {
 	return err
 }
 
-// CLEAR removes all templates on the video layer.
-func (b *CGBuilder) CLEAR() error {
+// Clear removes all templates on the video layer.
+func (b *CGBuilder) Clear() error {
 	cmd := commands.TemplateCommandCGClear{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -101,8 +101,8 @@ func (b *CGBuilder) CLEAR() error {
 	return err
 }
 
-// UPDATE sends new data to the template on specified layer.
-func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
+// Update sends new data to the template on specified layer.
+func (b *CGBuilder) Update(cgLayer int, data string) error {
 	cmd := commands.TemplateCommandCGUpdate{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -115,8 +115,8 @@ func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
 	return err
 }
 
-// INVOKE invokes the given method on the template.
-func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
+// Invoke invokes the given method on the template.
+func (b *CGBuilder) Invoke(cgLayer int, method string) error {
 	cmd := commands.TemplateCommandCGInvoke{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,
@@ -129,8 +129,8 @@ func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
 	return err
 }
 
-// INFO retrieves information about the template on the specified layer.
-func (b *CGBuilder) INFO(cgLayer *int) error {
+// Info retrieves information about the template on the specified layer.
+func (b *CGBuilder) Info(cgLayer *int) error {
 	cmd := commands.TemplateCommandCGInfo{
 		TemplateCommandCG: commands.TemplateCommandCG{
 			VideoChannel: b.videoChannel,

@@ -21,8 +21,8 @@ func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
 	}
 }
 
-// LOAD loads a clip to the layer.
-func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
+// Load loads a clip to the layer.
+func (b *LayerBuilder) Load(clip string, parameters *map[string]string) error {
 	cmd := commands.CommandLoad{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -35,8 +35,8 @@ func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
 	return err
 }
 
-// PLAY plays content on the layer.
-func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
+// Play plays content on the layer.
+func (b *LayerBuilder) Play(clip *string, parameters *map[string]string) error {
 	cmd := commands.CommandPlay{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -49,8 +49,8 @@ func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
 	return err
 }
 
-// PAUSE pauses playback on the layer.
-func (b *LayerBuilder) PAUSE() error {
+// Pause pauses playback on the layer.
+func (b *LayerBuilder) Pause() error {
 	cmd := commands.CommandPause{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -61,8 +61,8 @@ func (b *LayerBuilder) PAUSE() error {
 	return err
 }
 
-// RESUME resumes playback on the layer.
-func (b *LayerBuilder) RESUME() error {
+// Resume resumes playback on the layer.
+func (b *LayerBuilder) Resume() error {
 	cmd := commands.CommandResume{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -73,8 +73,8 @@ func (b *LayerBuilder) RESUME() error {
 	return err
 }
 
-// STOP stops playback on the layer.
-func (b *LayerBuilder) STOP() error {
+// Stop stops playback on the layer.
+func (b *LayerBuilder) Stop() error {
 	cmd := commands.CommandStop{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -85,8 +85,8 @@ func (b *LayerBuilder) STOP() error {
 	return err
 }
 
-// CLEAR clears the layer.
-func (b *LayerBuilder) CLEAR() error {
+// Clear clears the layer.
+func (b *LayerBuilder) Clear() error {
 	cmd := commands.CommandClear{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,
@@ -97,8 +97,8 @@ func (b *LayerBuilder) CLEAR() error {
 	return err
 }
 
-// CALL calls a function on the layer.
-func (b *LayerBuilder) CALL(params map[string]string) error {
+// Call calls a function on the layer.
+func (b *LayerBuilder) Call(params map[string]string) error {
 	cmd := commands.CommandCall{
 		BasicCommand: commands.BasicCommand{
 			VideoChannel: b.videoChannel,

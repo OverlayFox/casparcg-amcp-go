@@ -22,7 +22,7 @@ func main() {
 		}
 	}()
 
-	resp, err := client.PING("")
+	resp, err := client.Ping("")
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {

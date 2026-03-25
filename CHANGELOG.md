@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- optimised builder structs
+- changed from SnakeCase to CamelCase function names to follow go best practises
 - changed URLs in ReadMe to point to correct package
 
 ## [0.1.0] - 24-03-2026
