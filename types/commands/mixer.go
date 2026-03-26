@@ -317,18 +317,18 @@ func (c MixerVolume) String() string {
 }
 
 type MixerMasterVolume struct {
-	MixerCommand
+	VideoChannel int
 
 	Volume *float32 // Volume: The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
 }
 
 func (c MixerMasterVolume) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "VOLUME")
+	cmd := fmt.Sprintf("MIXER %d MASTER_VOLUME", c.VideoChannel)
 	return appendFloat(cmd, c.Volume)
 }
 
 type MixerStraightAlphaOutput struct {
-	MixerCommand
+	VideoChannel int
 
 	Enable *bool
 }
@@ -338,12 +338,56 @@ func (c MixerStraightAlphaOutput) String() string {
 	return appendBool(cmd, c.Enable)
 }
 
+type MixerGrid struct {
+	VideoChannel int
+
+	Resolution *int
+
+	Duration *int
+	Tween    *types.TweenType
+}
+
+func (c MixerGrid) String() string {
+	cmd := fmt.Sprintf("MIXER %d GRID", c.VideoChannel)
+	cmd = appendInt(cmd, c.Resolution)
+	return appendDurationTween(cmd, c.Duration, c.Tween)
+}
+
+type MixerClear struct {
+	VideoChannel int
+	Layer        *int
+}
+
+func (c MixerClear) String() string {
+	cmd := fmt.Sprintf("MIXER %d", c.VideoChannel)
+	if c.Layer != nil {
+		cmd += "-" + strconv.Itoa(*c.Layer)
+	}
+	cmd += " CLEAR"
+	return cmd
+}
+
+type MixerCommit struct {
+	VideoChannel int
+}
+
+func (c MixerCommit) String() string {
+	return fmt.Sprintf("MIXER %d COMMIT", c.VideoChannel)
+}
+
 //
 // Helper functions
 //
 
 func baseMixerCmd(channel, layer int, name string) string {
 	return fmt.Sprintf("MIXER %d-%d %s", channel, layer, name)
+}
+
+func appendInt(cmd string, value *int) string {
+	if value != nil {
+		return cmd + " " + strconv.Itoa(*value)
+	}
+	return cmd
 }
 
 func appendFloat(cmd string, value *float32) string {

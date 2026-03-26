@@ -67,7 +67,8 @@ Below is a specific list of AMCP commands still to be implemented:
 - [ ] [LOG CATEGORY](https://github.com/CasparCG/help/wiki/AMCP-Protocol#log-category)
 - [ ] [SET](https://github.com/CasparCG/help/wiki/AMCP-Protocol#set)
 - [ ] [All DATA Commands](https://github.com/CasparCG/help/wiki/AMCP-Protocol#data-commands)
-- [ ] [All MIXER Commands](https://github.com/CasparCG/help/wiki/AMCP-Protocol#mixer-commands)
+- [x] ~~[All MIXER Commands](https://github.com/CasparCG/help/wiki/AMCP-Protocol#mixer-commands)~~
+  - [ ] [MIXER DEFER Command](https://casparcg.com/docs/wiki/protocols/amcp-protocol#mixer-commit)
 - [ ] [All Thumbnail Commands](https://github.com/CasparCG/help/wiki/AMCP-Protocol#thumbnail-commands)
 - [ ] [DIAG](https://github.com/CasparCG/help/wiki/AMCP-Protocol#diag)
 - [ ] [GL INFO](https://github.com/CasparCG/help/wiki/AMCP-Protocol#gl-info)

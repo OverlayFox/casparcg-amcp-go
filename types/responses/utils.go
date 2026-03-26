@@ -14,6 +14,17 @@ func BoolFromResponse(data []string) (bool, error) {
 	return data[0] == "1", nil
 }
 
+func IntFromResponse(data []string) (int, error) {
+	if len(data) < 1 {
+		return 0, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
+	}
+	value, err := strconv.Atoi(data[0])
+	if err != nil {
+		return 0, fmt.Errorf("invalid integer value: %w", err)
+	}
+	return value, nil
+}
+
 func FloatFromResponse(data []string) (float32, error) {
 	if len(data) < 1 {
 		return 0, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
