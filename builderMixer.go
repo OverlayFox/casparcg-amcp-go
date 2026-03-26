@@ -90,10 +90,7 @@ type MixerChannelBuilder struct {
 // Channel selects the video channel to operate on and returns a MixerChannelBuilder for that channel.
 func (c *MixerBuilder) Channel(videoChannel int) *MixerChannelBuilder {
 	return &MixerChannelBuilder{
-		MixerBuilder: MixerBuilder{
-			client: c.client,
-			fade:   c.fade,
-		},
+		MixerBuilder: *c,
 		videoChannel: videoChannel,
 	}
 }

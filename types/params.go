@@ -82,3 +82,10 @@ type MixerPerspective struct {
 	BottomLeftX float32 // BottomLeftX defines the x coordinate of the bottom left corner.
 	BottomLeftY float32 // BottomLeftY defines the y coordinate of the bottom left corner.
 }
+
+type CGAdd struct {
+	Template   string // Template defines the name of the template to add. This is the filename of the template without the extension
+	PlayOnLoad bool   // PlayOnLoad defines whether the template should start playing immediately when added.
+
+	Data *string // Data defines optional data to pass to the template. This can be a JSON or XML inline string
+}

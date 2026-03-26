@@ -16,11 +16,11 @@ func TestCommandSerialization(t *testing.T) {
 		{
 			name: "CG STOP",
 			command: commands.TemplateCommandCGStop{
-				TemplateCommandCG: commands.TemplateCommandCG{
+				CGCommand: commands.CGCommand{
 					VideoChannel: 1,
-					Layer:        12,
+					Layer:        intPtr(12),
+					CgLayer:      intPtr(2),
 				},
-				CgLayer: 2,
 			},
 			expected: "CG 1-12 STOP 2",
 		},
@@ -98,11 +98,11 @@ func TestCommandSerialization(t *testing.T) {
 		{
 			name: "CG ADD with data",
 			command: commands.TemplateCommandCGAdd{
-				TemplateCommandCG: commands.TemplateCommandCG{
+				CGCommand: commands.CGCommand{
 					VideoChannel: 1,
-					Layer:        10,
+					Layer:        intPtr(10),
+					CgLayer:      intPtr(1),
 				},
-				CgLayer:    1,
 				Template:   "lower_third",
 				PlayOnLoad: true,
 				Data:       strPtr(`{"f0":"Hello"}`),
@@ -112,9 +112,9 @@ func TestCommandSerialization(t *testing.T) {
 		{
 			name: "CG CLEAR",
 			command: commands.TemplateCommandCGClear{
-				TemplateCommandCG: commands.TemplateCommandCG{
+				CGCommand: commands.CGCommand{
 					VideoChannel: 1,
-					Layer:        10,
+					Layer:        intPtr(10),
 				},
 			},
 			expected: "CG 1-10 CLEAR",
