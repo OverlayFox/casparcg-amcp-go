@@ -60,7 +60,6 @@ The main feature categories currently missing are:
 
 - Batching
 - Data Commands
-- Mixer Commands
 
 Below is a specific list of AMCP commands still to be implemented:
 
