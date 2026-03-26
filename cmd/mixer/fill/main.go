@@ -21,7 +21,7 @@ func main() {
 		}
 	}()
 
-	originalFill, err := client.Mixer(1, 1).GetFill()
+	originalFill, err := client.Mixer().Channel(1).Layer(1).GetFill()
 	if err != nil {
 		panic(err)
 	}
@@ -33,13 +33,13 @@ func main() {
 		XScale: 1.2,
 		YScale: 1.2,
 	}
-	err = client.Mixer(1, 1).SetFill(newFill)
+	err = client.Mixer().Channel(1).Layer(1).SetFill(newFill)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fill, err := client.Mixer(1, 1).GetFill()
+	fill, err := client.Mixer().Channel(1).Layer(1).GetFill()
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 
-	err = client.Mixer(1, 1).SetFill(types.MixerParamsFill{
+	err = client.Mixer().Channel(1).Layer(1).SetFill(types.MixerParamsFill{
 		X:      originalFill.X,
 		Y:      originalFill.Y,
 		XScale: originalFill.XScale,
@@ -57,7 +57,7 @@ func main() {
 		panic(err)
 	}
 
-	fill, err = client.Mixer(1, 1).GetFill()
+	fill, err = client.Mixer().Channel(1).Layer(1).GetFill()
 	if err != nil {
 		panic(err)
 	}

@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	brightness, err := client.Mixer(1, 1).GetBrightness()
+	brightness, err := client.Mixer().Channel(1).Layer(1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Brightness: %f\n", brightness)
 
-	err = client.Mixer(1, 1).SetBrightness(2)
+	err = client.Mixer().Channel(1).Layer(1).SetBrightness(2)
 	if err != nil {
 		panic(err)
 	}
 
-	brightness, err = client.Mixer(1, 1).GetBrightness()
+	brightness, err = client.Mixer().Channel(1).Layer(1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetBrightness(1.0)
+	err = client.Mixer().Channel(1).Layer(1).SetBrightness(1.0)
 	if err != nil {
 		panic(err)
 	}
 
-	brightness, err = client.Mixer(1, 1).GetBrightness()
+	brightness, err = client.Mixer().Channel(1).Layer(1).GetBrightness()
 	if err != nil {
 		panic(err)
 	}

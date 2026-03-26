@@ -22,7 +22,7 @@ func main() {
 		}
 	}()
 
-	info, err := client.Mixer(1, 1).GetChroma()
+	info, err := client.Mixer().Channel(1).Layer(1).GetChroma()
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +32,7 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).SetChroma(responses.MixerChroma{
+	err = client.Mixer().Channel(1).Layer(1).SetChroma(responses.MixerChroma{
 		Enabled:                 true,
 		TargetHue:               120,
 		HueWidth:                0.1,
@@ -47,20 +47,20 @@ func main() {
 		panic(err)
 	}
 
-	err = client.Mixer(1, 1).SetKeyer(true)
+	err = client.Mixer().Channel(1).Layer(1).SetKeyer(true)
 	if err != nil {
 		panic(err)
 	}
-	enabled, err := client.Mixer(1, 1).GetKeyer()
+	enabled, err := client.Mixer().Channel(1).Layer(1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Keyer enabled: %t\n", enabled)
-	err = client.Mixer(1, 1).SetKeyer(false)
+	err = client.Mixer().Channel(1).Layer(1).SetKeyer(false)
 	if err != nil {
 		panic(err)
 	}
-	enabled, err = client.Mixer(1, 1).GetKeyer()
+	enabled, err = client.Mixer().Channel(1).Layer(1).GetKeyer()
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +68,7 @@ func main() {
 
 	time.Sleep(600 * time.Millisecond)
 
-	info, err = client.Mixer(1, 1).GetChroma()
+	info, err = client.Mixer().Channel(1).Layer(1).GetChroma()
 	if err != nil {
 		panic(err)
 	}
@@ -78,12 +78,12 @@ func main() {
 	}
 	fmt.Println(string(jsonData))
 
-	err = client.Mixer(1, 1).SetChroma(responses.MixerChroma{}).Disable()
+	err = client.Mixer().Channel(1).Layer(1).SetChroma(responses.MixerChroma{}).Disable()
 	if err != nil {
 		panic(err)
 	}
 
-	info, err = client.Mixer(1, 1).GetChroma()
+	info, err = client.Mixer().Channel(1).Layer(1).GetChroma()
 	if err != nil {
 		panic(err)
 	}

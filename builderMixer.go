@@ -10,44 +10,14 @@ import (
 
 // MixerBuilder provides a fluent interface for mixer operations on a specific video channel and layer.
 type MixerBuilder struct {
-	client       *Client
-	videoChannel int
-	layer        *int
-	fade         *types.Fade // fade to apply to the next operation
-}
-
-// Mixer creates a new MixerBuilder for the specified video channel and layer.
-func (c *Client) Mixer(videoChannel int, layer *int) *MixerBuilder {
-	return &MixerBuilder{
-		client:       c,
-		videoChannel: videoChannel,
-		layer:        layer,
-	}
+	client *Client
+	fade   *types.Fade // fade to apply to the next operation
 }
 
 // sendCommand abstracts sending a command that does not expect a response value.
 func (b *MixerBuilder) sendCommand(cmd interface{ String() string }) error {
 	_, err := b.client.Send(cmd)
 	return err
-}
-
-// Fade sets a fade transition to be applied to the next setter operation.
-// The fade is automatically cleared after being used, so it only applies to one operation.
-// Returns the builder for method chaining.
-func (b *MixerBuilder) Fade(fade *types.Fade) *MixerBuilder {
-	b.fade = fade
-	return b
-}
-
-// baseMixerCommand returns a base mixer command with channel and layer set.
-func (b *MixerBuilder) baseMixerCommand() (commands.MixerCommand, error) {
-	if b.layer == nil {
-		return commands.MixerCommand{}, ErrLayerNotSet
-	}
-	return commands.MixerCommand{
-		VideoChannel: b.videoChannel,
-		Layer:        *b.layer,
-	}, nil
 }
 
 // getIntValue retrieves an int value using the provided command.
@@ -93,14 +63,157 @@ func (b *MixerBuilder) applyFade(setDuration func(*int), setTween func(*types.Tw
 	}
 }
 
-// GetKeyer retrieves the current keyer state for the layer.
-func (b *MixerBuilder) GetKeyer() (bool, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return false, err
+// Mixer creates a new MixerBuilder for the specified video channel and layer.
+func (c *Client) Mixer() *MixerBuilder {
+	return &MixerBuilder{
+		client: c,
 	}
+}
+
+// Fade sets a fade transition to be applied to the next setter operation.
+// The fade is automatically cleared after being used, so it only applies to one operation.
+// Returns the builder for method chaining.
+func (b *MixerBuilder) Fade(fade *types.Fade) *MixerBuilder {
+	b.fade = fade
+	return b
+}
+
+//
+// Channel Commands
+//
+
+type MixerChannelBuilder struct {
+	MixerBuilder
+	videoChannel int
+}
+
+// Channel selects the video channel to operate on and returns a MixerChannelBuilder for that channel.
+func (c *MixerBuilder) Channel(videoChannel int) *MixerChannelBuilder {
+	return &MixerChannelBuilder{
+		MixerBuilder: MixerBuilder{
+			client: c.client,
+			fade:   c.fade,
+		},
+		videoChannel: videoChannel,
+	}
+}
+
+func (b *MixerChannelBuilder) baseMixerChannelCommand() commands.MixerCommand {
+	return commands.MixerCommand{
+		VideoChannel: b.videoChannel,
+		Layer:        nil, // Layer is nil for channel-level commands
+	}
+}
+
+// GetMasterVolume retrieves the current master audio volume for the video channel.
+//
+// 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerChannelBuilder) GetMasterVolume() (float32, error) {
+	cmd := commands.MixerMasterVolume{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
+	return b.getFloat32Value(cmd)
+}
+
+// SetMasterVolume sets the master audio volume for the video channel.
+//
+// volume: float32 - The new master volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
+func (b *MixerChannelBuilder) SetMasterVolume(volume float32) error {
+	cmd := commands.MixerMasterVolume{
+		MixerCommand: b.baseMixerChannelCommand(),
+		Volume:       &volume,
+	}
+	return b.sendCommand(cmd)
+}
+
+// GetStraightAlphaOutput retrieves the current straight alpha output state for the channel.
+func (b *MixerChannelBuilder) GetStraightAlphaOutput() (bool, error) {
+	cmd := commands.MixerStraightAlphaOutput{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
+	return b.getBoolValue(cmd)
+}
+
+// SetStraightAlphaOutput enables or disables straight alpha output for the channel.
+//
+// This only works per video channel, not per layer.
+func (b *MixerChannelBuilder) SetStraightAlphaOutput(enable bool) error {
+	cmd := commands.MixerStraightAlphaOutput{
+		MixerCommand: b.baseMixerChannelCommand(),
+		Enable:       &enable,
+	}
+	return b.setBoolValue(cmd)
+}
+
+// GetGrid retrieves the current grid settings for the video channel.
+func (b *MixerChannelBuilder) GetGrid() (int, error) {
+	cmd := commands.MixerGrid{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
+	return b.getIntValue(cmd)
+}
+
+// Commit all deferred mixer transforms on the specified channel. This ensures that all animations start at the same exact frame.
+func (b *MixerChannelBuilder) Commit() error {
+	cmd := commands.MixerCommit{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// SetGrid creates a grid of video layer in ascending order of the layer index,
+// i.e. if resolution equals 2 then a 2x2 grid of layers will be created starting from layer 1.
+//
+// resolution: int - The number of cells in the grid. (e.g: 2 = 2x2 grid, 3 = 3x3 grid, etc.)
+//
+// Use Fade() before calling this method to apply a smooth transition.
+func (b *MixerChannelBuilder) SetGrid(resolution int) error {
+	if err := inRangeInt("resolution", resolution, 1, 9999); err != nil {
+		return err
+	}
+	cmd := commands.MixerGrid{
+		MixerCommand: b.baseMixerChannelCommand(),
+		Resolution:   &resolution,
+	}
+	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}
+
+// Clear clears all transformations on a channel or layer
+func (b *MixerChannelBuilder) Clear() error {
+	cmd := commands.MixerClear{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+//
+// Layer Commands
+//
+
+type MixerLayerBuilder struct {
+	MixerChannelBuilder
+	layer int
+}
+
+// Layer selects the layer to operate on and returns a MixerLayerBuilder for that layer.
+func (cb *MixerChannelBuilder) Layer(layer int) *MixerLayerBuilder {
+	return &MixerLayerBuilder{
+		MixerChannelBuilder: *cb,
+		layer:               layer,
+	}
+}
+
+func (b *MixerLayerBuilder) baseMixerLayerCommand() commands.MixerCommand {
+	cmd := b.baseMixerChannelCommand()
+	cmd.Layer = &b.layer
+	return cmd
+}
+
+// GetKeyer retrieves the current keyer state for the layer.
+func (b *MixerLayerBuilder) GetKeyer() (bool, error) {
 	cmd := commands.MixerCommandKeyer{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.getBoolValue(cmd)
 }
@@ -110,13 +223,9 @@ func (b *MixerBuilder) GetKeyer() (bool, error) {
 // and the RGB channels of layer n are hidden.
 // If show is true, the specified layer will not be rendered; instead it will be used
 // as the key for the layer above.
-func (b *MixerBuilder) SetKeyer(show bool) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetKeyer(show bool) error {
 	cmd := commands.MixerCommandKeyer{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Show:         &show,
 	}
 	return b.setBoolValue(cmd)
@@ -124,18 +233,14 @@ func (b *MixerBuilder) SetKeyer(show bool) error {
 
 // ChromaBuilder provides a fluent interface for chroma key operations.
 type ChromaBuilder struct {
-	mixer  *MixerBuilder
+	mixer  *MixerLayerBuilder
 	params responses.MixerChroma
 }
 
 // GetChroma retrieves the current chroma key settings for the layer.
-func (b *MixerBuilder) GetChroma() (responses.MixerChroma, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerChroma{}, err
-	}
+func (b *MixerLayerBuilder) GetChroma() (responses.MixerChroma, error) {
 	cmd := commands.MixerCommandChroma{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -149,7 +254,7 @@ func (b *MixerBuilder) GetChroma() (responses.MixerChroma, error) {
 // Use .Enable() or .Disable() to apply the settings.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetChroma(params responses.MixerChroma) *ChromaBuilder {
+func (b *MixerLayerBuilder) SetChroma(params responses.MixerChroma) *ChromaBuilder {
 	return &ChromaBuilder{
 		mixer:  b,
 		params: params,
@@ -166,13 +271,9 @@ func (c *ChromaBuilder) Disable() error {
 	return c.mixer.applyChroma(false, nil)
 }
 
-func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerChroma) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) applyChroma(enable bool, params *responses.MixerChroma) error {
 	cmd := commands.MixerCommandChroma{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Enable:       &enable,
 	}
 
@@ -192,13 +293,9 @@ func (b *MixerBuilder) applyChroma(enable bool, params *responses.MixerChroma) e
 }
 
 // GetBlendMode retrieves the current blend mode for the layer.
-func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return "", err
-	}
+func (b *MixerLayerBuilder) GetBlendMode() (types.BlendMode, error) {
 	cmd := commands.MixerCommandBlend{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -208,55 +305,38 @@ func (b *MixerBuilder) GetBlendMode() (types.BlendMode, error) {
 }
 
 // SetBlendMode sets the blend mode for the layer.
-func (b *MixerBuilder) SetBlendMode(mode types.BlendMode) error {
+func (b *MixerLayerBuilder) SetBlendMode(mode types.BlendMode) error {
 	if err := mode.Validate(); err != nil {
 		return err
 	}
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
-
 	cmd := commands.MixerCommandBlend{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		BlendMode:    &mode,
 	}
 	return b.setBoolValue(cmd)
 }
 
 // GetInvert retrieves the current invert state for the layer.
-func (b *MixerBuilder) GetInvert() (bool, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return false, err
-	}
+func (b *MixerLayerBuilder) GetInvert() (bool, error) {
 	cmd := commands.MixerCommandInvert{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.getBoolValue(cmd)
 }
 
 // SetInvert enables or disables color inversion for the layer.
-func (b *MixerBuilder) SetInvert(state bool) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetInvert(state bool) error {
 	cmd := commands.MixerCommandInvert{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Invert:       &state,
 	}
 	return b.setBoolValue(cmd)
 }
 
 // GetOpacity retrieves the current opacity value for the layer (0.0 to 1.0).
-func (b *MixerBuilder) GetOpacity() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetOpacity() (float32, error) {
 	return b.getFloat32Value(commands.MixerCommandOpacity{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
 
@@ -265,16 +345,12 @@ func (b *MixerBuilder) GetOpacity() (float32, error) {
 // opacity: float32 - The new opacity value, 0.0 = completely transparent, 1.0 = fully opaque.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetOpacity(opacity float32) error {
+func (b *MixerLayerBuilder) SetOpacity(opacity float32) error {
 	if err := inRangeFloat("opacity", opacity, 0.0, 1.0); err != nil {
 		return err
 	}
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
 	cmd := commands.MixerCommandOpacity{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Opacity:      &opacity,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
@@ -282,13 +358,9 @@ func (b *MixerBuilder) SetOpacity(opacity float32) error {
 }
 
 // GetBrightness retrieves the current brightness value for the layer.
-func (b *MixerBuilder) GetBrightness() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetBrightness() (float32, error) {
 	return b.getFloat32Value(commands.MixerCommandBrightness{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
 
@@ -297,16 +369,12 @@ func (b *MixerBuilder) GetBrightness() (float32, error) {
 // brightness: float32 - The new brightness value, 0.5 = original brightness, 0.0 = completely dark, 1.0 = double brightness.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetBrightness(brightness float32) error {
+func (b *MixerLayerBuilder) SetBrightness(brightness float32) error {
 	if err := inRangeFloat("brightness", brightness, 0.0, 1.0); err != nil {
 		return err
 	}
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
 	cmd := commands.MixerCommandBrightness{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Brightness:   &brightness,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
@@ -314,13 +382,9 @@ func (b *MixerBuilder) SetBrightness(brightness float32) error {
 }
 
 // GetSaturation retrieves the current saturation value for the layer.
-func (b *MixerBuilder) GetSaturation() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetSaturation() (float32, error) {
 	return b.getFloat32Value(commands.MixerCommandSaturation{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
 
@@ -329,16 +393,12 @@ func (b *MixerBuilder) GetSaturation() (float32, error) {
 // saturation: float32 - The new saturation value, 0.5 = original saturation, 0.0 = completely desaturated (gray), 1.0 = double saturation.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetSaturation(saturation float32) error {
+func (b *MixerLayerBuilder) SetSaturation(saturation float32) error {
 	if err := inRangeFloat("saturation", saturation, 0.0, 1.0); err != nil {
 		return err
 	}
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
 	cmd := commands.MixerCommandSaturation{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Saturation:   &saturation,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
@@ -346,13 +406,9 @@ func (b *MixerBuilder) SetSaturation(saturation float32) error {
 }
 
 // GetContrast retrieves the current contrast value for the layer.
-func (b *MixerBuilder) GetContrast() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetContrast() (float32, error) {
 	return b.getFloat32Value(commands.MixerCommandContrast{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
 
@@ -361,16 +417,12 @@ func (b *MixerBuilder) GetContrast() (float32, error) {
 // contrast: float32 - The new contrast value, 0.5 = original contrast, 0.0 = completely gray, 1.0 = double contrast.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetContrast(contrast float32) error {
+func (b *MixerLayerBuilder) SetContrast(contrast float32) error {
 	if err := inRangeFloat("contrast", contrast, 0.0, 1.0); err != nil {
 		return err
 	}
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
 	cmd := commands.MixerCommandContrast{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Contrast:     &contrast,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
@@ -378,13 +430,9 @@ func (b *MixerBuilder) SetContrast(contrast float32) error {
 }
 
 // GetLevels retrieves the current levels settings for the layer.
-func (b *MixerBuilder) GetLevels() (types.MixerLevels, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return types.MixerLevels{}, err
-	}
+func (b *MixerLayerBuilder) GetLevels() (types.MixerLevels, error) {
 	cmd := commands.MixerCommandLevels{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -396,13 +444,9 @@ func (b *MixerBuilder) GetLevels() (types.MixerLevels, error) {
 // SetLevels adjusts the input/output levels and gamma for the layer.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetLevels(params types.MixerLevels) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetLevels(params types.MixerLevels) error {
 	cmd := commands.MixerCommandLevels{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		MinInput:     &params.MinInput,
 		MaxInput:     &params.MaxInput,
 		Gamma:        &params.Gamma,
@@ -414,13 +458,9 @@ func (b *MixerBuilder) SetLevels(params types.MixerLevels) error {
 }
 
 // GetFill retrieves the current fill (position and scale) settings for the layer.
-func (b *MixerBuilder) GetFill() (responses.MixerFill, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerFill{}, err
-	}
+func (b *MixerLayerBuilder) GetFill() (responses.MixerFill, error) {
 	cmd := commands.MixerCommandFill{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -433,13 +473,9 @@ func (b *MixerBuilder) GetFill() (responses.MixerFill, error) {
 // The positioning and scaling is performed around the anchor point set by MIXER ANCHOR.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetFill(params types.MixerParamsFill) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetFill(params types.MixerParamsFill) error {
 	cmd := commands.MixerCommandFill{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		X:            &params.X,
 		Y:            &params.Y,
 		XScale:       &params.XScale,
@@ -450,13 +486,9 @@ func (b *MixerBuilder) SetFill(params types.MixerParamsFill) error {
 }
 
 // GetClip retrieves the current clip (position and scale) settings for the layer.
-func (b *MixerBuilder) GetClip() (responses.MixerClip, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerClip{}, err
-	}
+func (b *MixerLayerBuilder) GetClip() (responses.MixerClip, error) {
 	cmd := commands.MixerClip{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -468,13 +500,9 @@ func (b *MixerBuilder) GetClip() (responses.MixerClip, error) {
 // SetClip defines the rectangular viewport where a layer is rendered thru on the screen without being affected by MIXER FILL, MIXER ROTATION and MIXER PERSPECTIVE.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetClip(params responses.MixerClip) error {
 	cmd := commands.MixerClip{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		X:            &params.X,
 		Y:            &params.Y,
 		Width:        &params.Width,
@@ -485,13 +513,9 @@ func (b *MixerBuilder) SetClip(params responses.MixerClip) error {
 }
 
 // GetAnchor retrieves the current anchor point settings for the layer.
-func (b *MixerBuilder) GetAnchor() (responses.MixerAnchor, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerAnchor{}, err
-	}
+func (b *MixerLayerBuilder) GetAnchor() (responses.MixerAnchor, error) {
 	cmd := commands.MixerAnchor{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -503,13 +527,9 @@ func (b *MixerBuilder) GetAnchor() (responses.MixerAnchor, error) {
 // SetAnchor changes the anchor point of the specified layer.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetAnchor(params responses.MixerAnchor) error {
 	cmd := commands.MixerAnchor{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		X:            &params.X,
 		Y:            &params.Y,
 	}
@@ -518,13 +538,9 @@ func (b *MixerBuilder) SetAnchor(params responses.MixerAnchor) error {
 }
 
 // GetCrop retrieves the current crop settings for the layer.
-func (b *MixerBuilder) GetCrop() (responses.MixerCrop, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerCrop{}, err
-	}
+func (b *MixerLayerBuilder) GetCrop() (responses.MixerCrop, error) {
 	cmd := commands.MixerCrop{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -536,13 +552,9 @@ func (b *MixerBuilder) GetCrop() (responses.MixerCrop, error) {
 // SetCrop sets the crop values for the layer.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetCrop(params types.MixerCrop) error {
 	cmd := commands.MixerCrop{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	cmd.LeftEdge = &params.LeftEdge
 	cmd.TopEdge = &params.TopEdge
@@ -556,13 +568,9 @@ func (b *MixerBuilder) SetCrop(params types.MixerCrop) error {
 // GetRotation retrieves the current rotation angle for the layer in degrees.
 //
 // 0 = no rotation, 90 = 90 degrees clockwise, -90 = 90 degrees counterclockwise. Higher and lower values allowed.
-func (b *MixerBuilder) GetRotation() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetRotation() (float32, error) {
 	cmd := commands.MixerRotation{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -576,13 +584,9 @@ func (b *MixerBuilder) GetRotation() (float32, error) {
 // rotation: float32 - The new rotation angle, 0 = no rotation, 90 = 90 degrees clockwise, -90 = 90 degrees counterclockwise. Higher and lower values allowed.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetRotation(rotation float32) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetRotation(rotation float32) error {
 	cmd := commands.MixerRotation{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Angle:        &rotation,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
@@ -590,13 +594,9 @@ func (b *MixerBuilder) SetRotation(rotation float32) error {
 }
 
 // GetPerspective retrieves the current perspective settings for the layer.
-func (b *MixerBuilder) GetPerspective() (responses.MixerPerspective, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return responses.MixerPerspective{}, err
-	}
+func (b *MixerLayerBuilder) GetPerspective() (responses.MixerPerspective, error) {
 	cmd := commands.MixerPerspective{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -608,13 +608,9 @@ func (b *MixerBuilder) GetPerspective() (responses.MixerPerspective, error) {
 // SetPerspective sets the perspective transformation for the layer.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetPerspective(params types.MixerPerspective) error {
 	cmd := commands.MixerPerspective{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	cmd.TopLeftX = &params.TopLeftX
 	cmd.TopLeftY = &params.TopLeftY
@@ -629,25 +625,17 @@ func (b *MixerBuilder) SetPerspective(params types.MixerPerspective) error {
 }
 
 // GetMipMap retrieves the current mipmap state for the layer.
-func (b *MixerBuilder) GetMipMap() (bool, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return false, err
-	}
+func (b *MixerLayerBuilder) GetMipMap() (bool, error) {
 	cmd := commands.MixerMipMap{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.getBoolValue(cmd)
 }
 
 // SetMipMap enables or disables mipmapping for the layer.
-func (b *MixerBuilder) SetMipMap(enable bool) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetMipMap(enable bool) error {
 	cmd := commands.MixerMipMap{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Enable:       &enable,
 	}
 	return b.setBoolValue(cmd)
@@ -656,13 +644,9 @@ func (b *MixerBuilder) SetMipMap(enable bool) error {
 // GetVolume retrieves the current audio volume for the layer.
 //
 // 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
-func (b *MixerBuilder) GetVolume() (float32, error) {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return 0, err
-	}
+func (b *MixerLayerBuilder) GetVolume() (float32, error) {
 	cmd := commands.MixerVolume{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -676,116 +660,19 @@ func (b *MixerBuilder) GetVolume() (float32, error) {
 // volume: float32 - The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
 //
 // Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetVolume(volume float32) error {
-	mc, err := b.baseMixerCommand()
-	if err != nil {
-		return err
-	}
+func (b *MixerLayerBuilder) SetVolume(volume float32) error {
 	cmd := commands.MixerVolume{
-		MixerCommand: mc,
+		MixerCommand: b.baseMixerLayerCommand(),
 		Volume:       &volume,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.sendCommand(cmd)
-}
-
-// GetMasterVolume retrieves the current master audio volume for the video channel.
-//
-// 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
-func (b *MixerBuilder) GetMasterVolume() (float32, error) {
-	if b.layer != nil {
-		return 0, ErrLayerSet
-	}
-	cmd := commands.MixerMasterVolume{
-		VideoChannel: b.videoChannel,
-	}
-	return b.getFloat32Value(cmd)
-}
-
-// SetMasterVolume sets the master audio volume for the video channel.
-//
-// volume: float32 - The new master volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
-func (b *MixerBuilder) SetMasterVolume(volume float32) error {
-	if b.layer != nil {
-		return ErrLayerSet
-	}
-	cmd := commands.MixerMasterVolume{
-		VideoChannel: b.videoChannel,
-		Volume:       &volume,
-	}
-	return b.sendCommand(cmd)
-}
-
-// GetStraightAlphaOutput retrieves the current straight alpha output state for the channel.
-func (b *MixerBuilder) GetStraightAlphaOutput() (bool, error) {
-	if b.layer != nil {
-		return false, ErrLayerSet
-	}
-	cmd := commands.MixerStraightAlphaOutput{
-		VideoChannel: b.videoChannel,
-	}
-	return b.getBoolValue(cmd)
-}
-
-// SetStraightAlphaOutput enables or disables straight alpha output for the channel.
-//
-// This only works per video channel, not per layer.
-func (b *MixerBuilder) SetStraightAlphaOutput(enable bool) error {
-	if b.layer != nil {
-		return ErrLayerSet
-	}
-	cmd := commands.MixerStraightAlphaOutput{
-		VideoChannel: b.videoChannel,
-		Enable:       &enable,
-	}
-	return b.setBoolValue(cmd)
-}
-
-// GetGrid retrieves the current grid settings for the video channel.
-func (b *MixerBuilder) GetGrid() (int, error) {
-	if b.layer != nil {
-		return 0, ErrLayerSet
-	}
-	cmd := commands.MixerGrid{
-		VideoChannel: b.videoChannel,
-	}
-	return b.getIntValue(cmd)
-}
-
-// SetGrid creates a grid of video layer in ascending order of the layer index,
-// i.e. if resolution equals 2 then a 2x2 grid of layers will be created starting from layer 1.
-//
-// resolution: int - The number of cells in the grid. (e.g: 2 = 2x2 grid, 3 = 3x3 grid, etc.)
-//
-// Use Fade() before calling this method to apply a smooth transition.
-func (b *MixerBuilder) SetGrid(resolution int) error {
-	if err := inRangeInt("resolution", resolution, 1, 9999); err != nil {
-		return err
-	}
-	if b.layer != nil {
-		return ErrLayerSet
-	}
-	cmd := commands.MixerGrid{
-		VideoChannel: b.videoChannel,
-		Resolution:   &resolution,
-	}
-	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
-	return b.sendCommand(cmd)
-}
-
-// Commit all deferred mixer transforms on the specified channel. This ensures that all animations start at the same exact frame.
-func (b *MixerBuilder) Commit() error {
-	cmd := commands.MixerCommit{
-		VideoChannel: b.videoChannel,
-	}
 	return b.sendCommand(cmd)
 }
 
 // Clear clears all transformations on a channel or layer
-func (b *MixerBuilder) Clear() error {
+func (b *MixerLayerBuilder) Clear() error {
 	cmd := commands.MixerClear{
-		VideoChannel: b.videoChannel,
-		Layer:        b.layer,
+		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.sendCommand(cmd)
 }

@@ -21,18 +21,18 @@ func main() {
 		}
 	}()
 
-	mode, err := client.Mixer(1, 1).GetBlendMode()
+	mode, err := client.Mixer().Channel(1).Layer(1).GetBlendMode()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Blend mode: %s\n", mode)
 
-	err = client.Mixer(1, 1).SetBlendMode(types.BlendModeScreen)
+	err = client.Mixer().Channel(1).Layer(1).SetBlendMode(types.BlendModeScreen)
 	if err != nil {
 		panic(err)
 	}
 
-	mode, err = client.Mixer(1, 1).GetBlendMode()
+	mode, err = client.Mixer().Channel(1).Layer(1).GetBlendMode()
 	if err != nil {
 		panic(err)
 	}
@@ -40,12 +40,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetBlendMode(types.BlendModeNormal)
+	err = client.Mixer().Channel(1).Layer(1).SetBlendMode(types.BlendModeNormal)
 	if err != nil {
 		panic(err)
 	}
 
-	mode, err = client.Mixer(1, 1).GetBlendMode()
+	mode, err = client.Mixer().Channel(1).Layer(1).GetBlendMode()
 	if err != nil {
 		panic(err)
 	}

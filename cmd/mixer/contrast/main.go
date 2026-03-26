@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	contrast, err := client.Mixer(1, 1).GetContrast()
+	contrast, err := client.Mixer().Channel(1).Layer(1).GetContrast()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Contrast: %f\n", contrast)
 
-	err = client.Mixer(1, 1).SetContrast(0)
+	err = client.Mixer().Channel(1).Layer(1).SetContrast(0)
 	if err != nil {
 		panic(err)
 	}
 
-	contrast, err = client.Mixer(1, 1).GetContrast()
+	contrast, err = client.Mixer().Channel(1).Layer(1).GetContrast()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetContrast(1.0)
+	err = client.Mixer().Channel(1).Layer(1).SetContrast(1.0)
 	if err != nil {
 		panic(err)
 	}
 
-	contrast, err = client.Mixer(1, 1).GetContrast()
+	contrast, err = client.Mixer().Channel(1).Layer(1).GetContrast()
 	if err != nil {
 		panic(err)
 	}

@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	saturation, err := client.Mixer(1, 1).GetSaturation()
+	saturation, err := client.Mixer().Channel(1).Layer(1).GetSaturation()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Saturation: %f\n", saturation)
 
-	err = client.Mixer(1, 1).SetSaturation(0)
+	err = client.Mixer().Channel(1).Layer(1).SetSaturation(0)
 	if err != nil {
 		panic(err)
 	}
 
-	saturation, err = client.Mixer(1, 1).GetSaturation()
+	saturation, err = client.Mixer().Channel(1).Layer(1).GetSaturation()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetSaturation(1.0)
+	err = client.Mixer().Channel(1).Layer(1).SetSaturation(1.0)
 	if err != nil {
 		panic(err)
 	}
 
-	saturation, err = client.Mixer(1, 1).GetSaturation()
+	saturation, err = client.Mixer().Channel(1).Layer(1).GetSaturation()
 	if err != nil {
 		panic(err)
 	}

@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	invertState, err := client.Mixer(1, 1).GetInvert()
+	invertState, err := client.Mixer().Channel(1).Layer(1).GetInvert()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Invert state: %t\n", invertState)
 
-	err = client.Mixer(1, 1).SetInvert(true)
+	err = client.Mixer().Channel(1).Layer(1).SetInvert(true)
 	if err != nil {
 		panic(err)
 	}
 
-	invertState, err = client.Mixer(1, 1).GetInvert()
+	invertState, err = client.Mixer().Channel(1).Layer(1).GetInvert()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetInvert(false)
+	err = client.Mixer().Channel(1).Layer(1).SetInvert(false)
 	if err != nil {
 		panic(err)
 	}
 
-	invertState, err = client.Mixer(1, 1).GetInvert()
+	invertState, err = client.Mixer().Channel(1).Layer(1).GetInvert()
 	if err != nil {
 		panic(err)
 	}

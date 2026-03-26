@@ -20,18 +20,18 @@ func main() {
 		}
 	}()
 
-	opacity, err := client.Mixer(1, 1).GetOpacity()
+	opacity, err := client.Mixer().Channel(1).Layer(1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Opacity: %f\n", opacity)
 
-	err = client.Mixer(1, 1).SetOpacity(0.4)
+	err = client.Mixer().Channel(1).Layer(1).SetOpacity(0.4)
 	if err != nil {
 		panic(err)
 	}
 
-	opacity, err = client.Mixer(1, 1).GetOpacity()
+	opacity, err = client.Mixer().Channel(1).Layer(1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	err = client.Mixer(1, 1).SetOpacity(1.0)
+	err = client.Mixer().Channel(1).Layer(1).SetOpacity(1.0)
 	if err != nil {
 		panic(err)
 	}
 
-	opacity, err = client.Mixer(1, 1).GetOpacity()
+	opacity, err = client.Mixer().Channel(1).Layer(1).GetOpacity()
 	if err != nil {
 		panic(err)
 	}

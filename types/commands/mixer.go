@@ -9,7 +9,7 @@ import (
 
 type MixerCommand struct {
 	VideoChannel int
-	Layer        int // defaults to 9999
+	Layer        *int // defaults to 9999
 }
 
 type MixerCommandKeyer struct {
@@ -19,7 +19,7 @@ type MixerCommandKeyer struct {
 }
 
 func (c MixerCommandKeyer) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "KEYER")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "KEYER")
 	return appendBool(cmd, c.Show)
 }
 
@@ -42,7 +42,7 @@ type MixerCommandChroma struct {
 }
 
 func (c MixerCommandChroma) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CHROMA")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CHROMA")
 	cmd = appendBool(cmd, c.Enable)
 	cmd = appendFloat(cmd, c.TargetHue)
 	cmd = appendFloat(cmd, c.HueWidth)
@@ -62,7 +62,7 @@ type MixerCommandBlend struct {
 }
 
 func (c MixerCommandBlend) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "BLEND")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "BLEND")
 	if c.BlendMode != nil {
 		cmd += " " + c.BlendMode.String()
 	}
@@ -76,7 +76,7 @@ type MixerCommandInvert struct {
 }
 
 func (c MixerCommandInvert) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "INVERT")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "INVERT")
 	return appendBool(cmd, c.Invert)
 }
 
@@ -90,7 +90,7 @@ type MixerCommandOpacity struct {
 }
 
 func (c MixerCommandOpacity) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "OPACITY")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "OPACITY")
 	cmd = appendFloat(cmd, c.Opacity)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
@@ -105,7 +105,7 @@ type MixerCommandBrightness struct {
 }
 
 func (c MixerCommandBrightness) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "BRIGHTNESS")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "BRIGHTNESS")
 	cmd = appendFloat(cmd, c.Brightness)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
@@ -120,7 +120,7 @@ type MixerCommandSaturation struct {
 }
 
 func (c MixerCommandSaturation) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "SATURATION")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "SATURATION")
 	cmd = appendFloat(cmd, c.Saturation)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
@@ -135,7 +135,7 @@ type MixerCommandContrast struct {
 }
 
 func (c MixerCommandContrast) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CONTRAST")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CONTRAST")
 	cmd = appendFloat(cmd, c.Contrast)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
@@ -154,7 +154,7 @@ type MixerCommandLevels struct {
 }
 
 func (c MixerCommandLevels) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "LEVELS")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "LEVELS")
 	cmd = appendFloat(cmd, c.MinInput)
 	cmd = appendFloat(cmd, c.MaxInput)
 	cmd = appendFloat(cmd, c.Gamma)
@@ -176,7 +176,7 @@ type MixerCommandFill struct {
 }
 
 func (c MixerCommandFill) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "FILL")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "FILL")
 	cmd = appendFloat(cmd, c.X)
 	cmd = appendFloat(cmd, c.Y)
 	cmd = appendFloat(cmd, c.XScale)
@@ -197,7 +197,7 @@ type MixerClip struct {
 }
 
 func (c MixerClip) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CLIP")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CLIP")
 	cmd = appendFloat(cmd, c.X)
 	cmd = appendFloat(cmd, c.Y)
 	cmd = appendFloat(cmd, c.Width)
@@ -216,7 +216,7 @@ type MixerAnchor struct {
 }
 
 func (c MixerAnchor) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "ANCHOR")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "ANCHOR")
 	cmd = appendFloat(cmd, c.X)
 	cmd = appendFloat(cmd, c.Y)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
@@ -235,7 +235,7 @@ type MixerCrop struct {
 }
 
 func (c MixerCrop) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "CROP")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CROP")
 	cmd = appendFloat(cmd, c.LeftEdge)
 	cmd = appendFloat(cmd, c.TopEdge)
 	cmd = appendFloat(cmd, c.RightEdge)
@@ -253,7 +253,7 @@ type MixerRotation struct {
 }
 
 func (c MixerRotation) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "ROTATION")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "ROTATION")
 	cmd = appendFloat(cmd, c.Angle)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
@@ -278,7 +278,7 @@ type MixerPerspective struct {
 }
 
 func (c MixerPerspective) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "PERSPECTIVE")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "PERSPECTIVE")
 	cmd = appendFloat(cmd, c.TopLeftX)
 	cmd = appendFloat(cmd, c.TopLeftY)
 	cmd = appendFloat(cmd, c.TopRightX)
@@ -297,7 +297,7 @@ type MixerMipMap struct {
 }
 
 func (c MixerMipMap) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "MIPMAP")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "MIPMAP")
 	return appendBool(cmd, c.Enable)
 }
 
@@ -311,13 +311,13 @@ type MixerVolume struct {
 }
 
 func (c MixerVolume) String() string {
-	cmd := baseMixerCmd(c.VideoChannel, c.Layer, "VOLUME")
+	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "VOLUME")
 	cmd = appendFloat(cmd, c.Volume)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
 type MixerMasterVolume struct {
-	VideoChannel int
+	MixerCommand // channel only command, Layer is nil
 
 	Volume *float32 // Volume: The new volume, 1.0 = original volume, 0.5 = half volume, 2.0 = double volume. Higher and lower values allowed.
 }
@@ -328,7 +328,7 @@ func (c MixerMasterVolume) String() string {
 }
 
 type MixerStraightAlphaOutput struct {
-	VideoChannel int
+	MixerCommand // channel only command, Layer is nil
 
 	Enable *bool
 }
@@ -339,7 +339,7 @@ func (c MixerStraightAlphaOutput) String() string {
 }
 
 type MixerGrid struct {
-	VideoChannel int
+	MixerCommand // channel only command, Layer is nil
 
 	Resolution *int
 
@@ -354,8 +354,7 @@ func (c MixerGrid) String() string {
 }
 
 type MixerClear struct {
-	VideoChannel int
-	Layer        *int
+	MixerCommand
 }
 
 func (c MixerClear) String() string {
@@ -368,7 +367,7 @@ func (c MixerClear) String() string {
 }
 
 type MixerCommit struct {
-	VideoChannel int
+	MixerCommand // channel only command, Layer is nil
 }
 
 func (c MixerCommit) String() string {

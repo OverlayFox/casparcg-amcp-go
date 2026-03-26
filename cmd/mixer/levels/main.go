@@ -21,7 +21,7 @@ func main() {
 		}
 	}()
 
-	originalLevels, err := client.Mixer(1, 1).GetLevels()
+	originalLevels, err := client.Mixer().Channel(1).Layer(1).GetLevels()
 	if err != nil {
 		panic(err)
 	}
@@ -34,12 +34,12 @@ func main() {
 		MinOutput: 0,
 		MaxOutput: 1,
 	}
-	err = client.Mixer(1, 1).SetLevels(newLevels)
+	err = client.Mixer().Channel(1).Layer(1).SetLevels(newLevels)
 	if err != nil {
 		panic(err)
 	}
 
-	levels, err := client.Mixer(1, 1).GetLevels()
+	levels, err := client.Mixer().Channel(1).Layer(1).GetLevels()
 	if err != nil {
 		panic(err)
 	}
@@ -47,12 +47,12 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 
-	err = client.Mixer(1, 1).SetLevels(originalLevels)
+	err = client.Mixer().Channel(1).Layer(1).SetLevels(originalLevels)
 	if err != nil {
 		panic(err)
 	}
 
-	levels, err = client.Mixer(1, 1).GetLevels()
+	levels, err = client.Mixer().Channel(1).Layer(1).GetLevels()
 	if err != nil {
 		panic(err)
 	}
