@@ -67,6 +67,10 @@ jobs:
           echo "CASPARCG_PID=$CASPARCG_PID" >> $GITHUB_ENV
           sleep 5 # Wait for server to start
 
+      - name: Run Tests
+        run: |
+          go test -tags=integration -v ./...
+
       - name: Stop CasparCG Server
         if: always()
         run: |
