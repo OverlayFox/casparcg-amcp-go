@@ -30,9 +30,6 @@ Commands are built directly based on the official [AMCP Protocol Documentation](
 - **Expanded Commands:** Extends the base AMCP commands for easier execution and strict typing.
 - **Optional Arguments:** Handles optional AMCP parameters using Go pointers.
 
-> **⚠️ Note:** Not all AMCP commands have been implemented yet.
-> The CasparCG Server version used to develop this package was `2.4.3`. Due to some inconsistencies in its returns, certain DTOs might be incomplete.
-
 ---
 
 ## 🧩 Examples
