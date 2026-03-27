@@ -44,8 +44,8 @@ jobs:
           echo "Installing CasparCG Server $TAG"
 
           # Get download URLs
-          CEF_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"cef\")) | .browser_download_url" | head -n1)
-          SERVER_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"server\") and endswith(\".deb\")) | .browser_download_url" | head -n1)
+          CEF_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"cef\") and contains(\"noble\")) | .browser_download_url" | head -n1)
+          SERVER_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"server\") and contains(\"noble\") and endswith(\".deb\")) | .browser_download_url" | head -n1)
 
           echo "Downloading CEF: $CEF_URL"
           wget -q "$CEF_URL" -O cef.deb
