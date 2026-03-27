@@ -27,17 +27,25 @@ jobs:
       - name: Install CasparCG Server ${{ matrix.casparcg-version }}
         run: |
           VERSION="${{ matrix.casparcg-version }}"
+          RELEASES=$(curl -s https://api.github.com/repos/CasparCG/server/releases)
 
-          # Get the latest release for this version
-          RELEASE_JSON=$(curl -s https://api.github.com/repos/CasparCG/server/releases | \
-            jq ".[] | select(.tag_name | startswith(\"v${VERSION}\"))" | head -n1)
+          if echo "$RELEASES" | jq -e '.message' > /dev/null 2>&1; then
+            echo "GitHub API Error:"
+            echo "$RELEASES" | jq -r '.message'
+            exit 1
+          fi
 
-          TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
+          TAG=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name | startswith(\"v${VERSION}\"))] | .[0].tag_name")
+          if [ "$TAG" = "null" ] || [ -z "$TAG" ]; then
+            echo "No release found for version ${VERSION}"
+            exit 1
+          fi
+
           echo "Installing CasparCG Server $TAG"
 
-          # Extract download URLs for CEF and Server packages
-          CEF_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("cef")) | .browser_download_url' | head -n1)
-          SERVER_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("server") and endswith(".deb")) | .browser_download_url' | head -n1)
+          # Get download URLs
+          CEF_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"cef\")) | .browser_download_url" | head -n1)
+          SERVER_URL=$(echo "$RELEASES" | jq -r "[.[] | select(.tag_name == \"$TAG\")] | .[0].assets[] | select(.name | contains(\"server\") and endswith(\".deb\")) | .browser_download_url" | head -n1)
 
           echo "Downloading CEF: $CEF_URL"
           wget -q "$CEF_URL" -O cef.deb
@@ -46,7 +54,6 @@ jobs:
           wget -q "$SERVER_URL" -O server.deb
 
           # Install packages
-          sudo apt-get update
           sudo dpkg -i cef.deb server.deb || true
           sudo apt-get install -f -y
 
