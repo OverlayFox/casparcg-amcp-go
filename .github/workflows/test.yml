@@ -1,0 +1,75 @@
+name: CasparCG-Test
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        casparcg-version: ["2.5", "2.4"]
+    steps:
+      - uses: action/checkout@v4
+      - name: Start Xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+          echo "Starting Xvfb..."
+          Xvfb :99 -screen 0 1024x768x24 &
+          export DISPLAY=:99
+          sleep 3 # Wait for Xvfb to start
+
+      - name: Install CasparCG Server ${{ matrix.casparcg-version }}
+        run: |
+          VERSION="${{ matrix.casparcg-version }}"
+
+          # Get the latest release for this version
+          RELEASE_JSON=$(curl -s https://api.github.com/repos/CasparCG/server/releases | \
+            jq ".[] | select(.tag_name | startswith(\"v${VERSION}\"))" | head -n1)
+
+          TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
+          echo "Installing CasparCG Server $TAG"
+
+          # Extract download URLs for CEF and Server packages
+          CEF_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("cef")) | .browser_download_url' | head -n1)
+          SERVER_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("server") and endswith(".deb")) | .browser_download_url' | head -n1)
+
+          echo "Downloading CEF: $CEF_URL"
+          wget -q "$CEF_URL" -O cef.deb
+
+          echo "Downloading Server: $SERVER_URL"
+          wget -q "$SERVER_URL" -O server.deb
+
+          # Install packages
+          sudo apt-get update
+          sudo dpkg -i cef.deb server.deb || true
+          sudo apt-get install -f -y
+
+          # Verify installation
+          which casparcg-server-${VERSION} || echo "CasparCG Server ${VERSION} not in PATH"
+
+      - name: Start CasparCG Server
+        run: |
+          casparcg-server-${{ matrix.casparcg-version }} > /tmp/casparcg.log 2>&1 &
+          CASPARCG_PID=$!
+          echo "CASPARCG_PID=$CASPARCG_PID" >> $GITHUB_ENV
+          sleep 5 # Wait for server to start
+
+      - name: Stop CasparCG Server
+        if: always()
+        run: |
+          if [ ! -z "$CASPARCG_PID" ]; then
+            echo "Stopping CasparCG Server (PID: $CASPARCG_PID)"
+            kill $CASPARCG_PID || true
+          fi
+
+          # Show logs for debugging
+          if [ -f /tmp/casparcg.log ]; then
+            echo "=== CasparCG Logs ==="
+            cat /tmp/casparcg.log
+          fi
