@@ -12,13 +12,20 @@ test:
 	@echo "==> Running tests with race detector..."
 	go test -race -v ./...
 
+test-integration:
+	@echo "==> Running integration tests..."
+	go test -tags=integration -v ./...
+
+test-all:
+	@echo "==> Running all tests..."
+	go test -tags=integration,unit -v ./...
+
 lint:
 	golangci-lint run 
 
 .PHONY: lint-fix
 lint-fix:
 	golangci-lint run --fix
-
 
 install-dev:
 	@echo "==> Installing development dependencies..."
