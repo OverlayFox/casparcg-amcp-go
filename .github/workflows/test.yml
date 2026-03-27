@@ -13,7 +13,7 @@ jobs:
       matrix:
         casparcg-version: ["2.5", "2.4"]
     steps:
-      - uses: action/checkout@v4
+      - uses: actions/checkout@v4
       - name: Start Xvfb
         run: |
           sudo apt-get update
