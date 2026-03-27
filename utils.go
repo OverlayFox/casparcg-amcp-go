@@ -45,16 +45,17 @@ func matchesToCINF(matches []string) (responses.CINF, error) {
 	}, nil
 }
 
-func inRangeFloat(valueName string, value, min, max float32) error {
-	if value < min || value > max {
-		return fmt.Errorf("%w: %s must be between %f and %f", ErrValueOutOfRange, valueName, min, max)
+//nolint:unparam // minValue may vary in future use cases.
+func inRangeFloat(valueName string, value, minValue, maxValue float32) error {
+	if value < minValue || value > maxValue {
+		return fmt.Errorf("%w: %s must be between %f and %f", ErrValueOutOfRange, valueName, minValue, maxValue)
 	}
 	return nil
 }
 
-func inRangeInt(valueName string, value, min, max int) error {
-	if value < min || value > max {
-		return fmt.Errorf("%w: %s must be between %d and %d", ErrValueOutOfRange, valueName, min, max)
+func inRangeInt(valueName string, value, minValue, maxValue int) error {
+	if value < minValue || value > maxValue {
+		return fmt.Errorf("%w: %s must be between %d and %d", ErrValueOutOfRange, valueName, minValue, maxValue)
 	}
 	return nil
 }

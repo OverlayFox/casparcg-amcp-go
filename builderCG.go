@@ -16,7 +16,7 @@ func (b *CGBuilder) sendCommand(cmd interface{ String() string }) error {
 	return err
 }
 
-// CG creates a new CG command builder for the specified channel and layer
+// CG creates a new CG command builder for the specified channel and layer.
 func (c *Client) CG() *CGBuilder {
 	return &CGBuilder{
 		client: c,
@@ -29,6 +29,7 @@ func (c *Client) CG() *CGBuilder {
 
 type CGChannelBuilder struct {
 	CGBuilder
+
 	videoChannel int
 }
 
@@ -56,6 +57,7 @@ func (b *CGChannelBuilder) baseCGChannelCommand() commands.CGCommand {
 
 type CGLayerBuilder struct {
 	CGChannelBuilder
+
 	layer int
 }
 
@@ -84,11 +86,12 @@ func (b *CGLayerBuilder) Info(cgLayer *int) error {
 }
 
 //
-// CG Layer Commands
+// CG Layer Commands.
 //
 
 type CGCGLayerBuilder struct {
 	CGLayerBuilder
+
 	CgLayer int
 }
 
@@ -159,7 +162,7 @@ func (b *CGCGLayerBuilder) Clear() error {
 
 // Update sends new data to the template on specified layer.
 //
-// data - string: data to pass to the template. This can be a JSON or XML inline string
+// data - string: data to pass to the template. This can be a JSON or XML inline string.
 func (b *CGCGLayerBuilder) Update(data string) error {
 	cmd := commands.TemplateCommandCGUpdate{
 		CGCommand: b.baseCGCGLayerCommand(),

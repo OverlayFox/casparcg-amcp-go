@@ -84,6 +84,7 @@ func (b *MixerBuilder) Fade(fade *types.Fade) *MixerBuilder {
 
 type MixerChannelBuilder struct {
 	MixerBuilder
+
 	videoChannel int
 }
 
@@ -176,7 +177,7 @@ func (b *MixerChannelBuilder) SetGrid(resolution int) error {
 	return b.sendCommand(cmd)
 }
 
-// Clear clears all transformations on a channel or layer
+// Clear clears all transformations on a channel or layer.
 func (b *MixerChannelBuilder) Clear() error {
 	cmd := commands.MixerClear{
 		MixerCommand: b.baseMixerChannelCommand(),
@@ -190,6 +191,7 @@ func (b *MixerChannelBuilder) Clear() error {
 
 type MixerLayerBuilder struct {
 	MixerChannelBuilder
+
 	layer int
 }
 
@@ -666,7 +668,7 @@ func (b *MixerLayerBuilder) SetVolume(volume float32) error {
 	return b.sendCommand(cmd)
 }
 
-// Clear clears all transformations on a channel or layer
+// Clear clears all transformations on a channel or layer.
 func (b *MixerLayerBuilder) Clear() error {
 	cmd := commands.MixerClear{
 		MixerCommand: b.baseMixerLayerCommand(),

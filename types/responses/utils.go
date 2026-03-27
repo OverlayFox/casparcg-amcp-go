@@ -42,3 +42,34 @@ func BlendModeFromResponse(data []string) (types.BlendMode, error) {
 	}
 	return types.ParseBlendMode(data[0])
 }
+
+// parseBool converts "1" to true, anything else to false.
+func parseBool(value string) bool {
+	return value == "1"
+}
+
+// parseFloat32 is a helper to parse a string to float32 with context.
+func parseFloat32(value, fieldName string) (float32, error) {
+	f, err := strconv.ParseFloat(value, 32)
+	if err != nil {
+		return 0, fmt.Errorf("invalid %s value: %w", fieldName, err)
+	}
+	return float32(f), nil
+}
+
+// parseFloat32Slice parses multiple float values from string slice.
+func parseFloat32Slice(data []string, fieldNames []string) ([]float32, error) {
+	if len(data) < len(fieldNames) {
+		return nil, fmt.Errorf("unexpected response length: got %d, expected at least %d", len(data), len(fieldNames))
+	}
+
+	result := make([]float32, len(fieldNames))
+	for i, name := range fieldNames {
+		val, err := parseFloat32(data[i], name)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = val
+	}
+	return result, nil
+}
