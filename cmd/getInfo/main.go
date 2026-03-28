@@ -21,7 +21,7 @@ func main() {
 		}
 	}()
 
-	data, err := client.Info().Server()
+	data, err := client.Query().Info().Server()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
