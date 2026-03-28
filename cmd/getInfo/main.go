@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/overlayfox/casparcg-amcp-go"
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 		}
 	}()
 
-	err = client.Query().GLGC()
+	err = client.CG().Channel(1).Layer(1).CGLayer(1).Add(types.CGAdd{Template: "L3", PlayOnLoad: true, Data: jsonString})
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
