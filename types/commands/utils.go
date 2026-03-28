@@ -47,9 +47,16 @@ func appendBool(cmd string, value *bool) string {
 	return cmd
 }
 
-func appendString(cmd string, value *string) string {
+func appendQuotedString(cmd string, value *string) string {
 	if value != nil {
 		return cmd + " " + quote(*value)
+	}
+	return cmd
+}
+
+func appendString(cmd string, value *string) string {
+	if value != nil {
+		return cmd + " " + *value
 	}
 	return cmd
 }
