@@ -31,7 +31,7 @@ var reCINF = regexp.MustCompile(`^"?([^"]+)"?\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+
 
 // CINF returns information about a media file.
 func (b *QueryBuilder) CINF(filename string) (responses.CINF, error) {
-	cmd := commands.QueryCommandCINF{
+	cmd := commands.QueryCINF{
 		Filename: filename,
 	}
 	resp, err := b.client.Send(cmd)
@@ -54,7 +54,7 @@ func (b *QueryBuilder) CINF(filename string) (responses.CINF, error) {
 //
 // If the optional sub_directory is specified only the media files in that sub directory will be returned.
 func (b *QueryBuilder) CLS(subDirectory *string) ([]responses.CINF, error) {
-	cmd := commands.QueryCommandCLS{
+	cmd := commands.QueryCLS{
 		Directory: subDirectory,
 	}
 	resp, err := b.client.Send(cmd)
@@ -79,7 +79,7 @@ func (b *QueryBuilder) CLS(subDirectory *string) ([]responses.CINF, error) {
 //
 // TODO: implement DTO for FLS response
 func (b *QueryBuilder) FLS() ([]string, error) {
-	cmd := commands.QueryCommandFLS{}
+	cmd := commands.QueryFLS{}
 	return b.client.Send(cmd)
 }
 
@@ -89,7 +89,7 @@ func (b *QueryBuilder) FLS() ([]string, error) {
 //
 // If the optional sub_directory is specified only the template files in that sub directory will be returned.
 func (b *QueryBuilder) TLS(directory *string) ([]string, error) {
-	cmd := commands.QueryCommandTLS{
+	cmd := commands.QueryTLS{
 		Directory: directory,
 	}
 	return b.client.Send(cmd)
@@ -111,7 +111,7 @@ func (b *QueryBuilder) Version() *QueryVersionCommand {
 }
 
 func (c *QueryBuilder) sendVersion(component types.VersionInfo) (string, error) {
-	cmd := commands.QueryCommandVersion{
+	cmd := commands.QueryVersion{
 		Component: component,
 	}
 	resp, err := c.client.Send(cmd)
@@ -159,7 +159,7 @@ func (b *QueryBuilder) Info() *QueryInfoCommand {
 }
 
 func (b *QueryInfoCommand) sendInfo(component types.InfoComponent) ([]string, error) {
-	cmd := commands.QueryCommandInfo{
+	cmd := commands.QueryInfo{
 		Component: component,
 	}
 	return b.client.Send(cmd)
@@ -179,7 +179,7 @@ func (b *QueryInfoCommand) Generic() ([]responses.QueryChannelInfo, error) {
 // Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) Template(template string) (responses.QueryChannelInfo, error) {
-	cmd := commands.QueryCommandInfoTemplate{
+	cmd := commands.QueryInfoTemplate{
 		Template: template,
 	}
 	resp, err := b.client.Send(cmd)
@@ -269,7 +269,7 @@ func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
 
 // GLInfo retrieves information about the allocated and pooled OpenGL resources.
 func (b *QueryInfoCommand) GL() (responses.GLInfo, error) {
-	cmd := commands.QueryCommandGLInfo{}
+	cmd := commands.QueryGLInfo{}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
 		return responses.GLInfo{}, err

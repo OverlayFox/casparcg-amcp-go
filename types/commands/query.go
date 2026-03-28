@@ -4,119 +4,119 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
-// QueryCommandCINF returns information about a media file.
-type QueryCommandCINF struct {
+// QueryCINF returns information about a media file.
+type QueryCINF struct {
 	Filename string
 }
 
-func (c QueryCommandCINF) String() string {
+func (c QueryCINF) String() string {
 	return "CINF " + quote(c.Filename)
 }
 
-// QueryCommandCLS lists media files in the media folder.
+// QueryCLS lists media files in the media folder.
 // Use the command INFO PATHS to get the path to the media folder.
-type QueryCommandCLS struct {
+type QueryCLS struct {
 	Directory *string
 }
 
-func (c QueryCommandCLS) String() string {
+func (c QueryCLS) String() string {
 	cmd := "CLS"
-	return appendString(cmd, c.Directory)
+	return appendQuotedString(cmd, c.Directory)
 }
 
-// QueryCommandFLS lists all fonts in the fonts folder.
+// QueryFLS lists all fonts in the fonts folder.
 // Use the command INFO PATHS to get the path to the fonts folder.
-type QueryCommandFLS struct{}
+type QueryFLS struct{}
 
-func (c QueryCommandFLS) String() string {
+func (c QueryFLS) String() string {
 	return "FLS"
 }
 
-// QueryCommandTLS lists template files in the templates folder.
+// QueryTLS lists template files in the templates folder.
 // Use the command INFO PATHS to get the path to the templates folder.
-type QueryCommandTLS struct {
+type QueryTLS struct {
 	Directory *string
 }
 
-func (c QueryCommandTLS) String() string {
+func (c QueryTLS) String() string {
 	cmd := "TLS"
 	return appendString(cmd, c.Directory)
 }
 
-// QueryCommandVersion returns the version of specified component.
-type QueryCommandVersion struct {
+// QueryVersion returns the version of specified component.
+type QueryVersion struct {
 	Component types.VersionInfo
 }
 
-func (c QueryCommandVersion) String() string {
+func (c QueryVersion) String() string {
 	if c.Component != "" {
 		return "VERSION " + string(c.Component)
 	}
 	return "VERSION"
 }
 
-// QueryCommandInfo retrieves a list of available channels.
-type QueryCommandInfo struct {
+// QueryInfo retrieves a list of available channels.
+type QueryInfo struct {
 	Component types.InfoComponent
 }
 
-func (c QueryCommandInfo) String() string {
+func (c QueryInfo) String() string {
 	if c.Component != "" {
 		return "INFO " + string(c.Component)
 	}
 	return "INFO"
 }
 
-// QueryCommandInfoTemplate gets information about the specified template.
-type QueryCommandInfoTemplate struct {
+// QueryInfoTemplate gets information about the specified template.
+type QueryInfoTemplate struct {
 	Template string
 }
 
-func (c QueryCommandInfoTemplate) String() string {
+func (c QueryInfoTemplate) String() string {
 	return "INFO TEMPLATE " + quote(c.Template)
 }
 
-type QueryCommandDiag struct{}
+type QueryDiag struct{}
 
-func (c QueryCommandDiag) String() string {
+func (c QueryDiag) String() string {
 	return "DIAG"
 }
 
-type QueryCommandGLInfo struct{}
+type QueryGLInfo struct{}
 
-func (c QueryCommandGLInfo) String() string {
+func (c QueryGLInfo) String() string {
 	return "GL INFO"
 }
 
-type QueryCommandGLGC struct{}
+type QueryGLGC struct{}
 
-func (c QueryCommandGLGC) String() string {
+func (c QueryGLGC) String() string {
 	return "GL GC"
 }
 
-type QueryCommandHelp struct {
+type QueryHelp struct {
 	Command *string
 }
 
-func (c QueryCommandHelp) String() string {
+func (c QueryHelp) String() string {
 	cmd := "HELP"
 	return appendString(cmd, c.Command)
 }
 
-type QueryCommandHelpProducer struct {
+type QueryHelpProducer struct {
 	Producer *string
 }
 
-func (c QueryCommandHelpProducer) String() string {
+func (c QueryHelpProducer) String() string {
 	cmd := "HELP PRODUCER"
 	return appendString(cmd, c.Producer)
 }
 
-type QueryCommandHelpConsumer struct {
+type QueryHelpConsumer struct {
 	Consumer *string
 }
 
-func (c QueryCommandHelpConsumer) String() string {
+func (c QueryHelpConsumer) String() string {
 	cmd := "HELP CONSUMER"
 	return appendString(cmd, c.Consumer)
 }

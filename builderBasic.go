@@ -33,7 +33,7 @@ func (c *Client) Ping(token *string) (string, error) {
 
 // Diag opens the diagnostic window.
 func (c *Client) Diag() error {
-	cmd := commands.QueryCommandDiag{}
+	cmd := commands.QueryDiag{}
 	return c.sendCommand(cmd)
 }
 
@@ -41,7 +41,7 @@ func (c *Client) Diag() error {
 //
 // ⚠️ WARNING: May cause a pause on all video channels.
 func (b *QueryBuilder) GLGC() error {
-	cmd := commands.QueryCommandGLGC{}
+	cmd := commands.QueryGLGC{}
 	return b.sendCommand(cmd)
 }
 
@@ -76,7 +76,7 @@ func (c *Client) Help() *ClientHelpCommand {
 
 // Generic shows a detailed description of the specified command, or a list of all commands if no command is specified.
 func (b *ClientHelpCommand) Generic(command *string) ([]string, error) {
-	cmd := commands.QueryCommandHelp{
+	cmd := commands.QueryHelp{
 		Command: command,
 	}
 	return b.client.Send(cmd)
@@ -84,7 +84,7 @@ func (b *ClientHelpCommand) Generic(command *string) ([]string, error) {
 
 // Producer shows a detailed description of the specified producer, or a list of all producers if no producer is specified.
 func (b *ClientHelpCommand) Producer(producer *string) ([]string, error) {
-	cmd := commands.QueryCommandHelpProducer{
+	cmd := commands.QueryHelpProducer{
 		Producer: producer,
 	}
 	return b.client.Send(cmd)
@@ -92,7 +92,7 @@ func (b *ClientHelpCommand) Producer(producer *string) ([]string, error) {
 
 // Consumer shows a detailed description of the specified consumer, or a list of all consumers if no consumer is specified.
 func (b *ClientHelpCommand) Consumer(consumer *string) ([]string, error) {
-	cmd := commands.QueryCommandHelpConsumer{
+	cmd := commands.QueryHelpConsumer{
 		Consumer: consumer,
 	}
 	return b.client.Send(cmd)
