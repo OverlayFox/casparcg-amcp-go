@@ -1,10 +1,5 @@
 package commands
 
-import (
-	"fmt"
-	"strconv"
-)
-
 // CGCommand is the base struct for all CG template commands. It contains the common fields for all CG commands.
 type CGCommand struct {
 	VideoChannel int
@@ -12,10 +7,10 @@ type CGCommand struct {
 	CgLayer      *int // optional, only used for layer-specific commands
 }
 
-// TemplateCommandCGAdd Prepares a template for displaying.
+// TemplateCGAdd Prepares a template for displaying.
 // It won't show until you call CG PLAY (unless you supply the play-on-load flag, 1 for true).
 // Data is either inline XML or a reference to a saved dataset.
-type TemplateCommandCGAdd struct {
+type TemplateCGAdd struct {
 	CGCommand
 
 	Template string
@@ -24,99 +19,109 @@ type TemplateCommandCGAdd struct {
 	Data       *string // JSON or XML inline string
 }
 
-func (c TemplateCommandCGAdd) String() string {
-	cmd := fmt.Sprintf("CG %d-%d ADD %d %s", c.VideoChannel, c.Layer, c.CgLayer, quote(c.Template))
-	if c.PlayOnLoad {
-		cmd += " 1"
-	} else {
-		cmd += " 0"
-	}
-	if c.Data != nil {
-		cmd += " " + quote(*c.Data)
-	}
+func (c TemplateCGAdd) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("ADD"))
+	cmd = appendInt(cmd, c.CgLayer)
+	cmd = appendQuotedString(cmd, ptr(c.Template))
+	cmd = appendBool(cmd, &c.PlayOnLoad)
+	return appendQuotedString(cmd, c.Data)
+}
+
+// TemplateCGPlay plays and displays the template in the specified layer.
+type TemplateCGPlay struct {
+	CGCommand
+}
+
+func (c TemplateCGPlay) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("PLAY"))
+	return appendInt(cmd, c.CgLayer)
+}
+
+// TemplateCGStop stops the template in the specified layer.
+// This is different from CG REMOVE in that the template gets a chance to animate out when it is stopped.
+type TemplateCGStop struct {
+	CGCommand
+}
+
+func (c TemplateCGStop) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("STOP"))
+	return appendInt(cmd, c.CgLayer)
+}
+
+// TemplateCGNext triggers a "continue" in the template on the specified layer.
+// This is used to control animations that has multiple discreet steps.
+type TemplateCGNext struct {
+	CGCommand
+}
+
+func (c TemplateCGNext) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("NEXT"))
+	return appendInt(cmd, c.CgLayer)
+}
+
+// TemplateCGRemove removes the template from the specified layer.
+type TemplateCGRemove struct {
+	CGCommand
+}
+
+func (c TemplateCGRemove) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("REMOVE"))
+	return appendInt(cmd, c.CgLayer)
+}
+
+// TemplateCGClear removes all templates on a video layer. The entire cg producer will be removed.
+type TemplateCGClear struct {
+	CGCommand
+}
+
+func (c TemplateCGClear) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("CLEAR"))
 	return cmd
 }
 
-// TemplateCommandCGPlay plays and displays the template in the specified layer.
-type TemplateCommandCGPlay struct {
-	CGCommand
-}
-
-func (c TemplateCommandCGPlay) String() string {
-	return fmt.Sprintf("CG %d-%d PLAY %d", c.VideoChannel, c.Layer, c.CgLayer)
-}
-
-// TemplateCommandCGStop stops the template in the specified layer.
-// This is different from CG REMOVE in that the template gets a chance to animate out when it is stopped.
-type TemplateCommandCGStop struct {
-	CGCommand
-}
-
-func (c TemplateCommandCGStop) String() string {
-	return fmt.Sprintf("CG %d-%d STOP %d", c.VideoChannel, c.Layer, c.CgLayer)
-}
-
-// TemplateCommandCGNext triggers a "continue" in the template on the specified layer.
-// This is used to control animations that has multiple discreet steps.
-type TemplateCommandCGNext struct {
-	CGCommand
-}
-
-func (c TemplateCommandCGNext) String() string {
-	return fmt.Sprintf("CG %d-%d NEXT %d", c.VideoChannel, c.Layer, c.CgLayer)
-}
-
-// TemplateCommandCGRemove removes the template from the specified layer.
-type TemplateCommandCGRemove struct {
-	CGCommand
-}
-
-func (c TemplateCommandCGRemove) String() string {
-	return fmt.Sprintf("CG %d-%d REMOVE %d", c.VideoChannel, c.Layer, c.CgLayer)
-}
-
-// TemplateCommandCGClear removes all templates on a video layer. The entire cg producer will be removed.
-type TemplateCommandCGClear struct {
-	CGCommand
-}
-
-func (c TemplateCommandCGClear) String() string {
-	return fmt.Sprintf("CG %d-%d CLEAR", c.VideoChannel, c.Layer)
-}
-
-// TemplateCommandCGUpdate sends new data to the template on specified layer.
+// TemplateCGUpdate sends new data to the template on specified layer.
 // Data is either inline XML or a reference to a saved dataset.
-type TemplateCommandCGUpdate struct {
+type TemplateCGUpdate struct {
 	CGCommand
 
 	Data string // JSON or XML inline string
 }
 
-func (c TemplateCommandCGUpdate) String() string {
-	return fmt.Sprintf("CG %d-%d UPDATE %d %s", c.VideoChannel, c.Layer, c.CgLayer, quote(c.Data))
+func (c TemplateCGUpdate) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("UPDATE"))
+	cmd = appendInt(cmd, c.CgLayer)
+	return appendQuotedString(cmd, ptr(c.Data))
 }
 
-// TemplateCommandCGInvoke invokes the given method on the template on the specified layer.
-type TemplateCommandCGInvoke struct {
+// TemplateCGInvoke invokes the given method on the template on the specified layer.
+type TemplateCGInvoke struct {
 	CGCommand
 
 	Method string
 }
 
-func (c TemplateCommandCGInvoke) String() string {
-	return fmt.Sprintf("CG %d-%d INVOKE %d %s", c.VideoChannel, c.Layer, c.CgLayer, quote(c.Method))
+func (c TemplateCGInvoke) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("INVOKE"))
+	cmd = appendInt(cmd, c.CgLayer)
+	return appendQuotedString(cmd, ptr(c.Method))
 }
 
-// TemplateCommandCGInfo retrieves information about the template on the specified layer.
+// TemplateCGInfo retrieves information about the template on the specified layer.
 // If `cg_layer` is not given, information about the template host is given instead.
-type TemplateCommandCGInfo struct {
+type TemplateCGInfo struct {
 	CGCommand
 }
 
-func (c TemplateCommandCGInfo) String() string {
-	cmd := fmt.Sprintf("CG %d-%d INFO", c.VideoChannel, c.Layer)
-	if c.CgLayer != nil {
-		cmd += " " + strconv.Itoa(*c.CgLayer)
-	}
-	return cmd
+func (c TemplateCGInfo) String() string {
+	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd = appendString(cmd, ptr("INFO"))
+	return appendInt(cmd, c.CgLayer)
 }

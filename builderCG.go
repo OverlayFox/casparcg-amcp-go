@@ -77,7 +77,7 @@ func (b *CGLayerBuilder) baseCGLayerCommand() commands.CGCommand {
 //
 // TODO: Implement response object of INFO command
 func (b *CGLayerBuilder) Info(cgLayer *int) error {
-	cmd := commands.TemplateCommandCGInvoke{
+	cmd := commands.TemplateCGInvoke{
 		CGCommand: b.baseCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -109,7 +109,7 @@ func (b *CGCGLayerBuilder) baseCGCGLayerCommand() commands.CGCommand {
 
 // Add prepares a template for displaying.
 func (b *CGCGLayerBuilder) Add(params types.CGAdd) error {
-	cmd := commands.TemplateCommandCGAdd{
+	cmd := commands.TemplateCGAdd{
 		CGCommand:  b.baseCGCGLayerCommand(),
 		Template:   params.Template,
 		PlayOnLoad: params.PlayOnLoad,
@@ -120,7 +120,7 @@ func (b *CGCGLayerBuilder) Add(params types.CGAdd) error {
 
 // Play plays and displays the template in the specified layer.
 func (b *CGCGLayerBuilder) Play() error {
-	cmd := commands.TemplateCommandCGPlay{
+	cmd := commands.TemplateCGPlay{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -128,7 +128,7 @@ func (b *CGCGLayerBuilder) Play() error {
 
 // Stop stops the template in the specified layer.
 func (b *CGCGLayerBuilder) Stop() error {
-	cmd := commands.TemplateCommandCGStop{
+	cmd := commands.TemplateCGStop{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -136,7 +136,7 @@ func (b *CGCGLayerBuilder) Stop() error {
 
 // Next triggers a "continue" in the template.
 func (b *CGCGLayerBuilder) Next() error {
-	cmd := commands.TemplateCommandCGNext{
+	cmd := commands.TemplateCGNext{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -144,7 +144,7 @@ func (b *CGCGLayerBuilder) Next() error {
 
 // Remove removes the template from the specified layer.
 func (b *CGCGLayerBuilder) Remove() error {
-	cmd := commands.TemplateCommandCGRemove{
+	cmd := commands.TemplateCGRemove{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -152,7 +152,7 @@ func (b *CGCGLayerBuilder) Remove() error {
 
 // Clear removes all templates on the video layer.
 func (b *CGCGLayerBuilder) Clear() error {
-	cmd := commands.TemplateCommandCGClear{
+	cmd := commands.TemplateCGClear{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -162,7 +162,7 @@ func (b *CGCGLayerBuilder) Clear() error {
 //
 // data - string: data to pass to the template. This can be a JSON or XML inline string.
 func (b *CGCGLayerBuilder) Update(data string) error {
-	cmd := commands.TemplateCommandCGUpdate{
+	cmd := commands.TemplateCGUpdate{
 		CGCommand: b.baseCGCGLayerCommand(),
 		Data:      data,
 	}
@@ -173,7 +173,7 @@ func (b *CGCGLayerBuilder) Update(data string) error {
 //
 // method - string: the name of the method to invoke on the template.
 func (b *CGCGLayerBuilder) Invoke(method string) error {
-	cmd := commands.TemplateCommandCGInvoke{
+	cmd := commands.TemplateCGInvoke{
 		CGCommand: b.baseCGCGLayerCommand(),
 		Method:    method,
 	}
@@ -184,7 +184,7 @@ func (b *CGCGLayerBuilder) Invoke(method string) error {
 //
 // TODO: Implement response object of INFO command
 func (b *CGCGLayerBuilder) Info(cgLayer *int) error {
-	cmd := commands.TemplateCommandCGInvoke{
+	cmd := commands.TemplateCGInvoke{
 		CGCommand: b.baseCGCGLayerCommand(),
 	}
 	return b.sendCommand(cmd)
