@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - DIAG
     - GL_INFO
     - GLGC
+    - HELP
+    - HELP PRODUCER
+    - HELP CONSUMER
   - Layer:
     - LAYER_INFO
     - CHANNEL_INFO

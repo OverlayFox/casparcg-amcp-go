@@ -267,14 +267,8 @@ func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
 //
 // functions are found in `/builderLayer.go` because it requires a channel and layer to be specified, which is not the case for the other Info commands.
 
-// Diag opens the diagnostic window.
-func (b *QueryBuilder) Diag() error {
-	cmd := commands.QueryCommandDiag{}
-	return b.sendCommand(cmd)
-}
-
 // GLInfo retrieves information about the allocated and pooled OpenGL resources.
-func (b *QueryBuilder) GLInfo() (responses.GLInfo, error) {
+func (b *QueryInfoCommand) GL() (responses.GLInfo, error) {
 	cmd := commands.QueryCommandGLInfo{}
 	resp, err := b.client.Send(cmd)
 	if err != nil {
@@ -286,12 +280,4 @@ func (b *QueryBuilder) GLInfo() (responses.GLInfo, error) {
 		return responses.GLInfo{}, err
 	}
 	return glInfo, nil
-}
-
-// GLGC releases all the pooled OpenGL resources.
-//
-// ⚠️ WARNING: May cause a pause on all video channels.
-func (b *QueryBuilder) GLGC() error {
-	cmd := commands.QueryCommandGLGC{}
-	return b.sendCommand(cmd)
 }

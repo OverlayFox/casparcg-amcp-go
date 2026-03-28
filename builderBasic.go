@@ -31,23 +31,69 @@ func (c *Client) Ping(token *string) (string, error) {
 	return data[0], nil
 }
 
+// Diag opens the diagnostic window.
+func (c *Client) Diag() error {
+	cmd := commands.QueryCommandDiag{}
+	return c.sendCommand(cmd)
+}
+
+// GLGC releases all the pooled OpenGL resources.
+//
+// ⚠️ WARNING: May cause a pause on all video channels.
+func (b *QueryBuilder) GLGC() error {
+	cmd := commands.QueryCommandGLGC{}
+	return b.sendCommand(cmd)
+}
+
 // Bye closes the connection.
 func (c *Client) Bye() error {
 	cmd := commands.CommandBye{}
-	_, err := c.Send(cmd)
-	return err
+	return c.sendCommand(cmd)
 }
 
 // Kill kills the server.
 func (c *Client) Kill() error {
 	cmd := commands.CommandKill{}
-	_, err := c.Send(cmd)
-	return err
+	return c.sendCommand(cmd)
 }
 
 // Restart restarts the server.
 func (c *Client) Restart() error {
 	cmd := commands.CommandRestart{}
-	_, err := c.Send(cmd)
-	return err
+	return c.sendCommand(cmd)
+}
+
+type ClientHelpCommand struct {
+	client *Client
+}
+
+// Help shows online help for a specific command or a list of all commands
+func (c *Client) Help() *ClientHelpCommand {
+	return &ClientHelpCommand{
+		client: c,
+	}
+}
+
+// Generic shows a detailed description of the specified command, or a list of all commands if no command is specified.
+func (b *ClientHelpCommand) Generic(command *string) ([]string, error) {
+	cmd := commands.QueryCommandHelp{
+		Command: command,
+	}
+	return b.client.Send(cmd)
+}
+
+// Producer shows a detailed description of the specified producer, or a list of all producers if no producer is specified.
+func (b *ClientHelpCommand) Producer(producer *string) ([]string, error) {
+	cmd := commands.QueryCommandHelpProducer{
+		Producer: producer,
+	}
+	return b.client.Send(cmd)
+}
+
+// Consumer shows a detailed description of the specified consumer, or a list of all consumers if no consumer is specified.
+func (b *ClientHelpCommand) Consumer(consumer *string) ([]string, error) {
+	cmd := commands.QueryCommandHelpConsumer{
+		Consumer: consumer,
+	}
+	return b.client.Send(cmd)
 }

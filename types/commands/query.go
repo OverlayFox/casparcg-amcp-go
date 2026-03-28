@@ -93,3 +93,30 @@ type QueryCommandGLGC struct{}
 func (c QueryCommandGLGC) String() string {
 	return "GL GC"
 }
+
+type QueryCommandHelp struct {
+	Command *string
+}
+
+func (c QueryCommandHelp) String() string {
+	cmd := "HELP"
+	return appendString(cmd, c.Command)
+}
+
+type QueryCommandHelpProducer struct {
+	Producer *string
+}
+
+func (c QueryCommandHelpProducer) String() string {
+	cmd := "HELP PRODUCER"
+	return appendString(cmd, c.Producer)
+}
+
+type QueryCommandHelpConsumer struct {
+	Consumer *string
+}
+
+func (c QueryCommandHelpConsumer) String() string {
+	cmd := "HELP CONSUMER"
+	return appendString(cmd, c.Consumer)
+}
