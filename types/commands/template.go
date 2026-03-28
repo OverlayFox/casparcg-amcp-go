@@ -1,23 +1,23 @@
-package types
+package commands
 
 import (
 	"fmt"
 	"strconv"
 )
 
-// TemplateCommandCG is the base struct for all CG template commands. It contains the common fields for all CG commands.
-type TemplateCommandCG struct {
+// CGCommand is the base struct for all CG template commands. It contains the common fields for all CG commands.
+type CGCommand struct {
 	VideoChannel int
-	Layer        int // defaults to 9999
+	Layer        *int // defaults to 9999
+	CgLayer      *int // optional, only used for layer-specific commands
 }
 
 // TemplateCommandCGAdd Prepares a template for displaying.
 // It won't show until you call CG PLAY (unless you supply the play-on-load flag, 1 for true).
 // Data is either inline XML or a reference to a saved dataset.
 type TemplateCommandCGAdd struct {
-	TemplateCommandCG
+	CGCommand
 
-	CgLayer  int
 	Template string
 
 	PlayOnLoad bool
@@ -39,9 +39,7 @@ func (c TemplateCommandCGAdd) String() string {
 
 // TemplateCommandCGPlay plays and displays the template in the specified layer.
 type TemplateCommandCGPlay struct {
-	TemplateCommandCG
-
-	CgLayer int
+	CGCommand
 }
 
 func (c TemplateCommandCGPlay) String() string {
@@ -51,9 +49,7 @@ func (c TemplateCommandCGPlay) String() string {
 // TemplateCommandCGStop stops the template in the specified layer.
 // This is different from CG REMOVE in that the template gets a chance to animate out when it is stopped.
 type TemplateCommandCGStop struct {
-	TemplateCommandCG
-
-	CgLayer int
+	CGCommand
 }
 
 func (c TemplateCommandCGStop) String() string {
@@ -63,9 +59,7 @@ func (c TemplateCommandCGStop) String() string {
 // TemplateCommandCGNext triggers a "continue" in the template on the specified layer.
 // This is used to control animations that has multiple discreet steps.
 type TemplateCommandCGNext struct {
-	TemplateCommandCG
-
-	CgLayer int
+	CGCommand
 }
 
 func (c TemplateCommandCGNext) String() string {
@@ -74,9 +68,7 @@ func (c TemplateCommandCGNext) String() string {
 
 // TemplateCommandCGRemove removes the template from the specified layer.
 type TemplateCommandCGRemove struct {
-	TemplateCommandCG
-
-	CgLayer int
+	CGCommand
 }
 
 func (c TemplateCommandCGRemove) String() string {
@@ -85,7 +77,7 @@ func (c TemplateCommandCGRemove) String() string {
 
 // TemplateCommandCGClear removes all templates on a video layer. The entire cg producer will be removed.
 type TemplateCommandCGClear struct {
-	TemplateCommandCG
+	CGCommand
 }
 
 func (c TemplateCommandCGClear) String() string {
@@ -95,10 +87,9 @@ func (c TemplateCommandCGClear) String() string {
 // TemplateCommandCGUpdate sends new data to the template on specified layer.
 // Data is either inline XML or a reference to a saved dataset.
 type TemplateCommandCGUpdate struct {
-	TemplateCommandCG
+	CGCommand
 
-	CgLayer int
-	Data    string // JSON or XML inline string
+	Data string // JSON or XML inline string
 }
 
 func (c TemplateCommandCGUpdate) String() string {
@@ -107,10 +98,9 @@ func (c TemplateCommandCGUpdate) String() string {
 
 // TemplateCommandCGInvoke invokes the given method on the template on the specified layer.
 type TemplateCommandCGInvoke struct {
-	TemplateCommandCG
+	CGCommand
 
-	CgLayer int
-	Method  string
+	Method string
 }
 
 func (c TemplateCommandCGInvoke) String() string {
@@ -120,9 +110,7 @@ func (c TemplateCommandCGInvoke) String() string {
 // TemplateCommandCGInfo retrieves information about the template on the specified layer.
 // If `cg_layer` is not given, information about the template host is given instead.
 type TemplateCommandCGInfo struct {
-	TemplateCommandCG
-
-	CgLayer *int
+	CGCommand
 }
 
 func (c TemplateCommandCGInfo) String() string {

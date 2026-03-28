@@ -1,109 +1,385 @@
 package casparcg
 
-import "github.com/overlayfox/casparcg-amcp-go/types"
+import (
+	"encoding/xml"
+	"fmt"
+	"strings"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+	"github.com/overlayfox/casparcg-amcp-go/types/responses"
+)
 
 // LayerBuilder provides a fluent interface for building layer-based commands.
 type LayerBuilder struct {
-	client       *Client
-	videoChannel int
-	layer        int
+	client *Client
 }
 
-// Layer creates a new layer command builder for the specified channel and layer
-// Example: client.Layer(1, 10).PLAY("myclip", nil).
-func (c *Client) Layer(videoChannel, layer int) *LayerBuilder {
+// sendCommand abstracts sending a command that does not expect a response value.
+func (b *LayerBuilder) sendCommand(cmd interface{ String() string }) error {
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+// Layer creates a new layer command builder for the specified channel and layer.
+func (c *Client) Layer() *LayerBuilder {
 	return &LayerBuilder{
-		client:       c,
+		client: c,
+	}
+}
+
+//
+// Channel Commands
+//
+
+type LayerChannelBuilder struct {
+	LayerBuilder
+
+	videoChannel int
+}
+
+func (c *LayerBuilder) Channel(videoChannel int) *LayerChannelBuilder {
+	return &LayerChannelBuilder{
+		LayerBuilder: *c,
 		videoChannel: videoChannel,
-		layer:        layer,
 	}
 }
 
-// LOAD loads a clip to the layer.
-func (b *LayerBuilder) LOAD(clip string, parameters *map[string]string) error {
-	cmd := types.CommandLoad{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		Clip:       clip,
-		Parameters: parameters,
+func (b *LayerChannelBuilder) baseLayerChannelCommand() commands.LayerCommand {
+	return commands.LayerCommand{
+		VideoChannel: b.videoChannel,
+		Layer:        nil, // Layer is nil for channel-level commands
 	}
-	_, err := b.client.Send(cmd)
-	return err
 }
 
-// PLAY plays content on the layer.
-func (b *LayerBuilder) PLAY(clip *string, parameters *map[string]string) error {
-	cmd := types.CommandPlay{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		Clip:       clip,
-		Parameters: parameters,
+// Clear clears all layers in the channel.
+func (b *LayerChannelBuilder) Clear() error {
+	cmd := commands.LayerCommandClear{
+		LayerCommand: b.baseLayerChannelCommand(),
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
 }
 
-// PAUSE pauses playback on the layer.
-func (b *LayerBuilder) PAUSE() error {
-	cmd := types.CommandPause{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
+// Swap swaps channels.
+func (b *LayerChannelBuilder) Swap(channel2 int, transforms bool) error {
+	cmd := commands.LayerCommandSwap{
+		LayerCommand:  b.baseLayerChannelCommand(),
+		VideoChannel2: channel2,
+		Layer2:        nil,
+		Transform:     transforms,
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
 }
 
-// RESUME resumes playback on the layer.
-func (b *LayerBuilder) RESUME() error {
-	cmd := types.CommandResume{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
+func (b *LayerChannelBuilder) Add(params types.LayerAdd) error {
+	cmd := commands.LayerCommandAdd{
+		LayerCommand: b.baseLayerChannelCommand(),
+		ConsumerName: params.ConsumerName,
+		ConsumerIdx:  params.ConsumerIdx,
+		Parameters:   params.Parameters,
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
 }
 
-// STOP stops playback on the layer.
-func (b *LayerBuilder) STOP() error {
-	cmd := types.CommandStop{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-	}
-	_, err := b.client.Send(cmd)
-	return err
+type LayerCommandRemove struct {
+	LayerChannelBuilder
 }
 
-// CLEAR clears the layer.
-func (b *LayerBuilder) CLEAR() error {
-	cmd := types.CommandClear{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
+// Remove removes an existing consumer from video_channel.
+func (b *LayerChannelBuilder) Remove() *LayerCommandRemove {
+	return &LayerCommandRemove{
+		LayerChannelBuilder: *b,
 	}
-	_, err := b.client.Send(cmd)
-	return err
 }
 
-// CALL calls a function on the layer.
-func (b *LayerBuilder) CALL(params map[string]string) error {
-	cmd := types.CommandCall{
-		BasicCommand: types.BasicCommand{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		Params: params,
+// ConsumerIDX removes the consumer via its id.
+func (b *LayerCommandRemove) ConsumerIDX(idx int) error {
+	cmd := commands.LayerCommandRemove{
+		LayerCommand: b.baseLayerChannelCommand(),
+		ConsumerIdx:  &idx,
+		Parameters:   nil,
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
+}
+
+// Params removes the consumer that matches the given parameters.
+func (b *LayerCommandRemove) Params(params []string) error {
+	cmd := commands.LayerCommandRemove{
+		LayerCommand: b.baseLayerChannelCommand(),
+		ConsumerIdx:  nil,
+		Parameters:   &params,
+	}
+	return b.sendCommand(cmd)
+}
+
+func (b *LayerChannelBuilder) Print() error {
+	cmd := commands.LayerCommandPrint{
+		LayerCommand: b.baseLayerChannelCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+type LayerCommandSet struct {
+	LayerChannelBuilder
+}
+
+func (b *LayerChannelBuilder) Set() *LayerCommandSet {
+	return &LayerCommandSet{
+		LayerChannelBuilder: *b,
+	}
+}
+
+func (b *LayerCommandSet) Mode(value types.VideoMode) error {
+	cmd := commands.LayerCommandSet{
+		LayerCommand: b.baseLayerChannelCommand(),
+		VariableName: "MODE",
+		Value:        string(value),
+	}
+	return b.sendCommand(cmd)
+}
+
+func (b *LayerCommandSet) ChannelLayout(value types.AudioChannelLayout) error {
+	cmd := commands.LayerCommandSet{
+		LayerCommand: b.baseLayerChannelCommand(),
+		VariableName: "CHANNELS",
+		Value:        string(value),
+	}
+	return b.sendCommand(cmd)
+}
+
+type LayerCommandLock struct {
+	LayerChannelBuilder
+}
+
+// Lock locks a channel for exclusive access.
+func (b *LayerChannelBuilder) Lock() *LayerCommandLock {
+	return &LayerCommandLock{
+		LayerChannelBuilder: *b,
+	}
+}
+
+// Acquire acquires the lock with the given passphrase.
+func (b *LayerCommandLock) Acquire(passphrase string) error {
+	cmd := commands.LayerCommandLock{
+		LayerCommand: b.baseLayerChannelCommand(),
+		Action:       types.LockActionAcquire,
+		Passphrase:   &passphrase,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Release releases the lock with the given passphrase.
+func (b *LayerCommandLock) Release(passphrase string) error {
+	cmd := commands.LayerCommandLock{
+		LayerCommand: b.baseLayerChannelCommand(),
+		Action:       types.LockActionRelease,
+		Passphrase:   &passphrase,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Clear clears the lock
+//
+// This is for emergency use only and should be used with caution
+func (b *LayerCommandLock) Clear() error {
+	cmd := commands.LayerCommandLock{
+		LayerCommand: b.baseLayerChannelCommand(),
+		Action:       types.LockActionClear,
+		Passphrase:   nil,
+	}
+	return b.sendCommand(cmd)
+}
+
+type LayerCommandChannelInfo struct {
+	LayerChannelBuilder
+}
+
+func (b *LayerChannelBuilder) Info() *LayerCommandChannelInfo {
+	return &LayerCommandChannelInfo{
+		LayerChannelBuilder: *b,
+	}
+}
+
+// Generic gets information about the channel.
+func (b *LayerCommandChannelInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfo{
+		LayerCommand: b.baseLayerChannelCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
+}
+
+// Delay get the current delay on the specified channel.
+//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
+// https://github.com/CasparCG/server/issues/1151
+func (b *LayerCommandChannelInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfoDelay{
+		LayerCommand: b.baseLayerChannelCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	fmt.Print(data)
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
+}
+
+//
+// Layer Commands
+//
+
+type LayerLayerBuilder struct {
+	LayerChannelBuilder
+
+	layer int
+}
+
+func (c *LayerChannelBuilder) Layer(layer int) *LayerLayerBuilder {
+	return &LayerLayerBuilder{
+		LayerChannelBuilder: *c,
+		layer:               layer,
+	}
+}
+
+func (b *LayerLayerBuilder) baseLayerLayerCommand() commands.LayerCommand {
+	return commands.LayerCommand{
+		VideoChannel: b.videoChannel,
+		Layer:        &b.layer,
+	}
+}
+
+// Load loads a clip to the layer.
+func (b *LayerLayerBuilder) Load(params types.LayerLoad) error {
+	cmd := commands.LayerCommandLoad{
+		LayerCommand: b.baseLayerLayerCommand(),
+		Clip:         params.ClipName,
+		Parameters:   params.Parameters,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Play plays content on the layer.
+func (b *LayerLayerBuilder) Play(params types.LayerPlay) error {
+	cmd := commands.LayerCommandPlay{
+		LayerCommand: b.baseLayerLayerCommand(),
+		Clip:         params.ClipName,
+		Parameters:   params.Parameters,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Pause pauses playback on the layer.
+func (b *LayerLayerBuilder) Pause() error {
+	cmd := commands.LayerCommandPause{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Resume resumes playback on the layer.
+func (b *LayerLayerBuilder) Resume() error {
+	cmd := commands.LayerCommandResume{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Stop stops playback on the layer.
+func (b *LayerLayerBuilder) Stop() error {
+	cmd := commands.LayerCommandStop{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Clear clears the layer.
+func (b *LayerLayerBuilder) Clear() error {
+	cmd := commands.LayerCommandClear{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Call calls a function on the layer.
+//
+// TODO: Implement all possible parameter for CALL command
+func (b *LayerLayerBuilder) Call(params []string) error {
+	cmd := commands.LayerCommandCall{
+		LayerCommand: b.baseLayerLayerCommand(),
+		Params:       params,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Swap swaps layers between channels.
+func (b *LayerLayerBuilder) Swap(channel2 int, layer2 int, transforms bool) error {
+	cmd := commands.LayerCommandSwap{
+		LayerCommand:  b.baseLayerLayerCommand(),
+		VideoChannel2: channel2,
+		Layer2:        &layer2,
+		Transform:     transforms,
+	}
+	return b.sendCommand(cmd)
+}
+
+type LayerCommandLayerInfo struct {
+	LayerLayerBuilder
+}
+
+func (b *LayerLayerBuilder) Info() *LayerCommandLayerInfo {
+	return &LayerCommandLayerInfo{
+		LayerLayerBuilder: *b,
+	}
+}
+
+// Generic gets information about the channel.
+func (b *LayerCommandLayerInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfo{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
+}
+
+// Delay get the current delay on the specified channel.
+//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
+// https://github.com/CasparCG/server/issues/1151
+func (b *LayerCommandLayerInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfoDelay{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	fmt.Print(data)
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
 }

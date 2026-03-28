@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
+	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
 func main() {
@@ -21,7 +22,11 @@ func main() {
 		}
 	}()
 
-	err = client.CG(1, 10).ADD(1, "TITLE", true, nil)
+	err = client.CG().Channel(1).Layer(10).CGLayer(0).Add(types.CGAdd{
+		Template:   "template",
+		PlayOnLoad: true,
+		Data:       stringPtr("This is some custom data"),
+	})
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
@@ -31,7 +36,7 @@ func main() {
 	}
 	time.Sleep(2 * time.Second)
 
-	err = client.CG(1, 10).STOP(1)
+	err = client.CG().Channel(1).Layer(10).CGLayer(0).Stop()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
@@ -39,4 +44,8 @@ func main() {
 		}
 		panic(err)
 	}
+}
+
+var stringPtr = func(s string) *string {
+	return &s
 }

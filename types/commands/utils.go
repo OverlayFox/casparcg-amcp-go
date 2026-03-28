@@ -1,0 +1,82 @@
+package commands
+
+import (
+	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/overlayfox/casparcg-amcp-go/types"
+)
+
+func buildParams(params map[string]string) string {
+	var parts []string
+	for k, v := range params {
+		parts = append(parts, k+" "+v)
+	}
+	return strings.Join(parts, " ")
+}
+
+func appendParams(cmd string, params *[]string) string {
+	if params != nil && len(*params) > 0 {
+		return cmd + " " + strings.Join(*params, " ")
+	}
+	return cmd
+}
+
+func appendInt(cmd string, value *int) string {
+	if value != nil {
+		return cmd + " " + strconv.Itoa(*value)
+	}
+	return cmd
+}
+
+func appendFloat(cmd string, value *float32) string {
+	if value != nil {
+		return cmd + " " + fmt.Sprintf("%f", *value)
+	}
+	return cmd
+}
+
+func appendBool(cmd string, value *bool) string {
+	if value != nil {
+		if *value {
+			return cmd + " 1"
+		}
+		return cmd + " 0"
+	}
+	return cmd
+}
+
+func appendString(cmd string, value *string) string {
+	if value != nil {
+		return cmd + " " + quote(*value)
+	}
+	return cmd
+}
+
+func appendDurationTween(cmd string, duration *int, tween *types.TweenType) string {
+	if duration != nil {
+		cmd += " " + strconv.Itoa(*duration)
+	}
+	if tween != nil {
+		cmd += " " + tween.String()
+	}
+	return cmd
+}
+
+func quote(s string) string {
+	escaped := strings.ReplaceAll(s, `"`, `\"`)
+	return "\"" + escaped + "\""
+}
+
+func baseLayerCommand(command string, videoChannel int, layer *int) string {
+	cmd := fmt.Sprintf("%s %d", command, videoChannel)
+	if layer != nil {
+		cmd += fmt.Sprintf("-%d", *layer)
+	}
+	return cmd
+}
+
+func ptr[T any](v T) *T {
+	return &v
+}

@@ -1,13 +1,58 @@
 package types
 
-import "fmt"
+import (
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"io"
+)
 
 type FrameRate struct {
 	Num int `xml:"num"`
 	Den int `xml:"den"`
 }
 
-func (f FrameRate) Float() float64 {
+// UnmarshalXML handles the repeating <framerate> tags manually.
+func (f *FrameRate) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var values []int
+	for {
+		var val int
+		err := d.DecodeElement(&val, &start)
+		if err != nil {
+			return err
+		}
+		values = append(values, val)
+
+		t, err := d.Token()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		if nextStart, ok := t.(xml.StartElement); ok && nextStart.Name.Local == "framerate" {
+			start = nextStart
+			continue
+		} else {
+			break
+		}
+	}
+
+	// Assign values to the struct
+	if len(values) >= 1 {
+		f.Num = values[0]
+	}
+	if len(values) >= 2 {
+		f.Den = values[1]
+	} else {
+		f.Den = 1 // Default denominator
+	}
+
+	return nil
+}
+
+func (f *FrameRate) Float() float64 {
 	if f.Den == 0 {
 		return 0
 	}
@@ -135,3 +180,97 @@ const (
 	DecklinkKeyerInternal               DecklinkKeyer = "internal"
 	DecklinkKeyerDefault                DecklinkKeyer = "default"
 )
+
+type TweenType string
+
+const (
+	TweenTypeLinear     TweenType = "linear"
+	TweenTypeEaseInSine TweenType = "easeinsine"
+)
+
+var validTweenTypes = map[TweenType]any{
+	TweenTypeLinear:     nil,
+	TweenTypeEaseInSine: nil,
+}
+
+func ParseTweenType(s string) (TweenType, error) {
+	tweenType := TweenType(s)
+	if _, ok := validTweenTypes[tweenType]; !ok {
+		return "", fmt.Errorf("invalid tween type: %s", s)
+	}
+	return tweenType, nil
+}
+
+func (t TweenType) String() string {
+	return string(t)
+}
+
+type BlendMode string
+
+const (
+	BlendModeNormal BlendMode = "normal"
+	BlendModeScreen BlendMode = "screen"
+)
+
+var validBlendModes = map[BlendMode]any{
+	BlendModeNormal: nil,
+	BlendModeScreen: nil,
+}
+
+func ParseBlendMode(s string) (BlendMode, error) {
+	mode := BlendMode(s)
+	if _, ok := validBlendModes[mode]; !ok {
+		return "", fmt.Errorf("invalid blend mode: %s", s)
+	}
+	return mode, nil
+}
+
+func (b BlendMode) String() string {
+	return string(b)
+}
+
+func (b BlendMode) Validate() error {
+	if _, ok := validBlendModes[b]; !ok {
+		return fmt.Errorf("invalid blend mode: %s", b)
+	}
+	return nil
+}
+
+type VersionInfo string
+
+const (
+	VersionInfoServer       VersionInfo = "SERVER"
+	VersionInfoFlash        VersionInfo = "FLASH"
+	VersionInfoTemplateHost VersionInfo = "TEMPLATE_HOST"
+	VersionInfoCEF          VersionInfo = "CEF"
+)
+
+type InfoComponent string
+
+const (
+	InfoComponentConfig  InfoComponent = "CONFIG"
+	InfoComponentPaths   InfoComponent = "PATHS"
+	InfoComponentSystem  InfoComponent = "SYSTEM"
+	InfoComponentServer  InfoComponent = "SERVER"
+	InfoComponentQueues  InfoComponent = "QUEUES"
+	InfoComponentThreads InfoComponent = "THREADS"
+)
+
+type SetVariable string
+
+const (
+	SetVariableMode          SetVariable = "MODE"
+	SetVariableChannelLayout SetVariable = "CHANNEL_LAYOUT"
+)
+
+type LockAction string
+
+const (
+	LockActionAcquire LockAction = "ACQUIRE"
+	LockActionRelease LockAction = "RELEASE"
+	LockActionClear   LockAction = "CLEAR"
+)
+
+func (a LockAction) String() string {
+	return string(a)
+}
