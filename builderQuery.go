@@ -146,89 +146,128 @@ func (b *QueryBuilder) Info() *QueryInfoCommand {
 	}
 }
 
-func (b *QueryInfoCommand) Generic() (types.InfoComponent, error) {
-	data, err := b.info("")
+// Generic retrieves a list of the available channels.
+func (b *QueryInfoCommand) Generic() ([]responses.QueryChannelInfo, error) {
+	resp, err := b.sendInfo("")
 	if err != nil {
-		config, ok := data.(types.InfoComponent)
-		if !ok {
-			return "", fmt.Errorf("unexpected data type for config info: %T", data)
-		}
-		return config, nil
+		return nil, err
 	}
-	return "", err
+	channelInfo := make([]responses.QueryChannelInfo, 0, len(resp))
+	for _, line := range resp {
+		parts := strings.Split(line, " ")
+		info, err := responses.PartsToQueryChannelInfo(parts)
+		if err != nil {
+			return nil, err
+		}
+		channelInfo = append(channelInfo, info)
+	}
+	return channelInfo, nil
 }
 
+// Template gets information about the specified template.
+func (b *QueryInfoCommand) Template(template string) (responses.QueryChannelInfo, error) {
+	cmd := commands.QueryCommandInfoTemplate{
+		Template: template,
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfo{}, err
+	}
+
+	parts := strings.Split(data[0], " ")
+	if len(parts) != 3 {
+		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected format for template info: %s", data[0])
+	}
+
+	videoChannel, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return responses.QueryChannelInfo{}, fmt.Errorf("invalid video channel in template info: %s", parts[0])
+	}
+
+	return responses.QueryChannelInfo{
+		ChannelIndex: videoChannel,
+		VideoMode:    types.VideoMode(parts[1]),
+		Status:       parts[2],
+	}, nil
+}
+
+// Config gets the contents of the configuration used.
 func (b *QueryInfoCommand) Config() (responses.CasparConfig, error) {
-	data, err := b.info(types.InfoComponentConfig)
+	resp, err := b.sendInfo(types.InfoComponentConfig)
 	if err != nil {
-		config, ok := data.(responses.CasparConfig)
-		if !ok {
-			return responses.CasparConfig{}, fmt.Errorf("unexpected data type for config info: %T", data)
-		}
-		return config, nil
+		return responses.CasparConfig{}, err
 	}
-	return responses.CasparConfig{}, err
+	var config responses.CasparConfig
+	err = xml.Unmarshal([]byte(strings.Join(resp, "\n")), &config)
+	if err != nil {
+		return responses.CasparConfig{}, err
+	}
+	return config, nil
 }
 
+// Paths gets information about the paths used.
 func (b *QueryInfoCommand) Paths() (responses.Paths, error) {
-	data, err := b.info(types.InfoComponentPaths)
+	resp, err := b.sendInfo(types.InfoComponentPaths)
 	if err != nil {
-		paths, ok := data.(responses.Paths)
-		if !ok {
-			return responses.Paths{}, fmt.Errorf("unexpected data type for paths info: %T", data)
-		}
-		return paths, nil
+		return responses.Paths{}, err
 	}
-	return responses.Paths{}, err
+
+	var paths responses.Paths
+	err = xml.Unmarshal([]byte(strings.Join(resp, "\n")), &paths)
+	if err != nil {
+		return responses.Paths{}, err
+	}
+	return paths, nil
 }
 
-func (b *QueryInfoCommand) System() (responses.GenericInfo, error) {
-	data, err := b.info(types.InfoComponentSystem)
-	if err != nil {
-		systemInfo, ok := data.(responses.GenericInfo)
-		if !ok {
-			return responses.GenericInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
-		}
-		return systemInfo, nil
-	}
-	return responses.GenericInfo{}, err
-}
+// // System gets system information like OS, CPU and library version numbers.
+// func (b *QueryInfoCommand) System() (responses.QueryChannelInfo, error) {
+// 	data, err := b.info(types.InfoComponentSystem)
+// 	if err != nil {
+// 		systemInfo, ok := data.(responses.QueryChannelInfo)
+// 		if !ok {
+// 			return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
+// 		}
+// 		return systemInfo, nil
+// 	}
+// 	return responses.QueryChannelInfo{}, err
+// }
 
-func (b *QueryInfoCommand) Server() (responses.GenericInfo, error) {
-	data, err := b.info(types.InfoComponentServer)
-	if err != nil {
-		return responses.GenericInfo{}, err
-	}
-	serverInfo, ok := data.(responses.GenericInfo)
-	if !ok {
-		return responses.GenericInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
-	}
-	return serverInfo, nil
-}
+// func (b *QueryInfoCommand) Server() (responses.QueryChannelInfo, error) {
+// 	data, err := b.info(types.InfoComponentServer)
+// 	if err != nil {
+// 		return responses.QueryChannelInfo{}, err
+// 	}
+// 	serverInfo, ok := data.(responses.QueryChannelInfo)
+// 	if !ok {
+// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
+// 	}
+// 	return serverInfo, nil
+// }
 
-func (b *QueryInfoCommand) Queues() (responses.GenericInfo, error) {
-	data, err := b.info(types.InfoComponentQueues)
-	if err != nil {
-		return responses.GenericInfo{}, err
-	}
-	queuesInfo, ok := data.(responses.GenericInfo)
-	if !ok {
-		return responses.GenericInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
-	}
-	return queuesInfo, nil
-}
+// func (b *QueryInfoCommand) Queues() (responses.QueryChannelInfo, error) {
+// 	data, err := b.info(types.InfoComponentQueues)
+// 	if err != nil {
+// 		return responses.QueryChannelInfo{}, err
+// 	}
+// 	queuesInfo, ok := data.(responses.QueryChannelInfo)
+// 	if !ok {
+// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
+// 	}
+// 	return queuesInfo, nil
+// }
 
-func (b *QueryInfoCommand) Threads() (responses.GenericInfo, error) {
-	data, err := b.info(types.InfoComponentThreads)
-	if err != nil {
-		return responses.GenericInfo{}, err
-	}
-	threadsInfo, ok := data.(responses.GenericInfo)
-	if !ok {
-		return responses.GenericInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
-	}
-	return threadsInfo, nil
-}
+// func (b *QueryInfoCommand) Threads() (responses.QueryChannelInfo, error) {
+// 	data, err := b.info(types.InfoComponentThreads)
+// 	if err != nil {
+// 		return responses.QueryChannelInfo{}, err
+// 	}
+// 	threadsInfo, ok := data.(responses.QueryChannelInfo)
+// 	if !ok {
+// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
+// 	}
+// 	return threadsInfo, nil
+// }
 
 // Channel gets information about a channel or layer.
 func (b *QueryInfoCommand) Channel(videoChannel int) (responses.InfoChannel, error) {
@@ -267,33 +306,6 @@ func (b *QueryInfoCommand) ChannelLayer(videoChannel int, layer int) (responses.
 	}
 
 	return infoChannel, nil
-}
-
-// Template gets information about the specified template.
-func (b *QueryInfoCommand) Template(template string) (responses.GenericInfo, error) {
-	cmd := commands.QueryCommandInfoTemplate{
-		Template: template,
-	}
-	data, err := b.client.Send(cmd)
-	if err != nil {
-		return responses.GenericInfo{}, err
-	}
-
-	parts := strings.Split(data[0], " ")
-	if len(parts) != 3 {
-		return responses.GenericInfo{}, fmt.Errorf("unexpected format for template info: %s", data[0])
-	}
-
-	videoChannel, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return responses.GenericInfo{}, fmt.Errorf("invalid video channel in template info: %s", parts[0])
-	}
-
-	return responses.GenericInfo{
-		VideoChannel: videoChannel,
-		VideoMode:    types.VideoMode(parts[1]),
-		Status:       parts[2],
-	}, nil
 }
 
 // InfoChannelDelay gets delay information.
@@ -335,52 +347,20 @@ func (b *QueryInfoCommand) ChannelLayerDelay(videoChannel int, layer int) (respo
 	return infoChannel, nil
 }
 
-func (b *QueryInfoCommand) info(component types.InfoComponent) (any, error) {
+func (b *QueryInfoCommand) sendInfo(component types.InfoComponent) ([]string, error) {
 	cmd := commands.QueryCommandInfo{
 		Component: component,
 	}
-	resp, err := b.client.Send(cmd)
-	if err != nil {
-		return nil, err
-	}
+	return b.client.Send(cmd)
 
-	fullXML := strings.Join(resp, "\n")
-	switch component {
-	case types.InfoComponentConfig:
-		var config responses.CasparConfig
-		err := xml.Unmarshal([]byte(fullXML), &config)
-		if err != nil {
-			return nil, err
-		}
-		return config, nil
+	// switch component {
+	// case types.InfoComponentConfig:
 
-	case types.InfoComponentPaths:
-		var paths responses.Paths
-		err := xml.Unmarshal([]byte(fullXML), &paths)
-		if err != nil {
-			return nil, err
-		}
-		return paths, nil
+	// case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
+	// 	parts := strings.Split(fullXML, " ")
+	// 	return responses.PartsToQueryChannelInfo(parts)
 
-	case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
-		parts := strings.Split(fullXML, " ")
-		if len(parts) != 3 {
-			return nil, fmt.Errorf("unexpected format for '%s' info: %s", component, fullXML)
-		}
-
-		videoChannel, err := strconv.Atoi(parts[0])
-		if err != nil {
-			return nil, fmt.Errorf("invalid video channel in '%s' info: %s", component, parts[0])
-		}
-
-		systemInfo := responses.GenericInfo{
-			VideoChannel: videoChannel,
-			VideoMode:    types.VideoMode(parts[1]),
-			Status:       parts[2],
-		}
-		return systemInfo, nil
-
-	default:
-		return nil, fmt.Errorf("unknown info component: %s", component)
-	}
+	// default:
+	// 	return nil, fmt.Errorf("unknown info component: %s", component)
+	// }
 }

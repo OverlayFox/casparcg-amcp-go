@@ -176,3 +176,11 @@ func (c LayerCommandLock) String() string {
 	cmd = appendString(cmd, c.Passphrase)
 	return cmd
 }
+
+type LayerCommandInfo struct {
+	LayerCommand
+}
+
+func (c LayerCommandInfo) String() string {
+	return baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+}

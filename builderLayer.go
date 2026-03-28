@@ -185,6 +185,14 @@ func (b *LayerCommandLock) Clear() error {
 	return b.sendCommand(cmd)
 }
 
+// Info gets information about the channel.
+func (b *LayerChannelBuilder) Info() ([]string, error) {
+	cmd := commands.LayerCommandInfo{
+		LayerCommand: b.baseLayerChannelCommand(),
+	}
+	return b.client.Send(cmd)
+}
+
 //
 // Layer Commands
 //
@@ -284,4 +292,12 @@ func (b *LayerLayerBuilder) Swap(channel2 int, layer2 int, transforms bool) erro
 		Transform:     transforms,
 	}
 	return b.sendCommand(cmd)
+}
+
+// Info gets information about the Layer.
+func (b *LayerLayerBuilder) Info() ([]string, error) {
+	cmd := commands.LayerCommandInfo{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	return b.client.Send(cmd)
 }
