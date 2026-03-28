@@ -87,3 +87,9 @@ type QueryCommandGLInfo struct{}
 func (c QueryCommandGLInfo) String() string {
 	return "GL INFO"
 }
+
+type QueryCommandGLGC struct{}
+
+func (c QueryCommandGLGC) String() string {
+	return "GL GC"
+}

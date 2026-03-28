@@ -273,6 +273,7 @@ func (b *QueryBuilder) Diag() error {
 	return b.sendCommand(cmd)
 }
 
+// GLInfo retrieves information about the allocated and pooled OpenGL resources.
 func (b *QueryBuilder) GLInfo() (responses.GLInfo, error) {
 	cmd := commands.QueryCommandGLInfo{}
 	resp, err := b.client.Send(cmd)
@@ -285,4 +286,12 @@ func (b *QueryBuilder) GLInfo() (responses.GLInfo, error) {
 		return responses.GLInfo{}, err
 	}
 	return glInfo, nil
+}
+
+// GLGC releases all the pooled OpenGL resources.
+//
+// ⚠️ WARNING: May cause a pause on all video channels.
+func (b *QueryBuilder) GLGC() error {
+	cmd := commands.QueryCommandGLGC{}
+	return b.sendCommand(cmd)
 }

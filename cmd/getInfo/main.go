@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -21,7 +20,7 @@ func main() {
 		}
 	}()
 
-	data, err := client.Query().GLInfo()
+	err = client.Query().GLGC()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {
@@ -30,9 +29,9 @@ func main() {
 		panic(err)
 	}
 
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(jsonData))
+	// jsonData, err := json.MarshalIndent(data, "", "  ")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(string(jsonData))
 }
