@@ -8,17 +8,13 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
-func buildParams(params map[string]string) string {
-	var parts []string
-	for k, v := range params {
-		parts = append(parts, k+" "+v)
-	}
-	return strings.Join(parts, " ")
-}
-
 func appendParams(cmd string, params *[]string) string {
 	if params != nil && len(*params) > 0 {
-		return cmd + " " + strings.Join(*params, " ")
+		quotedParams := make([]string, len(*params))
+		for i, p := range *params {
+			quotedParams[i] = quote(p)
+		}
+		return cmd + " " + strings.Join(quotedParams, " ")
 	}
 	return cmd
 }

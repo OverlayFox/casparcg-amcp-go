@@ -263,6 +263,10 @@ const (
 	SetVariableChannelLayout SetVariable = "CHANNEL_LAYOUT"
 )
 
+func (v SetVariable) String() string {
+	return string(v)
+}
+
 type LockAction string
 
 const (

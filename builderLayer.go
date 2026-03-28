@@ -76,7 +76,7 @@ func (b *LayerChannelBuilder) Add(params types.LayerAdd) error {
 		LayerCommand: b.baseLayerChannelCommand(),
 		ConsumerName: params.ConsumerName,
 		ConsumerIdx:  params.ConsumerIdx,
-		Parameters:   params.Parameters,
+		Params:       params.Parameters,
 	}
 	return b.sendCommand(cmd)
 }
@@ -132,7 +132,7 @@ func (b *LayerChannelBuilder) Set() *LayerCommandSet {
 func (b *LayerCommandSet) Mode(value types.VideoMode) error {
 	cmd := commands.LayerCommandSet{
 		LayerCommand: b.baseLayerChannelCommand(),
-		VariableName: "MODE",
+		VariableName: types.SetVariableMode,
 		Value:        string(value),
 	}
 	return b.sendCommand(cmd)
@@ -141,7 +141,7 @@ func (b *LayerCommandSet) Mode(value types.VideoMode) error {
 func (b *LayerCommandSet) ChannelLayout(value types.AudioChannelLayout) error {
 	cmd := commands.LayerCommandSet{
 		LayerCommand: b.baseLayerChannelCommand(),
-		VariableName: "CHANNELS",
+		VariableName: types.SetVariableChannelLayout,
 		Value:        string(value),
 	}
 	return b.sendCommand(cmd)

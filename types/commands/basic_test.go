@@ -7,7 +7,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types/commands"
 )
 
-func TestBasicCommandSSerilization(t *testing.T) {
+func TestBasicCommandSerialization(t *testing.T) {
 	tests := []struct {
 		name     string
 		command  interface{ String() string }
