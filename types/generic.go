@@ -225,3 +225,7 @@ const (
 	LockActionRelease LockAction = "RELEASE"
 	LockActionClear   LockAction = "CLEAR"
 )
+
+func (a LockAction) String() string {
+	return string(a)
+}

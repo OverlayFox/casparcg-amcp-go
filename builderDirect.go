@@ -12,92 +12,23 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types/responses"
 )
 
-// Direct command methods on Client for commands that don't require a builder
-
-// Swap swaps layers between channels.
-func (c *Client) Swap(channel1, channel2 int, layer1, layer2 *int, transform bool) error {
-	cmd := commands.CommandSwap{
-		VideoChannel1: channel1,
-		Layer1:        layer1,
-		VideoChannel2: channel2,
-		Layer2:        layer2,
-		Transform:     transform,
-	}
-	_, err := c.Send(cmd)
-	return err
-}
-
-// Add adds a consumer to the specified video channel.
-func (c *Client) Add(
-	videoChannel int,
-	consumerIdx *int,
-	consumerName string,
-	parameters map[string]string,
-) error {
-	cmd := commands.CommandAdd{
-		VideoChannel: videoChannel,
-		ConsumerIdx:  consumerIdx,
-		ConsumerName: consumerName,
-		Parameters:   parameters,
-	}
-	_, err := c.Send(cmd)
-	return err
-}
-
-// Remove removes a consumer from the specified video channel.
-func (c *Client) Remove(videoChannel int, consumerIdx *int, parameters *map[string]string) error {
-	cmd := commands.CommandRemove{
-		VideoChannel: videoChannel,
-		ConsumerIdx:  consumerIdx,
-		Parameters:   parameters,
-	}
-	_, err := c.Send(cmd)
-	return err
-}
-
-// Print sends a print command for the specified video channel.
-func (c *Client) Print(videoChannel int) error {
-	cmd := commands.CommandPrint{
-		VideoChannel: videoChannel,
-	}
-	_, err := c.Send(cmd)
+// sendCommand abstracts sending a command that does not expect a response value.
+func (b *Client) sendCommand(cmd interface{ String() string }) error {
+	_, err := b.Send(cmd)
 	return err
 }
 
 // LogLevel sets the log level.
 func (c *Client) LogLevel(level types.LogLevel) error {
-	cmd := commands.CommandLogLevel{
+	cmd := commands.DirectCommandLogLevel{
 		Level: level,
 	}
-	_, err := c.Send(cmd)
-	return err
-}
-
-// Set changes the value of a channel variable.
-func (c *Client) Set(videoChannel int, variable types.SetVariable, value string) error {
-	cmd := commands.CommandSet{
-		VideoChannel: videoChannel,
-		Variable:     variable,
-		Value:        value,
-	}
-	_, err := c.Send(cmd)
-	return err
-}
-
-// Lock performs a lock operation on the specified channel.
-func (c *Client) Lock(videoChannel int, action types.LockAction, secret *string) error {
-	cmd := commands.CommandLock{
-		VideoChannel: videoChannel,
-		Action:       action,
-		Secret:       secret,
-	}
-	_, err := c.Send(cmd)
-	return err
+	return c.sendCommand(cmd)
 }
 
 // Ping sends a ping command.
-func (c *Client) Ping(token string) (string, error) {
-	cmd := commands.CommandPing{
+func (c *Client) Ping(token *string) (string, error) {
+	cmd := commands.DirectCommandPing{
 		Token: token,
 	}
 	data, err := c.Send(cmd)

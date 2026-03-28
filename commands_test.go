@@ -26,7 +26,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY with clip",
-			command: commands.CommandPlay{
+			command: commands.LayerCommandPlay{
 				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
@@ -37,7 +37,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY without clip",
-			command: commands.CommandPlay{
+			command: commands.LayerCommandPlay{
 				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
@@ -47,7 +47,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOAD",
-			command: commands.CommandLoad{
+			command: commands.LayerCommandLoad{
 				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        11,
@@ -58,7 +58,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PAUSE",
-			command: commands.CommandPause{
+			command: commands.LayerCommandPause{
 				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
@@ -68,7 +68,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "STOP",
-			command: commands.CommandStop{
+			command: commands.LayerCommandStop{
 				BasicCommand: commands.BasicCommand{
 					VideoChannel: 1,
 					Layer:        10,
@@ -121,14 +121,14 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOGLEVEL",
-			command: commands.CommandLogLevel{
+			command: commands.DirectCommandLogLevel{
 				Level: types.LogLevelInfo,
 			},
 			expected: "LOG LEVEL info",
 		},
 		{
 			name: "SWAP layers",
-			command: commands.CommandSwap{
+			command: commands.LayerCommandSwap{
 				VideoChannel1: 1,
 				Layer1:        intPtr(10),
 				VideoChannel2: 1,
@@ -139,7 +139,7 @@ func TestCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP with transforms",
-			command: commands.CommandSwap{
+			command: commands.LayerCommandSwap{
 				VideoChannel1: 1,
 				Layer1:        intPtr(10),
 				VideoChannel2: 2,

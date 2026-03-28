@@ -381,37 +381,3 @@ func (c MixerCommit) String() string {
 func baseMixerCmd(channel, layer int, name string) string {
 	return fmt.Sprintf("MIXER %d-%d %s", channel, layer, name)
 }
-
-func appendInt(cmd string, value *int) string {
-	if value != nil {
-		return cmd + " " + strconv.Itoa(*value)
-	}
-	return cmd
-}
-
-func appendFloat(cmd string, value *float32) string {
-	if value != nil {
-		return cmd + " " + fmt.Sprintf("%f", *value)
-	}
-	return cmd
-}
-
-func appendBool(cmd string, value *bool) string {
-	if value != nil {
-		if *value {
-			return cmd + " 1"
-		}
-		return cmd + " 0"
-	}
-	return cmd
-}
-
-func appendDurationTween(cmd string, duration *int, tween *types.TweenType) string {
-	if duration != nil {
-		cmd += " " + strconv.Itoa(*duration)
-	}
-	if tween != nil {
-		cmd += " " + tween.String()
-	}
-	return cmd
-}

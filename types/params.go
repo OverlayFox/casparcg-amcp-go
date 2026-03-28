@@ -89,3 +89,32 @@ type CGAdd struct {
 
 	Data *string // Data defines optional data to pass to the template. This can be a JSON or XML inline string
 }
+
+type LayerLoad struct {
+	ClipName string // ClipName defines the name of the clip to load. This is the filename of the clip without the extension.
+
+	Parameters *[]string // Parameters defines optional parameters to pass to the clip. This can be used for dynamic templates or to pass other parameters to the clip.
+}
+
+type LayerPlay struct {
+	ClipName *string // ClipName defines the name of the clip to play. This is the filename of the clip without the extension. If not specified, it will play the currently loaded clip.
+
+	Parameters *[]string // Parameters defines optional parameters to pass to the clip. This can be used for dynamic templates or to pass other parameters to the clip.
+}
+
+type LayerAdd struct {
+	ConsumerName string // ConsumerName defines the name of the consumer to add. This is the name of the consumer, e.g. "STREAM", "RECORD", etc. // TODO: Make this an enum of possible consumer types
+
+	ConsumerIdx *int      // ConsumerIdx overrides the index that the consumer itself decides and can later be used with the REMOVE command to remove the consumer.
+	Parameters  *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
+}
+
+type LayerRemove struct {
+	ConsumerIdx *int      // ConsumerIdx overrides the index that the consumer itself decides and can later be used with the REMOVE command to remove the consumer.
+	Parameters  *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
+}
+
+type LayerSet struct {
+	VariableName string // VariableName defines the name of the variable to set.
+	Value        string // Value defines the value to set the variable to.
+}

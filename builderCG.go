@@ -36,9 +36,7 @@ type CGChannelBuilder struct {
 // Channel selects the video channel to operate on and returns a CGChannelBuilder for that channel.
 func (c *CGBuilder) Channel(videoChannel int) *CGChannelBuilder {
 	return &CGChannelBuilder{
-		CGBuilder: CGBuilder{
-			client: c.client,
-		},
+		CGBuilder:    *c,
 		videoChannel: videoChannel,
 	}
 }
