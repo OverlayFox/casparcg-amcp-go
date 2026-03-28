@@ -1,6 +1,7 @@
 package responses
 
 import (
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
@@ -43,4 +44,104 @@ func ResponseToQueryChannelInfo(response []string) ([]QueryChannelInfo, error) {
 		channelInfo = append(channelInfo, info)
 	}
 	return channelInfo, nil
+}
+
+// QueryChannelInfoVerbose is your target struct for JSON/Application use.
+type QueryChannelInfoVerbose struct {
+	VideoMode types.VideoMode `json:"VideoMode"`
+	FrameRate types.FrameRate `json:"FrameRate"`
+	Mixer     struct {
+		Audio struct {
+			Volume []int `json:"Volume"`
+		} `json:"Audio"`
+	} `json:"Mixer"`
+	Output InfoChannelOutput `json:"Output"`
+}
+
+// UnmarshalXML is the entry point for the XML decoder.
+func (q *QueryChannelInfoVerbose) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	// This "proxy" struct mirrors the XML exactly and uses only EXPORTED fields
+	type xmlChannel struct {
+		Format     types.VideoMode `xml:"format"`
+		FrameRates []int           `xml:"framerate"`
+		Mixer      struct {
+			Audio struct {
+				Volume []int `xml:"volume"`
+			} `xml:"audio"`
+		} `xml:"mixer"`
+		Output InfoChannelOutput `xml:"output"`
+	}
+
+	var raw xmlChannel
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return err
+	}
+
+	// Now map the raw XML data to your clean struct
+	q.VideoMode = raw.Format
+	q.Mixer.Audio.Volume = raw.Mixer.Audio.Volume
+	q.Output = raw.Output
+
+	// Handle the multiple <framerate> tags manually
+	if len(raw.FrameRates) >= 2 {
+		q.FrameRate.Num = raw.FrameRates[0]
+		q.FrameRate.Den = raw.FrameRates[1]
+	} else if len(raw.FrameRates) == 1 {
+		q.FrameRate.Num = raw.FrameRates[0]
+		q.FrameRate.Den = 1
+	}
+
+	return nil
+}
+
+type InfoChannelOutput struct {
+	Port struct {
+		Consumers []InfoChannelConsumer `xml:",any"`
+	} `xml:"port"`
+}
+
+type InfoChannelConsumer struct {
+	XMLName  xml.Name `xml:""`
+	Consumer string   `xml:"consumer"`
+	Screen   *struct {
+		AlwaysOnTop bool   `xml:"always_on_top"`
+		Index       int    `xml:"index"`
+		KeyOnly     bool   `xml:"key_only"`
+		Name        string `xml:"name"`
+	} `xml:"screen,omitempty"`
+}
+
+// GLInfo is the root struct representing the <gl> tag.
+type GLInfo struct {
+	XMLName xml.Name `xml:"gl"`
+	Details Details  `xml:"details"`
+	Summary Summary  `xml:"summary"`
+}
+
+// Details represents the <details> section.
+// Using string types here since the tags in your example are empty/self-closing.
+type Details struct {
+	PooledDeviceBuffers string `xml:"pooled_device_buffers"`
+	PooledHostBuffers   string `xml:"pooled_host_buffers"`
+}
+
+// Summary represents the <summary> section, containing the aggregated stats.
+type Summary struct {
+	PooledDeviceBuffers DeviceBuffersStats `xml:"pooled_device_buffers"`
+	PooledHostBuffers   HostBuffersStats   `xml:"pooled_host_buffers"`
+	AllHostBuffers      HostBuffersStats   `xml:"all_host_buffers"`
+}
+
+// DeviceBuffersStats represents the structure for device buffer metrics.
+type DeviceBuffersStats struct {
+	TotalCount int64 `xml:"total_count"`
+	TotalSize  int64 `xml:"total_size"`
+}
+
+// HostBuffersStats represents the structure for both pooled and all host buffer metrics.
+type HostBuffersStats struct {
+	TotalReadCount  int64 `xml:"total_read_count"`
+	TotalWriteCount int64 `xml:"total_write_count"`
+	TotalReadSize   int64 `xml:"total_read_size"`
+	TotalWriteSize  int64 `xml:"total_write_size"`
 }

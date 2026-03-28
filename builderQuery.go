@@ -272,3 +272,17 @@ func (b *QueryBuilder) Diag() error {
 	cmd := commands.QueryCommandDiag{}
 	return b.sendCommand(cmd)
 }
+
+func (b *QueryBuilder) GLInfo() (responses.GLInfo, error) {
+	cmd := commands.QueryCommandGLInfo{}
+	resp, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.GLInfo{}, err
+	}
+	var glInfo responses.GLInfo
+	err = xml.Unmarshal([]byte(strings.Join(resp, "\n")), &glInfo)
+	if err != nil {
+		return responses.GLInfo{}, err
+	}
+	return glInfo, nil
+}

@@ -33,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - GRID
     - COMMIT
     - CLEAR
+  - Query:
+    - DIAG
+    - GL_INFO
+  - Layer:
+    - LAYER_INFO
+    - CHANNEL_INFO
 
 ### Changed
 

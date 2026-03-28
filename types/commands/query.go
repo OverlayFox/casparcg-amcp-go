@@ -81,3 +81,9 @@ type QueryCommandDiag struct{}
 func (c QueryCommandDiag) String() string {
 	return "DIAG"
 }
+
+type QueryCommandGLInfo struct{}
+
+func (c QueryCommandGLInfo) String() string {
+	return "GL INFO"
+}
