@@ -171,8 +171,7 @@ type LayerCommandLock struct {
 
 func (c LayerCommandLock) String() string {
 	cmd := baseLayerCommand("LOCK", c.VideoChannel, nil)
-	action := c.Action.String()
-	cmd = appendString(cmd, &action)
+	cmd = appendString(cmd, ptr(c.Action.String()))
 	cmd = appendString(cmd, c.Passphrase)
 	return cmd
 }
@@ -183,4 +182,15 @@ type LayerCommandInfo struct {
 
 func (c LayerCommandInfo) String() string {
 	return baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+}
+
+// LayerCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
+type LayerCommandInfoDelay struct {
+	LayerCommand
+}
+
+func (c LayerCommandInfoDelay) String() string {
+	cmd := baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+	cmd += " DELAY"
+	return cmd
 }

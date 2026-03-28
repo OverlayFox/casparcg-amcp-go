@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"strconv"
-
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
@@ -69,21 +67,6 @@ func (c QueryCommandInfo) String() string {
 	return "INFO"
 }
 
-// QueryCommandInfoChannel get information about a channel or a specific layer on a channel.
-// If layer is omitted information about the whole channel is returned.
-type QueryCommandInfoChannel struct {
-	VideoChannel int
-	Layer        *int
-}
-
-func (c QueryCommandInfoChannel) String() string {
-	cmd := "INFO " + strconv.Itoa(c.VideoChannel)
-	if c.Layer != nil {
-		cmd += "-" + strconv.Itoa(*c.Layer)
-	}
-	return cmd
-}
-
 // QueryCommandInfoTemplate gets information about the specified template.
 type QueryCommandInfoTemplate struct {
 	Template string
@@ -91,19 +74,4 @@ type QueryCommandInfoTemplate struct {
 
 func (c QueryCommandInfoTemplate) String() string {
 	return "INFO TEMPLATE " + quote(c.Template)
-}
-
-// QueryCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
-type QueryCommandInfoDelay struct {
-	VideoChannel int
-	Layer        *int
-}
-
-func (c QueryCommandInfoDelay) String() string {
-	cmd := "INFO " + strconv.Itoa(c.VideoChannel)
-	if c.Layer != nil {
-		cmd += "-" + strconv.Itoa(*c.Layer)
-	}
-	cmd += " DELAY"
-	return cmd
 }

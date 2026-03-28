@@ -31,3 +31,16 @@ func PartsToQueryChannelInfo(parts []string) (QueryChannelInfo, error) {
 	}
 	return channelInfo, nil
 }
+
+func ResponseToQueryChannelInfo(response []string) ([]QueryChannelInfo, error) {
+	channelInfo := make([]QueryChannelInfo, 0, len(response))
+	for _, line := range response {
+		parts := strings.Split(line, " ")
+		info, err := PartsToQueryChannelInfo(parts)
+		if err != nil {
+			return nil, err
+		}
+		channelInfo = append(channelInfo, info)
+	}
+	return channelInfo, nil
+}

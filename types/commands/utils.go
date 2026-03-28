@@ -76,3 +76,7 @@ func baseLayerCommand(command string, videoChannel int, layer *int) string {
 	}
 	return cmd
 }
+
+func ptr[T any](v T) *T {
+	return &v
+}

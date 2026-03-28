@@ -1,8 +1,13 @@
 package casparcg
 
 import (
+	"encoding/xml"
+	"fmt"
+	"strings"
+
 	"github.com/overlayfox/casparcg-amcp-go/types"
 	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+	"github.com/overlayfox/casparcg-amcp-go/types/responses"
 )
 
 // LayerBuilder provides a fluent interface for building layer-based commands.
@@ -185,12 +190,53 @@ func (b *LayerCommandLock) Clear() error {
 	return b.sendCommand(cmd)
 }
 
-// Info gets information about the channel.
-func (b *LayerChannelBuilder) Info() ([]string, error) {
+type LayerCommandChannelInfo struct {
+	LayerChannelBuilder
+}
+
+func (b *LayerChannelBuilder) Info() *LayerCommandChannelInfo {
+	return &LayerCommandChannelInfo{
+		LayerChannelBuilder: *b,
+	}
+}
+
+// Generic gets information about the channel.
+func (b *LayerCommandChannelInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
 	cmd := commands.LayerCommandInfo{
 		LayerCommand: b.baseLayerChannelCommand(),
 	}
-	return b.client.Send(cmd)
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
+}
+
+// Delay get the current delay on the specified channel.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
+func (b *LayerCommandChannelInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfoDelay{
+		LayerCommand: b.baseLayerChannelCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	fmt.Print(data)
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
 }
 
 //
@@ -203,13 +249,10 @@ type LayerLayerBuilder struct {
 	layer int
 }
 
-func (c *LayerBuilder) Layer(videoChannel, layer int) *LayerLayerBuilder {
+func (c *LayerChannelBuilder) Layer(layer int) *LayerLayerBuilder {
 	return &LayerLayerBuilder{
-		LayerChannelBuilder: LayerChannelBuilder{
-			LayerBuilder: *c,
-			videoChannel: videoChannel,
-		},
-		layer: layer,
+		LayerChannelBuilder: *c,
+		layer:               layer,
 	}
 }
 
@@ -294,10 +337,51 @@ func (b *LayerLayerBuilder) Swap(channel2 int, layer2 int, transforms bool) erro
 	return b.sendCommand(cmd)
 }
 
-// Info gets information about the Layer.
-func (b *LayerLayerBuilder) Info() ([]string, error) {
+type LayerCommandLayerInfo struct {
+	LayerLayerBuilder
+}
+
+func (b *LayerLayerBuilder) Info() *LayerCommandLayerInfo {
+	return &LayerCommandLayerInfo{
+		LayerLayerBuilder: *b,
+	}
+}
+
+// Generic gets information about the channel.
+func (b *LayerCommandLayerInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
 	cmd := commands.LayerCommandInfo{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
-	return b.client.Send(cmd)
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
+}
+
+// Delay get the current delay on the specified channel.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
+func (b *LayerCommandLayerInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
+	cmd := commands.LayerCommandInfoDelay{
+		LayerCommand: b.baseLayerLayerCommand(),
+	}
+	data, err := b.client.Send(cmd)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	fmt.Print(data)
+	var infoChannel responses.QueryChannelInfoVerbose
+	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
+	if err != nil {
+		return responses.QueryChannelInfoVerbose{}, err
+	}
+	return infoChannel, nil
 }

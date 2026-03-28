@@ -1,13 +1,58 @@
 package types
 
-import "fmt"
+import (
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"io"
+)
 
 type FrameRate struct {
 	Num int `xml:"num"`
 	Den int `xml:"den"`
 }
 
-func (f FrameRate) Float() float64 {
+// UnmarshalXML handles the repeating <framerate> tags manually.
+func (f *FrameRate) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var values []int
+	for {
+		var val int
+		err := d.DecodeElement(&val, &start)
+		if err != nil {
+			return err
+		}
+		values = append(values, val)
+
+		t, err := d.Token()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		if nextStart, ok := t.(xml.StartElement); ok && nextStart.Name.Local == "framerate" {
+			start = nextStart
+			continue
+		} else {
+			break
+		}
+	}
+
+	// Assign values to the struct
+	if len(values) >= 1 {
+		f.Num = values[0]
+	}
+	if len(values) >= 2 {
+		f.Den = values[1]
+	} else {
+		f.Den = 1 // Default denominator
+	}
+
+	return nil
+}
+
+func (f *FrameRate) Float() float64 {
 	if f.Den == 0 {
 		return 0
 	}

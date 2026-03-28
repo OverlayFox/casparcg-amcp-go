@@ -21,7 +21,7 @@ func main() {
 		}
 	}()
 
-	data, err := client.Query().Info().Paths()
+	data, err := client.Layer().Channel(1).Layer(1).Info().Delay()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
 		if errors.As(err, &casparErr) {

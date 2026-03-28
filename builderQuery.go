@@ -2,9 +2,7 @@ package casparcg
 
 import (
 	"encoding/xml"
-	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
@@ -146,49 +144,36 @@ func (b *QueryBuilder) Info() *QueryInfoCommand {
 	}
 }
 
+func (b *QueryInfoCommand) sendInfo(component types.InfoComponent) ([]string, error) {
+	cmd := commands.QueryCommandInfo{
+		Component: component,
+	}
+	return b.client.Send(cmd)
+}
+
 // Generic retrieves a list of the available channels.
 func (b *QueryInfoCommand) Generic() ([]responses.QueryChannelInfo, error) {
 	resp, err := b.sendInfo("")
 	if err != nil {
 		return nil, err
 	}
-	channelInfo := make([]responses.QueryChannelInfo, 0, len(resp))
-	for _, line := range resp {
-		parts := strings.Split(line, " ")
-		info, err := responses.PartsToQueryChannelInfo(parts)
-		if err != nil {
-			return nil, err
-		}
-		channelInfo = append(channelInfo, info)
-	}
-	return channelInfo, nil
+	return responses.ResponseToQueryChannelInfo(resp)
 }
 
 // Template gets information about the specified template.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) Template(template string) (responses.QueryChannelInfo, error) {
 	cmd := commands.QueryCommandInfoTemplate{
 		Template: template,
 	}
-	data, err := b.client.Send(cmd)
+	resp, err := b.client.Send(cmd)
 	if err != nil {
 		return responses.QueryChannelInfo{}, err
 	}
-
-	parts := strings.Split(data[0], " ")
-	if len(parts) != 3 {
-		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected format for template info: %s", data[0])
-	}
-
-	videoChannel, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return responses.QueryChannelInfo{}, fmt.Errorf("invalid video channel in template info: %s", parts[0])
-	}
-
-	return responses.QueryChannelInfo{
-		ChannelIndex: videoChannel,
-		VideoMode:    types.VideoMode(parts[1]),
-		Status:       parts[2],
-	}, nil
+	return responses.PartsToQueryChannelInfo(resp)
 }
 
 // Config gets the contents of the configuration used.
@@ -211,7 +196,6 @@ func (b *QueryInfoCommand) Paths() (responses.Paths, error) {
 	if err != nil {
 		return responses.Paths{}, err
 	}
-
 	var paths responses.Paths
 	err = xml.Unmarshal([]byte(strings.Join(resp, "\n")), &paths)
 	if err != nil {
@@ -220,147 +204,51 @@ func (b *QueryInfoCommand) Paths() (responses.Paths, error) {
 	return paths, nil
 }
 
-// // System gets system information like OS, CPU and library version numbers.
-// func (b *QueryInfoCommand) System() (responses.QueryChannelInfo, error) {
-// 	data, err := b.info(types.InfoComponentSystem)
-// 	if err != nil {
-// 		systemInfo, ok := data.(responses.QueryChannelInfo)
-// 		if !ok {
-// 			return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for system info: %T", data)
-// 		}
-// 		return systemInfo, nil
-// 	}
-// 	return responses.QueryChannelInfo{}, err
-// }
-
-// func (b *QueryInfoCommand) Server() (responses.QueryChannelInfo, error) {
-// 	data, err := b.info(types.InfoComponentServer)
-// 	if err != nil {
-// 		return responses.QueryChannelInfo{}, err
-// 	}
-// 	serverInfo, ok := data.(responses.QueryChannelInfo)
-// 	if !ok {
-// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for server info: %T", data)
-// 	}
-// 	return serverInfo, nil
-// }
-
-// func (b *QueryInfoCommand) Queues() (responses.QueryChannelInfo, error) {
-// 	data, err := b.info(types.InfoComponentQueues)
-// 	if err != nil {
-// 		return responses.QueryChannelInfo{}, err
-// 	}
-// 	queuesInfo, ok := data.(responses.QueryChannelInfo)
-// 	if !ok {
-// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for queues info: %T", data)
-// 	}
-// 	return queuesInfo, nil
-// }
-
-// func (b *QueryInfoCommand) Threads() (responses.QueryChannelInfo, error) {
-// 	data, err := b.info(types.InfoComponentThreads)
-// 	if err != nil {
-// 		return responses.QueryChannelInfo{}, err
-// 	}
-// 	threadsInfo, ok := data.(responses.QueryChannelInfo)
-// 	if !ok {
-// 		return responses.QueryChannelInfo{}, fmt.Errorf("unexpected data type for threads info: %T", data)
-// 	}
-// 	return threadsInfo, nil
-// }
-
-// Channel gets information about a channel or layer.
-func (b *QueryInfoCommand) Channel(videoChannel int) (responses.InfoChannel, error) {
-	cmd := commands.QueryCommandInfoChannel{
-		VideoChannel: videoChannel,
-		Layer:        nil,
-	}
-	data, err := b.client.Send(cmd)
+// System gets system information like OS, CPU and library version numbers.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
+func (b *QueryInfoCommand) System() ([]responses.QueryChannelInfo, error) {
+	resp, err := b.sendInfo(types.InfoComponentSystem)
 	if err != nil {
-		return responses.InfoChannel{}, err
+		return nil, err
 	}
+	return responses.ResponseToQueryChannelInfo(resp)
 
-	var infoChannel responses.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
-	if err != nil {
-		return responses.InfoChannel{}, err
-	}
-
-	return infoChannel, nil
 }
 
-func (b *QueryInfoCommand) ChannelLayer(videoChannel int, layer int) (responses.InfoChannel, error) {
-	cmd := commands.QueryCommandInfoChannel{
-		VideoChannel: videoChannel,
-		Layer:        &layer,
-	}
-	data, err := b.client.Send(cmd)
+// Server gets detailed information about all channels.
+func (b *QueryInfoCommand) Server() ([]responses.QueryChannelInfo, error) {
+	resp, err := b.sendInfo(types.InfoComponentServer)
 	if err != nil {
-		return responses.InfoChannel{}, err
+		return nil, err
 	}
-
-	var infoChannel responses.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
-	if err != nil {
-		return responses.InfoChannel{}, err
-	}
-
-	return infoChannel, nil
+	return responses.ResponseToQueryChannelInfo(resp)
 }
 
-// InfoChannelDelay gets delay information.
-func (b *QueryInfoCommand) InfoChannelDelay(videoChannel int, layer *int) (responses.InfoChannel, error) {
-	cmd := commands.QueryCommandInfoDelay{
-		VideoChannel: videoChannel,
-		Layer:        layer,
-	}
-	data, err := b.client.Send(cmd)
+// Queues gets detailed information about all AMCP Command Queues.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
+func (b *QueryInfoCommand) Queues() ([]responses.QueryChannelInfo, error) {
+	resp, err := b.sendInfo(types.InfoComponentQueues)
 	if err != nil {
-		return responses.InfoChannel{}, err
+		return nil, err
 	}
-
-	var infoChannel responses.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
-	if err != nil {
-		return responses.InfoChannel{}, err
-	}
-
-	return infoChannel, nil
+	return responses.ResponseToQueryChannelInfo(resp)
 }
 
-func (b *QueryInfoCommand) ChannelLayerDelay(videoChannel int, layer int) (responses.InfoChannel, error) {
-	cmd := commands.QueryCommandInfoDelay{
-		VideoChannel: videoChannel,
-		Layer:        &layer,
-	}
-	data, err := b.client.Send(cmd)
+// Threads lists all known threads in the server.
+//
+// WARNING: This command does not return what it states as of CasparCG 2.5.0
+//
+// https://github.com/CasparCG/server/issues/1151
+func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
+	resp, err := b.sendInfo(types.InfoComponentThreads)
 	if err != nil {
-		return responses.InfoChannel{}, err
+		return nil, err
 	}
-
-	var infoChannel responses.InfoChannel
-	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
-	if err != nil {
-		return responses.InfoChannel{}, err
-	}
-
-	return infoChannel, nil
-}
-
-func (b *QueryInfoCommand) sendInfo(component types.InfoComponent) ([]string, error) {
-	cmd := commands.QueryCommandInfo{
-		Component: component,
-	}
-	return b.client.Send(cmd)
-
-	// switch component {
-	// case types.InfoComponentConfig:
-
-	// case types.InfoComponentSystem, types.InfoComponentServer, types.InfoComponentQueues, types.InfoComponentThreads:
-	// 	parts := strings.Split(fullXML, " ")
-	// 	return responses.PartsToQueryChannelInfo(parts)
-
-	// default:
-	// 	return nil, fmt.Errorf("unknown info component: %s", component)
-	// }
+	return responses.ResponseToQueryChannelInfo(resp)
 }
