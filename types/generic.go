@@ -208,8 +208,8 @@ func (t TweenType) String() string {
 type BlendMode string
 
 const (
-	BlendModeNormal BlendMode = "normal"
-	BlendModeScreen BlendMode = "screen"
+	BlendModeNormal BlendMode = "NORMAL"
+	BlendModeScreen BlendMode = "SCREEN"
 )
 
 var validBlendModes = map[BlendMode]any{

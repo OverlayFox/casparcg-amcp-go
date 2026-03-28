@@ -28,7 +28,7 @@ func appendInt(cmd string, value *int) string {
 
 func appendFloat(cmd string, value *float32) string {
 	if value != nil {
-		return cmd + " " + fmt.Sprintf("%f", *value)
+		return cmd + " " + fmt.Sprintf("%.4g", *value)
 	}
 	return cmd
 }
