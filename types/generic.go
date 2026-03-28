@@ -79,12 +79,12 @@ const (
 type LogLevel string
 
 const (
-	LogLevelTrace LogLevel = "trace"
-	LogLevelDebug LogLevel = "debug"
-	LogLevelInfo  LogLevel = "info"
-	LogLevelWarn  LogLevel = "warn"
-	LogLevelError LogLevel = "error"
-	LogLevelFatal LogLevel = "fatal"
+	LogLevelTrace LogLevel = "TRACE"
+	LogLevelDebug LogLevel = "DEBUG"
+	LogLevelInfo  LogLevel = "INFO"
+	LogLevelWarn  LogLevel = "WARN"
+	LogLevelError LogLevel = "ERROR"
+	LogLevelFatal LogLevel = "FATAL"
 )
 
 type VideoMode string
@@ -208,8 +208,8 @@ func (t TweenType) String() string {
 type BlendMode string
 
 const (
-	BlendModeNormal BlendMode = "normal"
-	BlendModeScreen BlendMode = "screen"
+	BlendModeNormal BlendMode = "NORMAL"
+	BlendModeScreen BlendMode = "SCREEN"
 )
 
 var validBlendModes = map[BlendMode]any{
@@ -262,6 +262,10 @@ const (
 	SetVariableMode          SetVariable = "MODE"
 	SetVariableChannelLayout SetVariable = "CHANNEL_LAYOUT"
 )
+
+func (v SetVariable) String() string {
+	return string(v)
+}
 
 type LockAction string
 

@@ -21,7 +21,7 @@ type LayerCommandLoad struct {
 
 func (c LayerCommandLoad) String() string {
 	cmd := baseLayerCommand("LOAD", c.VideoChannel, c.Layer)
-	cmd = appendString(cmd, &c.Clip)
+	cmd = appendQuotedString(cmd, &c.Clip)
 	cmd = appendParams(cmd, c.Parameters)
 	return cmd
 }
@@ -110,7 +110,7 @@ type LayerCommandAdd struct {
 
 	ConsumerIdx  *int      // ConsumerIdx overrides the index that the consumer itself decides and can later be used with the REMOVE command to remove the consumer.
 	ConsumerName string    // TODO: Make this an enum of possible consumer types
-	Parameters   *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
+	Params       *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
 }
 
 func (c LayerCommandAdd) String() string {
@@ -118,8 +118,8 @@ func (c LayerCommandAdd) String() string {
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	}
-	appendString(cmd, &c.ConsumerName)
-	appendParams(cmd, c.Parameters)
+	cmd = appendString(cmd, &c.ConsumerName)
+	cmd = appendParams(cmd, c.Params)
 	return cmd
 }
 
@@ -135,7 +135,7 @@ func (c LayerCommandRemove) String() string {
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	} else {
-		appendParams(cmd, c.Parameters)
+		cmd = appendParams(cmd, c.Parameters)
 	}
 	return cmd
 }
@@ -151,13 +151,13 @@ func (c LayerCommandPrint) String() string {
 type LayerCommandSet struct {
 	LayerCommand
 
-	VariableName string
+	VariableName types.SetVariable
 	Value        string
 }
 
 func (c LayerCommandSet) String() string {
 	cmd := baseLayerCommand("SET", c.VideoChannel, nil)
-	cmd = appendString(cmd, &c.VariableName)
+	cmd = appendString(cmd, ptr(c.VariableName.String()))
 	cmd = appendString(cmd, &c.Value)
 	return cmd
 }

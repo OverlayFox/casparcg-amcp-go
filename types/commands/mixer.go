@@ -12,18 +12,18 @@ type MixerCommand struct {
 	Layer        *int // defaults to 9999
 }
 
-type MixerCommandKeyer struct {
+type MixerKeyer struct {
 	MixerCommand
 
-	Show *bool
+	Show bool
 }
 
-func (c MixerCommandKeyer) String() string {
+func (c MixerKeyer) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "KEYER")
-	return appendBool(cmd, c.Show)
+	return appendBool(cmd, &c.Show)
 }
 
-type MixerCommandChroma struct {
+type MixerChroma struct {
 	MixerCommand
 
 	Enable *bool
@@ -41,7 +41,7 @@ type MixerCommandChroma struct {
 	Tween        *types.TweenType
 }
 
-func (c MixerCommandChroma) String() string {
+func (c MixerChroma) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CHROMA")
 	cmd = appendBool(cmd, c.Enable)
 	cmd = appendFloat(cmd, c.TargetHue)
@@ -55,13 +55,13 @@ func (c MixerCommandChroma) String() string {
 	return appendDurationTween(cmd, c.FadeDuration, c.Tween)
 }
 
-type MixerCommandBlend struct {
+type MixerBlend struct {
 	MixerCommand
 
 	BlendMode *types.BlendMode
 }
 
-func (c MixerCommandBlend) String() string {
+func (c MixerBlend) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "BLEND")
 	if c.BlendMode != nil {
 		cmd += " " + c.BlendMode.String()
@@ -69,18 +69,18 @@ func (c MixerCommandBlend) String() string {
 	return cmd
 }
 
-type MixerCommandInvert struct {
+type MixerInvert struct {
 	MixerCommand
 
 	Invert *bool
 }
 
-func (c MixerCommandInvert) String() string {
+func (c MixerInvert) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "INVERT")
 	return appendBool(cmd, c.Invert)
 }
 
-type MixerCommandOpacity struct {
+type MixerOpacity struct {
 	MixerCommand
 
 	Opacity *float32
@@ -89,13 +89,13 @@ type MixerCommandOpacity struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandOpacity) String() string {
+func (c MixerOpacity) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "OPACITY")
 	cmd = appendFloat(cmd, c.Opacity)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
-type MixerCommandBrightness struct {
+type MixerBrightness struct {
 	MixerCommand
 
 	Brightness *float32
@@ -104,13 +104,13 @@ type MixerCommandBrightness struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandBrightness) String() string {
+func (c MixerBrightness) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "BRIGHTNESS")
 	cmd = appendFloat(cmd, c.Brightness)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
-type MixerCommandSaturation struct {
+type MixerSaturation struct {
 	MixerCommand
 
 	Saturation *float32
@@ -119,13 +119,13 @@ type MixerCommandSaturation struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandSaturation) String() string {
+func (c MixerSaturation) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "SATURATION")
 	cmd = appendFloat(cmd, c.Saturation)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
-type MixerCommandContrast struct {
+type MixerContrast struct {
 	MixerCommand
 
 	Contrast *float32
@@ -134,13 +134,13 @@ type MixerCommandContrast struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandContrast) String() string {
+func (c MixerContrast) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "CONTRAST")
 	cmd = appendFloat(cmd, c.Contrast)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
-type MixerCommandLevels struct {
+type MixerLevels struct {
 	MixerCommand
 
 	MinInput  *float32 // MinInput and MaxInput define the input range (between 0 and 1) to accept RGB values within.
@@ -153,7 +153,7 @@ type MixerCommandLevels struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandLevels) String() string {
+func (c MixerLevels) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "LEVELS")
 	cmd = appendFloat(cmd, c.MinInput)
 	cmd = appendFloat(cmd, c.MaxInput)
@@ -163,7 +163,7 @@ func (c MixerCommandLevels) String() string {
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
-type MixerCommandFill struct {
+type MixerFill struct {
 	MixerCommand
 
 	X      *float32 // X the new x position, 0 = left edge of monitor, 0.5 = middle of monitor, 1.0 = right edge of monitor. Higher and lower values allowed.
@@ -175,7 +175,7 @@ type MixerCommandFill struct {
 	Tween    *types.TweenType
 }
 
-func (c MixerCommandFill) String() string {
+func (c MixerFill) String() string {
 	cmd := baseMixerCmd(c.VideoChannel, *c.Layer, "FILL")
 	cmd = appendFloat(cmd, c.X)
 	cmd = appendFloat(cmd, c.Y)
@@ -283,10 +283,10 @@ func (c MixerPerspective) String() string {
 	cmd = appendFloat(cmd, c.TopLeftY)
 	cmd = appendFloat(cmd, c.TopRightX)
 	cmd = appendFloat(cmd, c.TopRightY)
-	cmd = appendFloat(cmd, c.BottomLeftX)
-	cmd = appendFloat(cmd, c.BottomLeftY)
 	cmd = appendFloat(cmd, c.BottomRightX)
 	cmd = appendFloat(cmd, c.BottomRightY)
+	cmd = appendFloat(cmd, c.BottomLeftX)
+	cmd = appendFloat(cmd, c.BottomLeftY)
 	return appendDurationTween(cmd, c.Duration, c.Tween)
 }
 
@@ -323,7 +323,7 @@ type MixerMasterVolume struct {
 }
 
 func (c MixerMasterVolume) String() string {
-	cmd := fmt.Sprintf("MIXER %d MASTER_VOLUME", c.VideoChannel)
+	cmd := fmt.Sprintf("MIXER %d MASTERVOLUME", c.VideoChannel)
 	return appendFloat(cmd, c.Volume)
 }
 
