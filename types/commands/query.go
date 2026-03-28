@@ -75,3 +75,9 @@ type QueryCommandInfoTemplate struct {
 func (c QueryCommandInfoTemplate) String() string {
 	return "INFO TEMPLATE " + quote(c.Template)
 }
+
+type QueryCommandDiag struct{}
+
+func (c QueryCommandDiag) String() string {
+	return "DIAG"
+}

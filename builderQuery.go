@@ -14,6 +14,12 @@ type QueryBuilder struct {
 	client *Client
 }
 
+// sendCommand abstracts sending a command that does not expect a response value.
+func (b *QueryBuilder) sendCommand(cmd interface{ String() string }) error {
+	_, err := b.client.Send(cmd)
+	return err
+}
+
 // Query creates a new query command builder for the specified channel and layer.
 func (c *Client) Query() *QueryBuilder {
 	return &QueryBuilder{
@@ -82,16 +88,20 @@ func (b *QueryBuilder) FLS() ([]string, error) {
 // Use the command INFO PATHS to get the path to the templates folder.
 //
 // If the optional sub_directory is specified only the template files in that sub directory will be returned.
-func (c *Client) TLS(directory *string) ([]string, error) {
+func (b *QueryBuilder) TLS(directory *string) ([]string, error) {
 	cmd := commands.QueryCommandTLS{
 		Directory: directory,
 	}
-	return c.Send(cmd)
+	return b.client.Send(cmd)
 }
 
 type QueryVersionCommand struct {
 	QueryBuilder
 }
+
+//
+// Version commands
+//
 
 // Version returns the version of specified component.
 func (b *QueryBuilder) Version() *QueryVersionCommand {
@@ -100,31 +110,11 @@ func (b *QueryBuilder) Version() *QueryVersionCommand {
 	}
 }
 
-func (b *QueryVersionCommand) Generic() (string, error) {
-	return b.client.version("")
-}
-
-func (b *QueryVersionCommand) Server() (string, error) {
-	return b.client.version(types.VersionInfoServer)
-}
-
-func (b *QueryVersionCommand) Flash() (string, error) {
-	return b.client.version(types.VersionInfoFlash)
-}
-
-func (b *QueryVersionCommand) TemplateHost() (string, error) {
-	return b.client.version(types.VersionInfoTemplateHost)
-}
-
-func (b *QueryVersionCommand) CEF() (string, error) {
-	return b.client.version(types.VersionInfoCEF)
-}
-
-func (c *Client) version(component types.VersionInfo) (string, error) {
+func (c *QueryBuilder) sendVersion(component types.VersionInfo) (string, error) {
 	cmd := commands.QueryCommandVersion{
 		Component: component,
 	}
-	resp, err := c.Send(cmd)
+	resp, err := c.client.Send(cmd)
 	if err != nil {
 		return "", err
 	}
@@ -133,6 +123,30 @@ func (c *Client) version(component types.VersionInfo) (string, error) {
 	}
 	return strings.TrimSpace(resp[0]), nil
 }
+
+func (b *QueryVersionCommand) Generic() (string, error) {
+	return b.sendVersion("")
+}
+
+func (b *QueryVersionCommand) Server() (string, error) {
+	return b.sendVersion(types.VersionInfoServer)
+}
+
+func (b *QueryVersionCommand) Flash() (string, error) {
+	return b.sendVersion(types.VersionInfoFlash)
+}
+
+func (b *QueryVersionCommand) TemplateHost() (string, error) {
+	return b.sendVersion(types.VersionInfoTemplateHost)
+}
+
+func (b *QueryVersionCommand) CEF() (string, error) {
+	return b.sendVersion(types.VersionInfoCEF)
+}
+
+//
+// Info commands
+//
 
 type QueryInfoCommand struct {
 	QueryBuilder
@@ -247,4 +261,14 @@ func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
 		return nil, err
 	}
 	return responses.ResponseToQueryChannelInfo(resp)
+}
+
+// Delay gets detailed information about all delay components.
+//
+// functions are found in `/builderLayer.go` because it requires a channel and layer to be specified, which is not the case for the other Info commands.
+
+// Diag opens the diagnostic window.
+func (b *QueryBuilder) Diag() error {
+	cmd := commands.QueryCommandDiag{}
+	return b.sendCommand(cmd)
 }
