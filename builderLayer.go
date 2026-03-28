@@ -219,8 +219,7 @@ func (b *LayerCommandChannelInfo) Generic() (responses.QueryChannelInfoVerbose, 
 
 // Delay get the current delay on the specified channel.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *LayerCommandChannelInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
 	cmd := commands.LayerCommandInfoDelay{
@@ -366,8 +365,7 @@ func (b *LayerCommandLayerInfo) Generic() (responses.QueryChannelInfoVerbose, er
 
 // Delay get the current delay on the specified channel.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *LayerCommandLayerInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
 	cmd := commands.LayerCommandInfoDelay{

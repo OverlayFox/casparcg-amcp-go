@@ -162,8 +162,7 @@ func (b *QueryInfoCommand) Generic() ([]responses.QueryChannelInfo, error) {
 
 // Template gets information about the specified template.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) Template(template string) (responses.QueryChannelInfo, error) {
 	cmd := commands.QueryCommandInfoTemplate{
@@ -206,8 +205,7 @@ func (b *QueryInfoCommand) Paths() (responses.Paths, error) {
 
 // System gets system information like OS, CPU and library version numbers.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) System() ([]responses.QueryChannelInfo, error) {
 	resp, err := b.sendInfo(types.InfoComponentSystem)
@@ -229,8 +227,7 @@ func (b *QueryInfoCommand) Server() ([]responses.QueryChannelInfo, error) {
 
 // Queues gets detailed information about all AMCP Command Queues.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) Queues() ([]responses.QueryChannelInfo, error) {
 	resp, err := b.sendInfo(types.InfoComponentQueues)
@@ -240,10 +237,9 @@ func (b *QueryInfoCommand) Queues() ([]responses.QueryChannelInfo, error) {
 	return responses.ResponseToQueryChannelInfo(resp)
 }
 
-// Threads lists all known threads in the server.
+// Threads gets detailed information about all threads.
 //
-// WARNING: This command does not return what it states as of CasparCG 2.5.0
-//
+// Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
 	resp, err := b.sendInfo(types.InfoComponentThreads)
