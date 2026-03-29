@@ -227,7 +227,6 @@ func (b *QueryInfoCommand) System() ([]responses.QueryChannelInfo, error) {
 		return nil, err
 	}
 	return responses.ResponseToQueryChannelInfo(resp)
-
 }
 
 // Server gets detailed information about all channels.
@@ -267,7 +266,7 @@ func (b *QueryInfoCommand) Threads() ([]responses.QueryChannelInfo, error) {
 //
 // functions are found in `/builderLayer.go` because it requires a channel and layer to be specified, which is not the case for the other Info commands.
 
-// GLInfo retrieves information about the allocated and pooled OpenGL resources.
+// GL retrieves information about the allocated and pooled OpenGL resources.
 func (b *QueryInfoCommand) GL() (responses.GLInfo, error) {
 	cmd := commands.QueryGLInfo{}
 	resp, err := b.client.Send(cmd)

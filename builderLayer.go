@@ -2,7 +2,6 @@ package casparcg
 
 import (
 	"encoding/xml"
-	"fmt"
 	"strings"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
@@ -180,7 +179,7 @@ func (b *LayerCommandLock) Release(passphrase string) error {
 
 // Clear clears the lock
 //
-// This is for emergency use only and should be used with caution
+// This is for emergency use only and should be used with caution.
 func (b *LayerCommandLock) Clear() error {
 	cmd := commands.LayerLock{
 		LayerCommand: b.baseLayerChannelCommand(),
@@ -229,7 +228,6 @@ func (b *LayerCommandChannelInfo) Delay() (responses.QueryChannelInfoVerbose, er
 	if err != nil {
 		return responses.QueryChannelInfoVerbose{}, err
 	}
-	fmt.Print(data)
 	var infoChannel responses.QueryChannelInfoVerbose
 	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {
@@ -375,7 +373,6 @@ func (b *LayerCommandLayerInfo) Delay() (responses.QueryChannelInfoVerbose, erro
 	if err != nil {
 		return responses.QueryChannelInfoVerbose{}, err
 	}
-	fmt.Print(data)
 	var infoChannel responses.QueryChannelInfoVerbose
 	err = xml.Unmarshal([]byte(strings.Join(data, "\n")), &infoChannel)
 	if err != nil {

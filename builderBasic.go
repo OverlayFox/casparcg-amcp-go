@@ -70,7 +70,7 @@ type ClientHelpCommand struct {
 	client *Client
 }
 
-// Help shows online help for a specific command or a list of all commands
+// Help shows online help for a specific command or a list of all commands.
 func (c *Client) Help() *ClientHelpCommand {
 	return &ClientHelpCommand{
 		client: c,
