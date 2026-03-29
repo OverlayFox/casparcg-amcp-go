@@ -151,14 +151,6 @@ func (b *MixerChannelBuilder) GetGrid() (int, error) {
 	return b.getIntValue(cmd)
 }
 
-// Commit all deferred mixer transforms on the specified channel. This ensures that all animations start at the same exact frame.
-func (b *MixerChannelBuilder) Commit() error {
-	cmd := commands.MixerCommit{
-		MixerCommand: b.baseMixerChannelCommand(),
-	}
-	return b.sendCommand(cmd)
-}
-
 // SetGrid creates a grid of video layer in ascending order of the layer index,
 // i.e. if resolution equals 2 then a 2x2 grid of layers will be created starting from layer 1.
 //
@@ -174,6 +166,14 @@ func (b *MixerChannelBuilder) SetGrid(resolution int) error {
 		Resolution:   &resolution,
 	}
 	b.applyFade(func(d *int) { cmd.Duration = d }, func(t *types.TweenType) { cmd.Tween = t })
+	return b.sendCommand(cmd)
+}
+
+// Commit commits all deferred mixer transforms on the specified channel. This ensures that all animations start at the same exact frame.
+func (b *MixerChannelBuilder) Commit() error {
+	cmd := commands.MixerCommit{
+		MixerCommand: b.baseMixerChannelCommand(),
+	}
 	return b.sendCommand(cmd)
 }
 
@@ -211,7 +211,7 @@ func (b *MixerLayerBuilder) baseMixerLayerCommand() commands.MixerCommand {
 
 // GetKeyer retrieves the current keyer state for the layer.
 func (b *MixerLayerBuilder) GetKeyer() (bool, error) {
-	cmd := commands.MixerCommandKeyer{
+	cmd := commands.MixerKeyer{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.getBoolValue(cmd)
@@ -223,9 +223,9 @@ func (b *MixerLayerBuilder) GetKeyer() (bool, error) {
 // If show is true, the specified layer will not be rendered; instead it will be used
 // as the key for the layer above.
 func (b *MixerLayerBuilder) SetKeyer(show bool) error {
-	cmd := commands.MixerCommandKeyer{
+	cmd := commands.MixerKeyer{
 		MixerCommand: b.baseMixerLayerCommand(),
-		Show:         &show,
+		Show:         show,
 	}
 	return b.setBoolValue(cmd)
 }
@@ -238,7 +238,7 @@ type ChromaBuilder struct {
 
 // GetChroma retrieves the current chroma key settings for the layer.
 func (b *MixerLayerBuilder) GetChroma() (responses.MixerChroma, error) {
-	cmd := commands.MixerCommandChroma{
+	cmd := commands.MixerChroma{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
@@ -271,7 +271,7 @@ func (c *ChromaBuilder) Disable() error {
 }
 
 func (b *MixerLayerBuilder) applyChroma(enable bool, params *responses.MixerChroma) error {
-	cmd := commands.MixerCommandChroma{
+	cmd := commands.MixerChroma{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Enable:       &enable,
 	}
@@ -293,7 +293,7 @@ func (b *MixerLayerBuilder) applyChroma(enable bool, params *responses.MixerChro
 
 // GetBlendMode retrieves the current blend mode for the layer.
 func (b *MixerLayerBuilder) GetBlendMode() (types.BlendMode, error) {
-	cmd := commands.MixerCommandBlend{
+	cmd := commands.MixerBlend{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
@@ -308,7 +308,7 @@ func (b *MixerLayerBuilder) SetBlendMode(mode types.BlendMode) error {
 	if err := mode.Validate(); err != nil {
 		return err
 	}
-	cmd := commands.MixerCommandBlend{
+	cmd := commands.MixerBlend{
 		MixerCommand: b.baseMixerLayerCommand(),
 		BlendMode:    &mode,
 	}
@@ -317,7 +317,7 @@ func (b *MixerLayerBuilder) SetBlendMode(mode types.BlendMode) error {
 
 // GetInvert retrieves the current invert state for the layer.
 func (b *MixerLayerBuilder) GetInvert() (bool, error) {
-	cmd := commands.MixerCommandInvert{
+	cmd := commands.MixerInvert{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	return b.getBoolValue(cmd)
@@ -325,7 +325,7 @@ func (b *MixerLayerBuilder) GetInvert() (bool, error) {
 
 // SetInvert enables or disables color inversion for the layer.
 func (b *MixerLayerBuilder) SetInvert(state bool) error {
-	cmd := commands.MixerCommandInvert{
+	cmd := commands.MixerInvert{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Invert:       &state,
 	}
@@ -334,7 +334,7 @@ func (b *MixerLayerBuilder) SetInvert(state bool) error {
 
 // GetOpacity retrieves the current opacity value for the layer (0.0 to 1.0).
 func (b *MixerLayerBuilder) GetOpacity() (float32, error) {
-	return b.getFloat32Value(commands.MixerCommandOpacity{
+	return b.getFloat32Value(commands.MixerOpacity{
 		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
@@ -348,7 +348,7 @@ func (b *MixerLayerBuilder) SetOpacity(opacity float32) error {
 	if err := inRangeFloat("opacity", opacity, 0.0, 1.0); err != nil {
 		return err
 	}
-	cmd := commands.MixerCommandOpacity{
+	cmd := commands.MixerOpacity{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Opacity:      &opacity,
 	}
@@ -358,7 +358,7 @@ func (b *MixerLayerBuilder) SetOpacity(opacity float32) error {
 
 // GetBrightness retrieves the current brightness value for the layer.
 func (b *MixerLayerBuilder) GetBrightness() (float32, error) {
-	return b.getFloat32Value(commands.MixerCommandBrightness{
+	return b.getFloat32Value(commands.MixerBrightness{
 		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
@@ -372,7 +372,7 @@ func (b *MixerLayerBuilder) SetBrightness(brightness float32) error {
 	if err := inRangeFloat("brightness", brightness, 0.0, 1.0); err != nil {
 		return err
 	}
-	cmd := commands.MixerCommandBrightness{
+	cmd := commands.MixerBrightness{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Brightness:   &brightness,
 	}
@@ -382,7 +382,7 @@ func (b *MixerLayerBuilder) SetBrightness(brightness float32) error {
 
 // GetSaturation retrieves the current saturation value for the layer.
 func (b *MixerLayerBuilder) GetSaturation() (float32, error) {
-	return b.getFloat32Value(commands.MixerCommandSaturation{
+	return b.getFloat32Value(commands.MixerSaturation{
 		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
@@ -396,7 +396,7 @@ func (b *MixerLayerBuilder) SetSaturation(saturation float32) error {
 	if err := inRangeFloat("saturation", saturation, 0.0, 1.0); err != nil {
 		return err
 	}
-	cmd := commands.MixerCommandSaturation{
+	cmd := commands.MixerSaturation{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Saturation:   &saturation,
 	}
@@ -406,7 +406,7 @@ func (b *MixerLayerBuilder) SetSaturation(saturation float32) error {
 
 // GetContrast retrieves the current contrast value for the layer.
 func (b *MixerLayerBuilder) GetContrast() (float32, error) {
-	return b.getFloat32Value(commands.MixerCommandContrast{
+	return b.getFloat32Value(commands.MixerContrast{
 		MixerCommand: b.baseMixerLayerCommand(),
 	})
 }
@@ -420,7 +420,7 @@ func (b *MixerLayerBuilder) SetContrast(contrast float32) error {
 	if err := inRangeFloat("contrast", contrast, 0.0, 1.0); err != nil {
 		return err
 	}
-	cmd := commands.MixerCommandContrast{
+	cmd := commands.MixerContrast{
 		MixerCommand: b.baseMixerLayerCommand(),
 		Contrast:     &contrast,
 	}
@@ -430,7 +430,7 @@ func (b *MixerLayerBuilder) SetContrast(contrast float32) error {
 
 // GetLevels retrieves the current levels settings for the layer.
 func (b *MixerLayerBuilder) GetLevels() (types.MixerLevels, error) {
-	cmd := commands.MixerCommandLevels{
+	cmd := commands.MixerLevels{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
@@ -444,7 +444,7 @@ func (b *MixerLayerBuilder) GetLevels() (types.MixerLevels, error) {
 //
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerLayerBuilder) SetLevels(params types.MixerLevels) error {
-	cmd := commands.MixerCommandLevels{
+	cmd := commands.MixerLevels{
 		MixerCommand: b.baseMixerLayerCommand(),
 		MinInput:     &params.MinInput,
 		MaxInput:     &params.MaxInput,
@@ -458,7 +458,7 @@ func (b *MixerLayerBuilder) SetLevels(params types.MixerLevels) error {
 
 // GetFill retrieves the current fill (position and scale) settings for the layer.
 func (b *MixerLayerBuilder) GetFill() (responses.MixerFill, error) {
-	cmd := commands.MixerCommandFill{
+	cmd := commands.MixerFill{
 		MixerCommand: b.baseMixerLayerCommand(),
 	}
 	resp, err := b.client.Send(cmd)
@@ -473,7 +473,7 @@ func (b *MixerLayerBuilder) GetFill() (responses.MixerFill, error) {
 //
 // Use Fade() before calling this method to apply a smooth transition.
 func (b *MixerLayerBuilder) SetFill(params types.MixerParamsFill) error {
-	cmd := commands.MixerCommandFill{
+	cmd := commands.MixerFill{
 		MixerCommand: b.baseMixerLayerCommand(),
 		X:            &params.X,
 		Y:            &params.Y,

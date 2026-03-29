@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- added unittest for all commands
 - added following commands:
   - Mixer:
     - KEYER
@@ -46,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- expanded examples in `cmd/*`
 - linked to new CasparCG AMCP Wiki
 - optimised and implemented new builder structs
 - changed from SnakeCase to CamelCase function names to follow go best practises

@@ -5,9 +5,19 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
+
+type CINF struct {
+	Filename     string           `xml:"filename"`
+	Type         types.MediaTypes `xml:"type"`
+	FileSize     int64            `xml:"filesize"`
+	LastModified time.Time        `xml:"lastmodified"`
+	FrameCount   int              `xml:"framecount"`
+	FrameRate    types.FrameRate  `xml:"framerate"`
+}
 
 type QueryChannelInfo struct {
 	ChannelIndex int
@@ -60,7 +70,6 @@ type QueryChannelInfoVerbose struct {
 
 // UnmarshalXML is the entry point for the XML decoder.
 func (q *QueryChannelInfoVerbose) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	// This "proxy" struct mirrors the XML exactly and uses only EXPORTED fields
 	type xmlChannel struct {
 		Format     types.VideoMode `xml:"format"`
 		FrameRates []int           `xml:"framerate"`
@@ -77,12 +86,10 @@ func (q *QueryChannelInfoVerbose) UnmarshalXML(d *xml.Decoder, start xml.StartEl
 		return err
 	}
 
-	// Now map the raw XML data to your clean struct
 	q.VideoMode = raw.Format
 	q.Mixer.Audio.Volume = raw.Mixer.Audio.Volume
 	q.Output = raw.Output
 
-	// Handle the multiple <framerate> tags manually
 	if len(raw.FrameRates) >= 2 {
 		q.FrameRate.Num = raw.FrameRates[0]
 		q.FrameRate.Den = raw.FrameRates[1]

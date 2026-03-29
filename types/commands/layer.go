@@ -11,7 +11,7 @@ type LayerCommand struct {
 	Layer        *int // Layer is optional for channel-level commands
 }
 
-type LayerCommandLoad struct {
+type LayerLoad struct {
 	LayerCommand
 
 	Clip string
@@ -19,72 +19,72 @@ type LayerCommandLoad struct {
 	Parameters *[]string
 }
 
-func (c LayerCommandLoad) String() string {
-	cmd := baseLayerCommand("LOAD", c.VideoChannel, c.Layer)
-	cmd = appendString(cmd, &c.Clip)
+func (c LayerLoad) String() string {
+	cmd := baseCommand("LOAD", c.VideoChannel, c.Layer)
+	cmd = appendQuotedString(cmd, &c.Clip)
 	cmd = appendParams(cmd, c.Parameters)
 	return cmd
 }
 
-type LayerCommandPlay struct {
+type LayerPlay struct {
 	LayerCommand
 
 	Clip       *string
 	Parameters *[]string
 }
 
-func (c LayerCommandPlay) String() string {
-	cmd := baseLayerCommand("PLAY", c.VideoChannel, c.Layer)
+func (c LayerPlay) String() string {
+	cmd := baseCommand("PLAY", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, c.Clip)
 	cmd = appendParams(cmd, c.Parameters)
 	return cmd
 }
 
-type LayerCommandPause struct {
+type LayerPause struct {
 	LayerCommand
 }
 
-func (c LayerCommandPause) String() string {
-	return baseLayerCommand("PAUSE", c.VideoChannel, c.Layer)
+func (c LayerPause) String() string {
+	return baseCommand("PAUSE", c.VideoChannel, c.Layer)
 }
 
-type LayerCommandResume struct {
+type LayerResume struct {
 	LayerCommand
 }
 
-func (c LayerCommandResume) String() string {
-	return baseLayerCommand("RESUME", c.VideoChannel, c.Layer)
+func (c LayerResume) String() string {
+	return baseCommand("RESUME", c.VideoChannel, c.Layer)
 }
 
-type LayerCommandStop struct {
+type LayerStop struct {
 	LayerCommand
 }
 
-func (c LayerCommandStop) String() string {
-	return baseLayerCommand("STOP", c.VideoChannel, c.Layer)
+func (c LayerStop) String() string {
+	return baseCommand("STOP", c.VideoChannel, c.Layer)
 }
 
-type LayerCommandClear struct {
+type LayerClear struct {
 	LayerCommand
 }
 
-func (c LayerCommandClear) String() string {
-	return baseLayerCommand("CLEAR", c.VideoChannel, c.Layer)
+func (c LayerClear) String() string {
+	return baseCommand("CLEAR", c.VideoChannel, c.Layer)
 }
 
-type LayerCommandCall struct {
+type LayerCall struct {
 	LayerCommand
 
 	Params []string
 }
 
-func (c LayerCommandCall) String() string {
-	cmd := baseLayerCommand("CALL", c.VideoChannel, c.Layer)
+func (c LayerCall) String() string {
+	cmd := baseCommand("CALL", c.VideoChannel, c.Layer)
 	cmd = appendParams(cmd, &c.Params)
 	return cmd
 }
 
-type LayerCommandSwap struct {
+type LayerSwap struct {
 	LayerCommand
 
 	VideoChannel2 int
@@ -93,8 +93,8 @@ type LayerCommandSwap struct {
 	Transform bool // either nil or "TRANSFORMS"
 }
 
-func (c LayerCommandSwap) String() string {
-	cmd := baseLayerCommand("SWAP", c.VideoChannel, c.Layer)
+func (c LayerSwap) String() string {
+	cmd := baseCommand("SWAP", c.VideoChannel, c.Layer)
 	cmd += " " + strconv.Itoa(c.VideoChannel2)
 	if c.Layer2 != nil {
 		cmd += "-" + strconv.Itoa(*c.Layer2)
@@ -105,92 +105,91 @@ func (c LayerCommandSwap) String() string {
 	return cmd
 }
 
-type LayerCommandAdd struct {
+type LayerAdd struct {
 	LayerCommand
 
-	ConsumerIdx  *int      // ConsumerIdx overrides the index that the consumer itself decides and can later be used with the REMOVE command to remove the consumer.
-	ConsumerName string    // TODO: Make this an enum of possible consumer types
-	Parameters   *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
+	ConsumerIdx  *int
+	ConsumerName string // TODO: Make this an enum of possible consumer types
+	Params       *[]string
 }
 
-func (c LayerCommandAdd) String() string {
-	cmd := baseLayerCommand("ADD", c.VideoChannel, nil)
+func (c LayerAdd) String() string {
+	cmd := baseCommand("ADD", c.VideoChannel, nil)
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	}
-	appendString(cmd, &c.ConsumerName)
-	appendParams(cmd, c.Parameters)
+	cmd = appendString(cmd, &c.ConsumerName)
+	cmd = appendParams(cmd, c.Params)
 	return cmd
 }
 
-type LayerCommandRemove struct {
+type LayerRemove struct {
 	LayerCommand
 
-	ConsumerIdx *int      // ConsumerIdx overrides the index that the consumer itself decides and can later be used with the REMOVE command to remove the consumer.
-	Parameters  *[]string // Parameters are specific to the consumer being added. For example, for a STREAM consumer you can add []string{"udp://localhost:5004", "-vcodec", "libx264", "-tune", "zerolatency"}
+	ConsumerIdx *int
+	Parameters  *[]string
 }
 
-func (c LayerCommandRemove) String() string {
-	cmd := baseLayerCommand("REMOVE", c.VideoChannel, nil)
+func (c LayerRemove) String() string {
+	cmd := baseCommand("REMOVE", c.VideoChannel, nil)
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	} else {
-		appendParams(cmd, c.Parameters)
+		cmd = appendParams(cmd, c.Parameters)
 	}
 	return cmd
 }
 
-type LayerCommandPrint struct {
+type LayerPrint struct {
 	LayerCommand
 }
 
-func (c LayerCommandPrint) String() string {
-	return baseLayerCommand("PRINT", c.VideoChannel, nil)
+func (c LayerPrint) String() string {
+	return baseCommand("PRINT", c.VideoChannel, nil)
 }
 
-type LayerCommandSet struct {
+type LayerSet struct {
 	LayerCommand
 
-	VariableName string
+	VariableName types.SetVariable
 	Value        string
 }
 
-func (c LayerCommandSet) String() string {
-	cmd := baseLayerCommand("SET", c.VideoChannel, nil)
-	cmd = appendString(cmd, &c.VariableName)
+func (c LayerSet) String() string {
+	cmd := baseCommand("SET", c.VideoChannel, nil)
+	cmd = appendString(cmd, ptr(c.VariableName.String()))
 	cmd = appendString(cmd, &c.Value)
 	return cmd
 }
 
-type LayerCommandLock struct {
+type LayerLock struct {
 	LayerCommand
 
 	Action     types.LockAction
 	Passphrase *string
 }
 
-func (c LayerCommandLock) String() string {
-	cmd := baseLayerCommand("LOCK", c.VideoChannel, nil)
+func (c LayerLock) String() string {
+	cmd := baseCommand("LOCK", c.VideoChannel, nil)
 	cmd = appendString(cmd, ptr(c.Action.String()))
 	cmd = appendString(cmd, c.Passphrase)
 	return cmd
 }
 
-type LayerCommandInfo struct {
+type LayerInfo struct {
 	LayerCommand
 }
 
-func (c LayerCommandInfo) String() string {
-	return baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+func (c LayerInfo) String() string {
+	return baseCommand("INFO", c.VideoChannel, c.Layer)
 }
 
-// LayerCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
-type LayerCommandInfoDelay struct {
+type LayerInfoDelay struct {
 	LayerCommand
 }
 
-func (c LayerCommandInfoDelay) String() string {
-	cmd := baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+func (c LayerInfoDelay) String() string {
+	cmd := baseCommand("INFO", c.VideoChannel, c.Layer)
 	cmd += " DELAY"
 	return cmd
 }
