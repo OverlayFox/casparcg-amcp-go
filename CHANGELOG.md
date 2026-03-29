@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- updated README.md
 - expanded examples in `cmd/*`
 - linked to new CasparCG AMCP Wiki
 - optimised and implemented new builder structs
