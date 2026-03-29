@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] - 2026-03-29
+
 ### Added
 
 - added unittest for all commands
@@ -54,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - changed from SnakeCase to CamelCase function names to follow go best practises
 - changed URLs in ReadMe to point to correct package
 
-## [0.1.0] - 24-03-2026
+## [0.1.0] - 2026-03-24
 
 ### Removed
 
@@ -81,7 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - check changelog running on main
 - a bunch of linter and formatter issues
 
-## [0.0.1] 28-02-2026
+## [0.0.1] 2026-02-28
 
 ### Added
 
