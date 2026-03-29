@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/overlayfox/casparcg-amcp-go"
 )
@@ -21,12 +22,21 @@ func main() {
 		}
 	}()
 
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println("CasparCG AMCP Go Client - Info Example")
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println()
+
 	// Ping server to see if it's alive and responding
-	pingResp, err := client.Ping(ptr("CasparCG AMCP Go Client - Info Example\n\n\n"))
+	pingResp, err := client.Ping(ptr("CasparCG AMCP Go Client"))
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Ping response:", pingResp)
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Ping Response")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(pingResp)
+	fmt.Println()
 
 	// Get generic info about the server and print it as JSON
 	resp, err := client.Query().Info().Generic()
@@ -41,8 +51,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Generic Info:")
-	fmt.Println(string(jsonData) + "\n\n\n")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Server Generic Info")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(string(jsonData))
+	fmt.Println()
 
 	// Some functions are marked as "deprecated" but they still work.
 	// They just won't return sensible data.
@@ -58,8 +71,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Deprecated Queues Info:")
-	fmt.Println(string(jsonData) + "\n\n\n")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Queues Info (Deprecated)")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(string(jsonData))
+	fmt.Println()
 
 	// Get config info about the server and print it as JSON
 	configResp, err := client.Query().Info().Config()
@@ -74,8 +90,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Config Info:")
-	fmt.Println(string(jsonData) + "\n\n\n")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Server Config Info")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(string(jsonData))
+	fmt.Println()
 
 	// Some query commands were moved to different builders to better reflect their purpose.
 	layerResp, err := client.Layer().Channel(1).Info().Generic()
@@ -90,8 +109,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Layer Channel Info:")
-	fmt.Println(string(jsonData) + "\n\n\n")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Channel 1 Info")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(string(jsonData))
+	fmt.Println()
 
 	// Some query commands were moved to different builders to better reflect their purpose.
 	layerResp, err = client.Layer().Channel(1).Layer(10).Info().Generic()
@@ -106,10 +128,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Layer Channel Layer Info:")
-	fmt.Println(string(jsonData) + "\n\n\n")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Channel 1, Layer 10 Info")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(string(jsonData))
+	fmt.Println()
 
-	fmt.Println("Done.")
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println("Done")
+	fmt.Println(strings.Repeat("=", 80))
 }
 
 func ptr[T any](v T) *T {

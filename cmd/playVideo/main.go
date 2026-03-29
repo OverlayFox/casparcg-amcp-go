@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/overlayfox/casparcg-amcp-go"
@@ -22,15 +23,26 @@ func main() {
 		}
 	}()
 
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println("  CasparCG AMCP Go Client - Video Playback Example")
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println()
+
 	// Ping server to see if it's alive and responding
-	resp, err := client.Ping(ptr("CasparCG AMCP Go Client - Video Playback Example"))
+	resp, err := client.Ping(ptr("CasparCG AMCP Go Client"))
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Ping response:", resp)
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println("Ping Response")
+	fmt.Println(strings.Repeat("-", 80))
+	fmt.Println(resp)
+	fmt.Println()
 
 	// Play a clip on channel 1, layer 10 without any optional parameters for 2 seconds
+	fmt.Println(strings.Repeat("-", 80))
 	fmt.Println("Playing clip on channel 1, layer 10...")
+	fmt.Println(strings.Repeat("-", 80))
 	err = client.Layer().Channel(1).Layer(10).Play(types.LayerPlay{ClipName: ptr("BACKGROUNDLOOP")})
 	if err != nil {
 		var casparErr casparcg.CasparCGError
@@ -39,10 +51,14 @@ func main() {
 		}
 		panic(err)
 	}
+	fmt.Println("OK")
+	fmt.Println()
 	time.Sleep(2 * time.Second)
 
 	// Pause the clip for 1 second
+	fmt.Println(strings.Repeat("-", 80))
 	fmt.Println("Pausing clip on channel 1, layer 10...")
+	fmt.Println(strings.Repeat("-", 80))
 	err = client.Layer().Channel(1).Layer(10).Pause()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
@@ -51,10 +67,14 @@ func main() {
 		}
 		panic(err)
 	}
+	fmt.Println("OK")
+	fmt.Println()
 	time.Sleep(1 * time.Second)
 
 	// Resume the clip for 2 seconds
+	fmt.Println(strings.Repeat("-", 80))
 	fmt.Println("Resuming clip on channel 1, layer 10...")
+	fmt.Println(strings.Repeat("-", 80))
 	err = client.Layer().Channel(1).Layer(10).Resume()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
@@ -63,10 +83,14 @@ func main() {
 		}
 		panic(err)
 	}
+	fmt.Println("OK")
+	fmt.Println()
 	time.Sleep(2 * time.Second)
 
 	// Stop the clip on channel 1, layer 10
+	fmt.Println(strings.Repeat("-", 80))
 	fmt.Println("Stopping clip on channel 1, layer 10...")
+	fmt.Println(strings.Repeat("-", 80))
 	err = client.Layer().Channel(1).Layer(10).Stop()
 	if err != nil {
 		var casparErr casparcg.CasparCGError
@@ -75,8 +99,12 @@ func main() {
 		}
 		panic(err)
 	}
+	fmt.Println("OK")
+	fmt.Println()
 
-	fmt.Println("Done.")
+	fmt.Println(strings.Repeat("=", 80))
+	fmt.Println("Done")
+	fmt.Println(strings.Repeat("=", 80))
 }
 
 func ptr[T any](v T) *T {
