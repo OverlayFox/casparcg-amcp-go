@@ -20,7 +20,7 @@ type LayerCommandLoad struct {
 }
 
 func (c LayerCommandLoad) String() string {
-	cmd := baseLayerCommand("LOAD", c.VideoChannel, c.Layer)
+	cmd := baseCommand("LOAD", c.VideoChannel, c.Layer)
 	cmd = appendQuotedString(cmd, &c.Clip)
 	cmd = appendParams(cmd, c.Parameters)
 	return cmd
@@ -34,7 +34,7 @@ type LayerCommandPlay struct {
 }
 
 func (c LayerCommandPlay) String() string {
-	cmd := baseLayerCommand("PLAY", c.VideoChannel, c.Layer)
+	cmd := baseCommand("PLAY", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, c.Clip)
 	cmd = appendParams(cmd, c.Parameters)
 	return cmd
@@ -45,7 +45,7 @@ type LayerCommandPause struct {
 }
 
 func (c LayerCommandPause) String() string {
-	return baseLayerCommand("PAUSE", c.VideoChannel, c.Layer)
+	return baseCommand("PAUSE", c.VideoChannel, c.Layer)
 }
 
 type LayerCommandResume struct {
@@ -53,7 +53,7 @@ type LayerCommandResume struct {
 }
 
 func (c LayerCommandResume) String() string {
-	return baseLayerCommand("RESUME", c.VideoChannel, c.Layer)
+	return baseCommand("RESUME", c.VideoChannel, c.Layer)
 }
 
 type LayerCommandStop struct {
@@ -61,7 +61,7 @@ type LayerCommandStop struct {
 }
 
 func (c LayerCommandStop) String() string {
-	return baseLayerCommand("STOP", c.VideoChannel, c.Layer)
+	return baseCommand("STOP", c.VideoChannel, c.Layer)
 }
 
 type LayerCommandClear struct {
@@ -69,7 +69,7 @@ type LayerCommandClear struct {
 }
 
 func (c LayerCommandClear) String() string {
-	return baseLayerCommand("CLEAR", c.VideoChannel, c.Layer)
+	return baseCommand("CLEAR", c.VideoChannel, c.Layer)
 }
 
 type LayerCommandCall struct {
@@ -79,7 +79,7 @@ type LayerCommandCall struct {
 }
 
 func (c LayerCommandCall) String() string {
-	cmd := baseLayerCommand("CALL", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CALL", c.VideoChannel, c.Layer)
 	cmd = appendParams(cmd, &c.Params)
 	return cmd
 }
@@ -94,7 +94,7 @@ type LayerCommandSwap struct {
 }
 
 func (c LayerCommandSwap) String() string {
-	cmd := baseLayerCommand("SWAP", c.VideoChannel, c.Layer)
+	cmd := baseCommand("SWAP", c.VideoChannel, c.Layer)
 	cmd += " " + strconv.Itoa(c.VideoChannel2)
 	if c.Layer2 != nil {
 		cmd += "-" + strconv.Itoa(*c.Layer2)
@@ -114,7 +114,7 @@ type LayerCommandAdd struct {
 }
 
 func (c LayerCommandAdd) String() string {
-	cmd := baseLayerCommand("ADD", c.VideoChannel, nil)
+	cmd := baseCommand("ADD", c.VideoChannel, nil)
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	}
@@ -131,7 +131,7 @@ type LayerCommandRemove struct {
 }
 
 func (c LayerCommandRemove) String() string {
-	cmd := baseLayerCommand("REMOVE", c.VideoChannel, nil)
+	cmd := baseCommand("REMOVE", c.VideoChannel, nil)
 	if c.ConsumerIdx != nil {
 		cmd += "-" + strconv.Itoa(*c.ConsumerIdx)
 	} else {
@@ -145,7 +145,7 @@ type LayerCommandPrint struct {
 }
 
 func (c LayerCommandPrint) String() string {
-	return baseLayerCommand("PRINT", c.VideoChannel, nil)
+	return baseCommand("PRINT", c.VideoChannel, nil)
 }
 
 type LayerCommandSet struct {
@@ -156,7 +156,7 @@ type LayerCommandSet struct {
 }
 
 func (c LayerCommandSet) String() string {
-	cmd := baseLayerCommand("SET", c.VideoChannel, nil)
+	cmd := baseCommand("SET", c.VideoChannel, nil)
 	cmd = appendString(cmd, ptr(c.VariableName.String()))
 	cmd = appendString(cmd, &c.Value)
 	return cmd
@@ -170,7 +170,7 @@ type LayerCommandLock struct {
 }
 
 func (c LayerCommandLock) String() string {
-	cmd := baseLayerCommand("LOCK", c.VideoChannel, nil)
+	cmd := baseCommand("LOCK", c.VideoChannel, nil)
 	cmd = appendString(cmd, ptr(c.Action.String()))
 	cmd = appendString(cmd, c.Passphrase)
 	return cmd
@@ -181,7 +181,7 @@ type LayerCommandInfo struct {
 }
 
 func (c LayerCommandInfo) String() string {
-	return baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+	return baseCommand("INFO", c.VideoChannel, c.Layer)
 }
 
 // LayerCommandInfoDelay gets the delay information for a channel or a specific layer on a channel.
@@ -190,7 +190,7 @@ type LayerCommandInfoDelay struct {
 }
 
 func (c LayerCommandInfoDelay) String() string {
-	cmd := baseLayerCommand("INFO", c.VideoChannel, c.Layer)
+	cmd := baseCommand("INFO", c.VideoChannel, c.Layer)
 	cmd += " DELAY"
 	return cmd
 }

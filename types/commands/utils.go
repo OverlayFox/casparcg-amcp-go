@@ -72,7 +72,7 @@ func quote(s string) string {
 	return "\"" + escaped + "\""
 }
 
-func baseLayerCommand(command string, videoChannel int, layer *int) string {
+func baseCommand(command string, videoChannel int, layer *int) string {
 	cmd := fmt.Sprintf("%s %d", command, videoChannel)
 	if layer != nil {
 		cmd += fmt.Sprintf("-%d", *layer)

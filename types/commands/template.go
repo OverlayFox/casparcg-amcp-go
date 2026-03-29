@@ -20,7 +20,7 @@ type TemplateCGAdd struct {
 }
 
 func (c TemplateCGAdd) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("ADD"))
 	cmd = appendInt(cmd, c.CgLayer)
 	cmd = appendQuotedString(cmd, ptr(c.Template))
@@ -34,7 +34,7 @@ type TemplateCGPlay struct {
 }
 
 func (c TemplateCGPlay) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("PLAY"))
 	return appendInt(cmd, c.CgLayer)
 }
@@ -46,7 +46,7 @@ type TemplateCGStop struct {
 }
 
 func (c TemplateCGStop) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("STOP"))
 	return appendInt(cmd, c.CgLayer)
 }
@@ -58,7 +58,7 @@ type TemplateCGNext struct {
 }
 
 func (c TemplateCGNext) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("NEXT"))
 	return appendInt(cmd, c.CgLayer)
 }
@@ -69,7 +69,7 @@ type TemplateCGRemove struct {
 }
 
 func (c TemplateCGRemove) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("REMOVE"))
 	return appendInt(cmd, c.CgLayer)
 }
@@ -80,7 +80,7 @@ type TemplateCGClear struct {
 }
 
 func (c TemplateCGClear) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("CLEAR"))
 	return cmd
 }
@@ -94,7 +94,7 @@ type TemplateCGUpdate struct {
 }
 
 func (c TemplateCGUpdate) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("UPDATE"))
 	cmd = appendInt(cmd, c.CgLayer)
 	return appendQuotedString(cmd, ptr(c.Data))
@@ -108,7 +108,7 @@ type TemplateCGInvoke struct {
 }
 
 func (c TemplateCGInvoke) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("INVOKE"))
 	cmd = appendInt(cmd, c.CgLayer)
 	return appendQuotedString(cmd, ptr(c.Method))
@@ -121,7 +121,7 @@ type TemplateCGInfo struct {
 }
 
 func (c TemplateCGInfo) String() string {
-	cmd := baseLayerCommand("CG", c.VideoChannel, c.Layer)
+	cmd := baseCommand("CG", c.VideoChannel, c.Layer)
 	cmd = appendString(cmd, ptr("INFO"))
 	return appendInt(cmd, c.CgLayer)
 }
