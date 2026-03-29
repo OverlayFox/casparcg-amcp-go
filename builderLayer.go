@@ -54,7 +54,7 @@ func (b *LayerChannelBuilder) baseLayerChannelCommand() commands.LayerCommand {
 
 // Clear clears all layers in the channel.
 func (b *LayerChannelBuilder) Clear() error {
-	cmd := commands.LayerCommandClear{
+	cmd := commands.LayerClear{
 		LayerCommand: b.baseLayerChannelCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -62,7 +62,7 @@ func (b *LayerChannelBuilder) Clear() error {
 
 // Swap swaps channels.
 func (b *LayerChannelBuilder) Swap(channel2 int, transforms bool) error {
-	cmd := commands.LayerCommandSwap{
+	cmd := commands.LayerSwap{
 		LayerCommand:  b.baseLayerChannelCommand(),
 		VideoChannel2: channel2,
 		Layer2:        nil,
@@ -72,7 +72,7 @@ func (b *LayerChannelBuilder) Swap(channel2 int, transforms bool) error {
 }
 
 func (b *LayerChannelBuilder) Add(params types.LayerAdd) error {
-	cmd := commands.LayerCommandAdd{
+	cmd := commands.LayerAdd{
 		LayerCommand: b.baseLayerChannelCommand(),
 		ConsumerName: params.ConsumerName,
 		ConsumerIdx:  params.ConsumerIdx,
@@ -94,7 +94,7 @@ func (b *LayerChannelBuilder) Remove() *LayerCommandRemove {
 
 // ConsumerIDX removes the consumer via its id.
 func (b *LayerCommandRemove) ConsumerIDX(idx int) error {
-	cmd := commands.LayerCommandRemove{
+	cmd := commands.LayerRemove{
 		LayerCommand: b.baseLayerChannelCommand(),
 		ConsumerIdx:  &idx,
 		Parameters:   nil,
@@ -104,7 +104,7 @@ func (b *LayerCommandRemove) ConsumerIDX(idx int) error {
 
 // Params removes the consumer that matches the given parameters.
 func (b *LayerCommandRemove) Params(params []string) error {
-	cmd := commands.LayerCommandRemove{
+	cmd := commands.LayerRemove{
 		LayerCommand: b.baseLayerChannelCommand(),
 		ConsumerIdx:  nil,
 		Parameters:   &params,
@@ -113,7 +113,7 @@ func (b *LayerCommandRemove) Params(params []string) error {
 }
 
 func (b *LayerChannelBuilder) Print() error {
-	cmd := commands.LayerCommandPrint{
+	cmd := commands.LayerPrint{
 		LayerCommand: b.baseLayerChannelCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -130,7 +130,7 @@ func (b *LayerChannelBuilder) Set() *LayerCommandSet {
 }
 
 func (b *LayerCommandSet) Mode(value types.VideoMode) error {
-	cmd := commands.LayerCommandSet{
+	cmd := commands.LayerSet{
 		LayerCommand: b.baseLayerChannelCommand(),
 		VariableName: types.SetVariableMode,
 		Value:        string(value),
@@ -139,7 +139,7 @@ func (b *LayerCommandSet) Mode(value types.VideoMode) error {
 }
 
 func (b *LayerCommandSet) ChannelLayout(value types.AudioChannelLayout) error {
-	cmd := commands.LayerCommandSet{
+	cmd := commands.LayerSet{
 		LayerCommand: b.baseLayerChannelCommand(),
 		VariableName: types.SetVariableChannelLayout,
 		Value:        string(value),
@@ -160,7 +160,7 @@ func (b *LayerChannelBuilder) Lock() *LayerCommandLock {
 
 // Acquire acquires the lock with the given passphrase.
 func (b *LayerCommandLock) Acquire(passphrase string) error {
-	cmd := commands.LayerCommandLock{
+	cmd := commands.LayerLock{
 		LayerCommand: b.baseLayerChannelCommand(),
 		Action:       types.LockActionAcquire,
 		Passphrase:   &passphrase,
@@ -170,7 +170,7 @@ func (b *LayerCommandLock) Acquire(passphrase string) error {
 
 // Release releases the lock with the given passphrase.
 func (b *LayerCommandLock) Release(passphrase string) error {
-	cmd := commands.LayerCommandLock{
+	cmd := commands.LayerLock{
 		LayerCommand: b.baseLayerChannelCommand(),
 		Action:       types.LockActionRelease,
 		Passphrase:   &passphrase,
@@ -182,7 +182,7 @@ func (b *LayerCommandLock) Release(passphrase string) error {
 //
 // This is for emergency use only and should be used with caution
 func (b *LayerCommandLock) Clear() error {
-	cmd := commands.LayerCommandLock{
+	cmd := commands.LayerLock{
 		LayerCommand: b.baseLayerChannelCommand(),
 		Action:       types.LockActionClear,
 		Passphrase:   nil,
@@ -202,7 +202,7 @@ func (b *LayerChannelBuilder) Info() *LayerCommandChannelInfo {
 
 // Generic gets information about the channel.
 func (b *LayerCommandChannelInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
-	cmd := commands.LayerCommandInfo{
+	cmd := commands.LayerInfo{
 		LayerCommand: b.baseLayerChannelCommand(),
 	}
 	data, err := b.client.Send(cmd)
@@ -222,7 +222,7 @@ func (b *LayerCommandChannelInfo) Generic() (responses.QueryChannelInfoVerbose, 
 // Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *LayerCommandChannelInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
-	cmd := commands.LayerCommandInfoDelay{
+	cmd := commands.LayerInfoDelay{
 		LayerCommand: b.baseLayerChannelCommand(),
 	}
 	data, err := b.client.Send(cmd)
@@ -264,7 +264,7 @@ func (b *LayerLayerBuilder) baseLayerLayerCommand() commands.LayerCommand {
 
 // Load loads a clip to the layer.
 func (b *LayerLayerBuilder) Load(params types.LayerLoad) error {
-	cmd := commands.LayerCommandLoad{
+	cmd := commands.LayerLoad{
 		LayerCommand: b.baseLayerLayerCommand(),
 		Clip:         params.ClipName,
 		Parameters:   params.Parameters,
@@ -274,7 +274,7 @@ func (b *LayerLayerBuilder) Load(params types.LayerLoad) error {
 
 // Play plays content on the layer.
 func (b *LayerLayerBuilder) Play(params types.LayerPlay) error {
-	cmd := commands.LayerCommandPlay{
+	cmd := commands.LayerPlay{
 		LayerCommand: b.baseLayerLayerCommand(),
 		Clip:         params.ClipName,
 		Parameters:   params.Parameters,
@@ -284,7 +284,7 @@ func (b *LayerLayerBuilder) Play(params types.LayerPlay) error {
 
 // Pause pauses playback on the layer.
 func (b *LayerLayerBuilder) Pause() error {
-	cmd := commands.LayerCommandPause{
+	cmd := commands.LayerPause{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -292,7 +292,7 @@ func (b *LayerLayerBuilder) Pause() error {
 
 // Resume resumes playback on the layer.
 func (b *LayerLayerBuilder) Resume() error {
-	cmd := commands.LayerCommandResume{
+	cmd := commands.LayerResume{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -300,7 +300,7 @@ func (b *LayerLayerBuilder) Resume() error {
 
 // Stop stops playback on the layer.
 func (b *LayerLayerBuilder) Stop() error {
-	cmd := commands.LayerCommandStop{
+	cmd := commands.LayerStop{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -308,7 +308,7 @@ func (b *LayerLayerBuilder) Stop() error {
 
 // Clear clears the layer.
 func (b *LayerLayerBuilder) Clear() error {
-	cmd := commands.LayerCommandClear{
+	cmd := commands.LayerClear{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	return b.sendCommand(cmd)
@@ -318,7 +318,7 @@ func (b *LayerLayerBuilder) Clear() error {
 //
 // TODO: Implement all possible parameter for CALL command
 func (b *LayerLayerBuilder) Call(params []string) error {
-	cmd := commands.LayerCommandCall{
+	cmd := commands.LayerCall{
 		LayerCommand: b.baseLayerLayerCommand(),
 		Params:       params,
 	}
@@ -327,7 +327,7 @@ func (b *LayerLayerBuilder) Call(params []string) error {
 
 // Swap swaps layers between channels.
 func (b *LayerLayerBuilder) Swap(channel2 int, layer2 int, transforms bool) error {
-	cmd := commands.LayerCommandSwap{
+	cmd := commands.LayerSwap{
 		LayerCommand:  b.baseLayerLayerCommand(),
 		VideoChannel2: channel2,
 		Layer2:        &layer2,
@@ -348,7 +348,7 @@ func (b *LayerLayerBuilder) Info() *LayerCommandLayerInfo {
 
 // Generic gets information about the channel.
 func (b *LayerCommandLayerInfo) Generic() (responses.QueryChannelInfoVerbose, error) {
-	cmd := commands.LayerCommandInfo{
+	cmd := commands.LayerInfo{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	data, err := b.client.Send(cmd)
@@ -368,7 +368,7 @@ func (b *LayerCommandLayerInfo) Generic() (responses.QueryChannelInfoVerbose, er
 // Deprecated: This command does not return what it states as of CasparCG 2.5.0
 // https://github.com/CasparCG/server/issues/1151
 func (b *LayerCommandLayerInfo) Delay() (responses.QueryChannelInfoVerbose, error) {
-	cmd := commands.LayerCommandInfoDelay{
+	cmd := commands.LayerInfoDelay{
 		LayerCommand: b.baseLayerLayerCommand(),
 	}
 	data, err := b.client.Send(cmd)

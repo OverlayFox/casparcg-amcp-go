@@ -7,6 +7,7 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
+// BoolFromResponse parses a boolean value from the response data.
 func BoolFromResponse(data []string) (bool, error) {
 	if len(data) < 1 {
 		return false, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
@@ -14,6 +15,7 @@ func BoolFromResponse(data []string) (bool, error) {
 	return data[0] == "1", nil
 }
 
+// IntFromResponse parses an integer value from the response data.
 func IntFromResponse(data []string) (int, error) {
 	if len(data) < 1 {
 		return 0, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
@@ -25,6 +27,7 @@ func IntFromResponse(data []string) (int, error) {
 	return value, nil
 }
 
+// FloatFromResponse parses a float32 value from the response data.
 func FloatFromResponse(data []string) (float32, error) {
 	if len(data) < 1 {
 		return 0, fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))
@@ -36,6 +39,7 @@ func FloatFromResponse(data []string) (float32, error) {
 	return float32(opacity), nil
 }
 
+// BlendModeFromResponse parses a blend mode from the response data.
 func BlendModeFromResponse(data []string) (types.BlendMode, error) {
 	if len(data) < 1 {
 		return "", fmt.Errorf("unexpected response length: got %d, expected at least 1", len(data))

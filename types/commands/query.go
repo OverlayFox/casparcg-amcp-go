@@ -4,7 +4,6 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
-// QueryCINF returns information about a media file.
 type QueryCINF struct {
 	Filename string
 }
@@ -13,8 +12,6 @@ func (c QueryCINF) String() string {
 	return "CINF " + quote(c.Filename)
 }
 
-// QueryCLS lists media files in the media folder.
-// Use the command INFO PATHS to get the path to the media folder.
 type QueryCLS struct {
 	Directory *string
 }
@@ -24,16 +21,12 @@ func (c QueryCLS) String() string {
 	return appendQuotedString(cmd, c.Directory)
 }
 
-// QueryFLS lists all fonts in the fonts folder.
-// Use the command INFO PATHS to get the path to the fonts folder.
 type QueryFLS struct{}
 
 func (c QueryFLS) String() string {
 	return "FLS"
 }
 
-// QueryTLS lists template files in the templates folder.
-// Use the command INFO PATHS to get the path to the templates folder.
 type QueryTLS struct {
 	Directory *string
 }
@@ -43,7 +36,6 @@ func (c QueryTLS) String() string {
 	return appendString(cmd, c.Directory)
 }
 
-// QueryVersion returns the version of specified component.
 type QueryVersion struct {
 	Component types.VersionInfo
 }
@@ -55,7 +47,6 @@ func (c QueryVersion) String() string {
 	return "VERSION"
 }
 
-// QueryInfo retrieves a list of available channels.
 type QueryInfo struct {
 	Component types.InfoComponent
 }
@@ -67,7 +58,6 @@ func (c QueryInfo) String() string {
 	return "INFO"
 }
 
-// QueryInfoTemplate gets information about the specified template.
 type QueryInfoTemplate struct {
 	Template string
 }

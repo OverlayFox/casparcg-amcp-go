@@ -15,7 +15,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 	}{
 		{
 			name: "LOAD with parameters",
-			command: commands.LayerCommandLoad{
+			command: commands.LayerLoad{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -30,7 +30,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOAD without parameters",
-			command: commands.LayerCommandLoad{
+			command: commands.LayerLoad{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -41,7 +41,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY with clip and parameters",
-			command: commands.LayerCommandPlay{
+			command: commands.LayerPlay{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -56,7 +56,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PLAY without clip and parameters",
-			command: commands.LayerCommandPlay{
+			command: commands.LayerPlay{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -66,7 +66,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PAUSE",
-			command: commands.LayerCommandPause{
+			command: commands.LayerPause{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -76,7 +76,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "RESUME",
-			command: commands.LayerCommandResume{
+			command: commands.LayerResume{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -86,7 +86,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "STOP",
-			command: commands.LayerCommandStop{
+			command: commands.LayerStop{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -96,7 +96,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "CLEAR on layer",
-			command: commands.LayerCommandClear{
+			command: commands.LayerClear{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -106,7 +106,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "CLEAR on channel",
-			command: commands.LayerCommandClear{
+			command: commands.LayerClear{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        nil,
@@ -116,7 +116,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "CALL",
-			command: commands.LayerCommandCall{
+			command: commands.LayerCall{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -127,7 +127,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP layers with Transform",
-			command: commands.LayerCommandSwap{
+			command: commands.LayerSwap{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -140,7 +140,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP layers without Transform",
-			command: commands.LayerCommandSwap{
+			command: commands.LayerSwap{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -153,7 +153,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP channels with Transform",
-			command: commands.LayerCommandSwap{
+			command: commands.LayerSwap{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        nil,
@@ -166,7 +166,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SWAP channels without Transform",
-			command: commands.LayerCommandSwap{
+			command: commands.LayerSwap{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        nil,
@@ -179,7 +179,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "ADD consumer with IDX and parameters",
-			command: commands.LayerCommandAdd{
+			command: commands.LayerAdd{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -192,7 +192,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "ADD consumer without IDX and parameters",
-			command: commands.LayerCommandAdd{
+			command: commands.LayerAdd{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -205,7 +205,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "ADD consumer without IDX but with parameters",
-			command: commands.LayerCommandAdd{
+			command: commands.LayerAdd{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -218,7 +218,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "ADD consumer with IDX but without parameters",
-			command: commands.LayerCommandAdd{
+			command: commands.LayerAdd{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -231,7 +231,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "REMOVE consumer with IDX",
-			command: commands.LayerCommandRemove{
+			command: commands.LayerRemove{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -242,7 +242,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "REMOVE consumer without IDX but with parameters",
-			command: commands.LayerCommandRemove{
+			command: commands.LayerRemove{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -254,7 +254,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "REMOVE consumer with IDX and with parameters", // IDX takes precedence over parameters
-			command: commands.LayerCommandRemove{
+			command: commands.LayerRemove{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -266,7 +266,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "PRINT",
-			command: commands.LayerCommandPrint{
+			command: commands.LayerPrint{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -276,7 +276,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "SET mode with parameters",
-			command: commands.LayerCommandSet{
+			command: commands.LayerSet{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -288,7 +288,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOCK ACQUIRE",
-			command: commands.LayerCommandLock{
+			command: commands.LayerLock{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -300,7 +300,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOCK RELEASE",
-			command: commands.LayerCommandLock{
+			command: commands.LayerLock{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -312,7 +312,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "LOCK CLEAR",
-			command: commands.LayerCommandLock{
+			command: commands.LayerLock{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -324,7 +324,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "INFO on layer",
-			command: commands.LayerCommandInfo{
+			command: commands.LayerInfo{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -334,7 +334,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "INFO on channel",
-			command: commands.LayerCommandInfo{
+			command: commands.LayerInfo{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        nil,
@@ -344,7 +344,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "INFO on layer",
-			command: commands.LayerCommandInfoDelay{
+			command: commands.LayerInfoDelay{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        ptr(2),
@@ -354,7 +354,7 @@ func TestLayerCommandSerialization(t *testing.T) {
 		},
 		{
 			name: "INFO on channel",
-			command: commands.LayerCommandInfoDelay{
+			command: commands.LayerInfoDelay{
 				LayerCommand: commands.LayerCommand{
 					VideoChannel: 1,
 					Layer:        nil,
