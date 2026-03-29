@@ -68,7 +68,7 @@ This package enforces a strict approach to stability via a automated testing sui
 
 - **Strict Code Standards:** Enforces consistent code style using `.golangci.yaml` via multiple linters and formatters.
 - [![Build Check & Unittest](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/go.yml/badge.svg)](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/go.yml) validates and tests every commit against all major Go versions via automated runners to ensure backward compatibility.
-- [![Integration Test](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/casparTest.yml/badge.svg)](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/casparTest.yml) verifies package against the latest builds of CasparCG Server `2.4` and `2.5`.
+- ~~[![Integration Test](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/casparTest.yml/badge.svg)](https://github.com/OverlayFox/casparcg-amcp-go/actions/workflows/casparTest.yml) verifies package against the latest builds of CasparCG Server `2.4` and `2.5`.~~ Not implemented yet.
 
 ## 🚧 Roadmap & Missing Features
 
