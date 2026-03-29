@@ -7,8 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- added unittest for all commands
+- added following commands:
+  - Mixer:
+    - KEYER
+    - CHROMA
+    - BLEND
+    - INVERT
+    - OPACITY
+    - BRIGHTNESS
+    - SATURATION
+    - CONTRAST
+    - LEVELS
+    - FILL
+    - CLIP
+    - ANCHOR
+    - CROP
+    - ROTATION
+    - PERSPECTIVE
+    - MIPMAP
+    - VOLUME
+    - MASTERVOLUME
+    - STRAIGHT_ALPHA_OUTPUT
+    - GRID
+    - COMMIT
+    - CLEAR
+  - Query:
+    - DIAG
+    - GL_INFO
+    - GLGC
+    - HELP
+    - HELP PRODUCER
+    - HELP CONSUMER
+  - Layer:
+    - LAYER_INFO
+    - CHANNEL_INFO
+
 ### Changed
 
+- expanded examples in `cmd/*`
+- linked to new CasparCG AMCP Wiki
+- optimised and implemented new builder structs
+- changed from SnakeCase to CamelCase function names to follow go best practises
 - changed URLs in ReadMe to point to correct package
 
 ## [0.1.0] - 24-03-2026

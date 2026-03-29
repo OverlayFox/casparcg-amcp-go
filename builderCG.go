@@ -1,141 +1,191 @@
 package casparcg
 
-import "github.com/overlayfox/casparcg-amcp-go/types"
+import (
+	"github.com/overlayfox/casparcg-amcp-go/types"
+	"github.com/overlayfox/casparcg-amcp-go/types/commands"
+)
 
 // CGBuilder provides a fluent interface for building CG (template) commands.
 type CGBuilder struct {
-	client       *Client
-	videoChannel int
-	layer        int
+	client *Client
 }
 
-// CG creates a new CG command builder for the specified channel and layer
-// Example: client.CG(1, 12).STOP(2).
-func (c *Client) CG(videoChannel, layer int) *CGBuilder {
+// sendCommand abstracts sending a command that does not expect a response value.
+func (b *CGBuilder) sendCommand(cmd interface{ String() string }) error {
+	_, err := b.client.Send(cmd)
+	return err
+}
+
+// CG creates a new CG command builder for the specified channel and layer.
+func (c *Client) CG() *CGBuilder {
 	return &CGBuilder{
-		client:       c,
+		client: c,
+	}
+}
+
+//
+// Channel Commands
+//
+
+type CGChannelBuilder struct {
+	CGBuilder
+
+	videoChannel int
+}
+
+// Channel selects the video channel to operate on and returns a CGChannelBuilder for that channel.
+func (c *CGBuilder) Channel(videoChannel int) *CGChannelBuilder {
+	return &CGChannelBuilder{
+		CGBuilder:    *c,
 		videoChannel: videoChannel,
-		layer:        layer,
 	}
 }
 
-// ADD prepares a template for displaying.
-func (b *CGBuilder) ADD(cgLayer int, template string, playOnLoad bool, data *string) error {
-	cmd := types.TemplateCommandCGAdd{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer:    cgLayer,
-		Template:   template,
-		PlayOnLoad: playOnLoad,
-		Data:       data,
+func (b *CGChannelBuilder) baseCGChannelCommand() commands.CGCommand {
+	return commands.CGCommand{
+		VideoChannel: b.videoChannel,
+		Layer:        nil, // Layer is nil for channel-level commands
+		CgLayer:      nil, // CgLayer is nil for channel-level commands
 	}
-	_, err := b.client.Send(cmd)
-	return err
 }
 
-// PLAY plays and displays the template in the specified layer.
-func (b *CGBuilder) PLAY(cgLayer int) error {
-	cmd := types.TemplateCommandCGPlay{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
-	}
-	_, err := b.client.Send(cmd)
-	return err
+//
+// Layer Commands
+//
+
+type CGLayerBuilder struct {
+	CGChannelBuilder
+
+	layer int
 }
 
-// STOP stops the template in the specified layer.
-func (b *CGBuilder) STOP(cgLayer int) error {
-	cmd := types.TemplateCommandCGStop{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
+// Layer selects the layer to operate on and returns a CGLayerBuilder for that layer.
+func (cb *CGChannelBuilder) Layer(layer int) *CGLayerBuilder {
+	return &CGLayerBuilder{
+		CGChannelBuilder: *cb,
+		layer:            layer,
 	}
-	_, err := b.client.Send(cmd)
-	return err
 }
 
-// NEXT triggers a "continue" in the template.
-func (b *CGBuilder) NEXT(cgLayer int) error {
-	cmd := types.TemplateCommandCGNext{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
-	}
-	_, err := b.client.Send(cmd)
-	return err
+func (b *CGLayerBuilder) baseCGLayerCommand() commands.CGCommand {
+	cmd := b.baseCGChannelCommand()
+	cmd.Layer = &b.layer
+	return cmd
 }
 
-// REMOVE removes the template from the specified layer.
-func (b *CGBuilder) REMOVE(cgLayer int) error {
-	cmd := types.TemplateCommandCGRemove{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
+// Info retrieves information about the template on the specified layer.
+//
+// TODO: Implement response object of INFO command
+func (b *CGLayerBuilder) Info(cgLayer *int) error {
+	cmd := commands.TemplateCGInvoke{
+		CGCommand: b.baseCGLayerCommand(),
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
 }
 
-// CLEAR removes all templates on the video layer.
-func (b *CGBuilder) CLEAR() error {
-	cmd := types.TemplateCommandCGClear{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-	}
-	_, err := b.client.Send(cmd)
-	return err
+//
+// CG Layer Commands.
+//
+
+type CGCGLayerBuilder struct {
+	CGLayerBuilder
+
+	CgLayer int
 }
 
-// UPDATE sends new data to the template on specified layer.
-func (b *CGBuilder) UPDATE(cgLayer int, data string) error {
-	cmd := types.TemplateCommandCGUpdate{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
-		Data:    data,
+// CGLayer selects the CG layer to operate on and returns a CGCGLayerBuilder for that CG layer.
+func (cb *CGLayerBuilder) CGLayer(cgLayer int) *CGCGLayerBuilder {
+	return &CGCGLayerBuilder{
+		CGLayerBuilder: *cb,
+		CgLayer:        cgLayer,
 	}
-	_, err := b.client.Send(cmd)
-	return err
 }
 
-// INVOKE invokes the given method on the template.
-func (b *CGBuilder) INVOKE(cgLayer int, method string) error {
-	cmd := types.TemplateCommandCGInvoke{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
-		Method:  method,
-	}
-	_, err := b.client.Send(cmd)
-	return err
+func (b *CGCGLayerBuilder) baseCGCGLayerCommand() commands.CGCommand {
+	cmd := b.baseCGLayerCommand()
+	cmd.CgLayer = &b.CgLayer
+	return cmd
 }
 
-// INFO retrieves information about the template on the specified layer.
-func (b *CGBuilder) INFO(cgLayer *int) error {
-	cmd := types.TemplateCommandCGInfo{
-		TemplateCommandCG: types.TemplateCommandCG{
-			VideoChannel: b.videoChannel,
-			Layer:        b.layer,
-		},
-		CgLayer: cgLayer,
+// Add prepares a template for displaying.
+func (b *CGCGLayerBuilder) Add(params types.CGAdd) error {
+	cmd := commands.TemplateCGAdd{
+		CGCommand:  b.baseCGCGLayerCommand(),
+		Template:   params.Template,
+		PlayOnLoad: params.PlayOnLoad,
+		Data:       params.Data,
 	}
-	_, err := b.client.Send(cmd)
-	return err
+	return b.sendCommand(cmd)
+}
+
+// Play plays and displays the template in the specified layer.
+func (b *CGCGLayerBuilder) Play() error {
+	cmd := commands.TemplateCGPlay{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Stop stops the template in the specified layer.
+func (b *CGCGLayerBuilder) Stop() error {
+	cmd := commands.TemplateCGStop{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Next triggers a "continue" in the template.
+func (b *CGCGLayerBuilder) Next() error {
+	cmd := commands.TemplateCGNext{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Remove removes the template from the specified layer.
+func (b *CGCGLayerBuilder) Remove() error {
+	cmd := commands.TemplateCGRemove{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Clear removes all templates on the video layer.
+func (b *CGCGLayerBuilder) Clear() error {
+	cmd := commands.TemplateCGClear{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
+}
+
+// Update sends new data to the template on specified layer.
+//
+// data - string: data to pass to the template. This can be a JSON or XML inline string.
+func (b *CGCGLayerBuilder) Update(data string) error {
+	cmd := commands.TemplateCGUpdate{
+		CGCommand: b.baseCGCGLayerCommand(),
+		Data:      data,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Invoke invokes the given method on the template.
+//
+// method - string: the name of the method to invoke on the template.
+func (b *CGCGLayerBuilder) Invoke(method string) error {
+	cmd := commands.TemplateCGInvoke{
+		CGCommand: b.baseCGCGLayerCommand(),
+		Method:    method,
+	}
+	return b.sendCommand(cmd)
+}
+
+// Info retrieves information about the template on the specified layer.
+//
+// TODO: Implement response object of INFO command
+func (b *CGCGLayerBuilder) Info(cgLayer *int) error {
+	cmd := commands.TemplateCGInvoke{
+		CGCommand: b.baseCGCGLayerCommand(),
+	}
+	return b.sendCommand(cmd)
 }

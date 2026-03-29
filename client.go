@@ -99,6 +99,11 @@ func (c *Client) readResponse() ([]string, error) {
 	// Try to parse the first part as a numeric code
 	code, err := strconv.Atoi(parts[0])
 	if err != nil {
+		// exception for PONG response, which is not a numeric code but is a valid response to a PING command
+		if parts[0] == "PONG" {
+			return parts, nil
+		}
+
 		return nil, CasparCGError{
 			Code:    0,
 			Message: fmt.Sprintf("could not parse response code: %v", err),
