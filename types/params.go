@@ -17,6 +17,22 @@ type MixerParamsFill struct {
 	YScale float32 // YScale defines the new y scale, 1 = 1x the screen height, 0.5 = half the screen height. Higher and lower values allowed. Negative values flips the layer.
 }
 
+func (m MixerParamsFill) Validate() error {
+	if m.X < 0 || m.X > 1 {
+		return fmt.Errorf("x must be between 0 and 1, got %f", m.X)
+	}
+	if m.Y < 0 || m.Y > 1 {
+		return fmt.Errorf("y must be between 0 and 1, got %f", m.Y)
+	}
+	if m.XScale < 0 || m.XScale > 1 {
+		return fmt.Errorf("xScale must be between 0 and 1, got %f", m.XScale)
+	}
+	if m.YScale < 0 || m.YScale > 1 {
+		return fmt.Errorf("yScale must be between 0 and 1, got %f", m.YScale)
+	}
+	return nil
+}
+
 type MixerLevels struct {
 	MinInput float32 // MinInput defines the minimum input value (between 0 and 1) to accept RGB values within.
 	MaxInput float32 // MaxInput defines the maximum input value (between 0 and 1) to accept RGB values within.

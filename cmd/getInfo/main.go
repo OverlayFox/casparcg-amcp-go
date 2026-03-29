@@ -10,6 +10,9 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go"
 )
 
+// main demonstrates how to query various types of information from the CasparCG server using the CasparCG AMCP Go client.
+//
+// This is not best practice for a real application - it's just a simple example to show how to use the client.
 func main() {
 	client := casparcg.NewClient("127.0.0.1", 5250)
 	err := client.Connect(context.TODO()) // replace with a proper context when implementing this

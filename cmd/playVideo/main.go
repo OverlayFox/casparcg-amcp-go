@@ -11,6 +11,9 @@ import (
 	"github.com/overlayfox/casparcg-amcp-go/types"
 )
 
+// main demonstrates how to play a video clip on a specific channel and layer, then pause, resume, and stop it using the CasparCG AMCP Go client.
+//
+// This is not best practice for a real application - it's just a simple example to show how to use the client.
 func main() {
 	client := casparcg.NewClient("127.0.0.1", 5250)
 	err := client.Connect(context.TODO()) // replace with a proper context when implementing this
