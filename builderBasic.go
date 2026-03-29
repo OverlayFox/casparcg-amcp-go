@@ -1,6 +1,8 @@
 package casparcg
 
 import (
+	"strings"
+
 	"github.com/overlayfox/casparcg-amcp-go/types"
 	"github.com/overlayfox/casparcg-amcp-go/types/commands"
 )
@@ -24,11 +26,12 @@ func (c *Client) Ping(token *string) (string, error) {
 	cmd := commands.DirectCommandPing{
 		Token: token,
 	}
-	data, err := c.Send(cmd)
+	resp, err := c.Send(cmd)
 	if err != nil {
 		return "", err
 	}
-	return data[0], nil
+
+	return strings.Join(resp, " "), nil
 }
 
 // Diag opens the diagnostic window.
