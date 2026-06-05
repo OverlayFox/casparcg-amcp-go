@@ -66,6 +66,12 @@ func (c *Client) Restart() error {
 	return c.sendCommand(cmd)
 }
 
+// ClearAll clears all channels at once.
+func (c *Client) ClearAll() error {
+	cmd := commands.CommandClearAll{}
+	return c.sendCommand(cmd)
+}
+
 type ClientHelpCommand struct {
 	client *Client
 }
