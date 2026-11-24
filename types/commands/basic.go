@@ -38,3 +38,9 @@ type CommandRestart struct{}
 func (c CommandRestart) String() string {
 	return "RESTART"
 }
+
+type CommandClearAll struct{}
+
+func (c CommandClearAll) String() string {
+	return "CLEAR ALL"
+}

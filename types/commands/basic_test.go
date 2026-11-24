@@ -49,6 +49,11 @@ func TestBasicCommandSerialization(t *testing.T) {
 			command:  commands.CommandRestart{},
 			expected: "RESTART",
 		},
+		{
+			name:     "CLEAR ALL",
+			command:  commands.CommandClearAll{},
+			expected: "CLEAR ALL",
+		},
 	}
 
 	for _, tt := range tests {
